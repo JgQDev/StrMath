@@ -16,6 +16,9 @@ uses
   Classes, SysUtils;
 
 function isNaN(const NumV:String):Boolean;
+function GetDeciCount:Integer;
+procedure SetDeciCountDefault;
+procedure SetDeciCount(const CountBaseOne:Integer);
 procedure CleanNum(var NumV:String);
 function CleanNum(const NumV:String):String;
 function ToInt(const NumV:String):String;
@@ -23,6 +26,7 @@ function isPositiveAdvance(const NumV:String):Byte;
 function isPositive(const NumV:String):Boolean;
 function isNum1Bigger(const Num1,Num2:String):Byte;
 function SumSub(const Num1,Num2:String):String;
+function MulDiv(const Num1,Num2:String;const doMul:Boolean = True):String;
 
 implementation
 
@@ -34,9 +38,12 @@ type
 
   StringMath = class(TObject)
   public
+    TDeciDigitCountBaseOne:Integer;
     constructor Create;
     destructor Destroy; override;
     function RR(const x:Real):Integer;
+    function unNum(const x:Integer):Integer;
+    procedure MoveDeciDiv(var Num1,Num2:String);
     procedure getWholeDeci(const NumV:String;out AWhole,ADeci:String);
     function isDigit(const NumV:String):Boolean;
     function isPositiveAd(const NumV:String):Byte;
@@ -50,6 +57,9 @@ type
     function Sum(const num1,num2:String):String;
     function Sub(const num1,num2:String):String;
     function SumSub(const num1,num2:String):String;
+    function Mul(const num1,num2:String):String;
+    function DivA(const num1,num2:String;const DeciDigitCountBaseOne:Integer):String;
+    function MulDiv(const num1,num2:String;const doMul:Boolean = True):String;
   end;
 
 var AStrMath:StringMath;
@@ -61,6 +71,21 @@ begin
   NV:=AStrMath.CleanNum(NumV);
   if(NV='nan')then Result:=True
   else Result:=False;
+end;
+
+function GetDeciCount: Integer;
+begin
+  Result:=AStrMath.TDeciDigitCountBaseOne;
+end;
+
+procedure SetDeciCountDefault;
+begin
+  AStrMath.TDeciDigitCountBaseOne:=5;
+end;
+
+procedure SetDeciCount(const CountBaseOne: Integer);
+begin
+  AStrMath.TDeciDigitCountBaseOne:=CountBaseOne;
 end;
 
 procedure CleanNum(var NumV: String);
@@ -125,11 +150,17 @@ begin
   Result:=AStrMath.SumSub(Num1,Num2);
 end;
 
+function MulDiv(const Num1, Num2: String; const doMul: Boolean): String;
+begin
+  Result:=AStrMath.MulDiv(Num1,Num2,doMul);
+end;
+
 { StringMath }
 
 constructor StringMath.Create;
 begin
   //nothing...
+  self.TDeciDigitCountBaseOne:=5;
 end;
 
 destructor StringMath.Destroy;
@@ -141,6 +172,35 @@ function StringMath.RR(const x: Real): Integer;
 begin
   Result:=Round(x);
   if(Round(x)>x)then Result:=Round(x)-1;
+end;
+
+function StringMath.unNum(const x: Integer): Integer;
+begin
+  if(x<0)then Result:=x*(-1) else Result:=x;
+end;
+
+procedure StringMath.MoveDeciDiv(var Num1, Num2: String);
+var
+  AWhole1,ADeci1,AWhole2,ADeci2:String;
+  n1,n2:String;
+  i:Integer;
+begin
+  GetWholeDeci(Num1,AWhole1,ADeci1);
+  GetWholeDeci(Num2,AWhole2,ADeci2);
+  if(Length(ADeci1)=Length(ADeci2))then begin
+    Num1:=AWhole1+ADeci1;
+    Num2:=AWhole2+ADeci2;
+  end else
+  if(Length(ADeci1)>Length(ADeci2))then begin
+    Num2:=AWhole2+ADeci2;
+    Num1:=AWhole1+Copy(ADeci1,1,Length(ADeci2))+'.'+
+    Copy(ADeci1,Length(ADeci2)+1,Length(ADeci1));
+  end else
+  if(Length(ADeci1)<Length(ADeci2))then begin
+    Num2:=AWhole2+ADeci2;
+    Num1:=AWhole1+ADeci1;
+    for i:=1 to (Length(ADeci2)-Length(ADeci1))do Num1:=Num1+'0';
+  end;
 end;
 
 procedure StringMath.getWholeDeci(const NumV: String; out AWhole, ADeci: String
@@ -216,6 +276,16 @@ begin
   end;
 
   bool1:=False;
+  for i:=Length(ADeci) downto 1 do begin
+    if(ADeci[i]<>'0')then begin
+      ADeci:=Copy(ADeci,1,i);
+      bool1:=True;
+      break;
+    end;
+  end;
+  if(bool1=False)then ADeci:='0';
+
+  bool1:=False;
   for i:=1 to Length(AWhole)do begin
     if(AWhole[i]<>'0')then begin
       AWhole:=Copy(AWhole,i,Length(AWhole));
@@ -225,18 +295,8 @@ begin
   end;
   if(bool1=False)then begin
     AWhole:='0';
-    ASign:=1;
+    if(ADeci='0')then ASign:=1;
   end;
-
-  bool1:=False;
-  for i:=Length(ADeci) downto 1 do begin
-    if(ADeci[i]<>'0')then begin
-      ADeci:=Copy(ADeci,1,i);
-      bool1:=True;
-      break;
-    end;
-  end;
-  if(bool1=False)then ADeci:='0';
 
   for i:=1 to Length(AWhole)do begin
     if(isDigit(AWhole[i])=False)then begin
@@ -362,11 +422,10 @@ begin
   for i:=Length(n1) downto 1 do begin
     nf1:=StrToInt(n1[i])+StrToInt(n2[i])+Cr;
     nf2:=(nf1-(RR(nf1/10)*10));
-    Result:=IntToStr(nf2)+Result;
+    Result:=Result+IntToStr(nf2);
     Cr:=RR(nf1/10);
   end;
-  if(Cr<>0)then Result:=IntToStr(Cr)+Result;
-  Result:=Reverse(Result);
+  if(Cr<>0)then Result:=Result+IntToStr(Cr);
   Result:=Copy(Result,1,Length(ADeci1))+'.'+
   Copy(Result,Length(ADeci1)+1,Length(Result));
   Result:=Reverse(Result);
@@ -402,10 +461,9 @@ begin
   TArr2:=nil;
   Carrying(BB,SS,TArr1,TArr2);
   Result:='';
-  for i:=(Length(TArr1)-1)downto 0 do Result:=IntToStr(TArr1[i]-TArr2[i])+Result;
+  for i:=(Length(TArr1)-1)downto 0 do Result:=Result+IntToStr(TArr1[i]-TArr2[i]);
   SetLength(TArr1,0);
   SetLength(TArr2,0);
-  Result:=Reverse(Result);
   Result:=Copy(Result,1,Length(ADeci1))+'.'+
   Copy(Result,Length(ADeci1)+1,Length(Result));
   Result:=Reverse(Result);
@@ -442,6 +500,155 @@ begin
     n1:=Copy(n1,2,Length(n1));
     n2:=Copy(n2,2,Length(n2));
     Result:='-'+Sum(n1,n2);
+  end;
+  Result:=CleanNum(Result);
+end;
+
+function StringMath.Mul(const num1, num2: String): String;
+var
+  AWhole1,ADeci1,AWhole2,ADeci2:String;
+  n1,n2:String;
+  i:Integer;
+  Cr,nf1,nf2:Byte;
+  TArr1:Array of String;
+  BIx,BIy:Integer;
+begin
+  getWholeDeci(num1,AWhole1,ADeci1);
+  getWholeDeci(num2,AWhole2,ADeci2);
+  n1:=AWhole1+ADeci1;
+  n2:=AWhole2+ADeci2;
+  Cr:=0;
+  nf1:=0;
+  nf2:=0;
+  Result:='';
+  BIx:=Length(n1);
+  BIy:=Length(n2);
+  TArr1:=nil;
+  SetLength(TArr1,Length(TArr1)+1);
+  for i:=1 to (Length(n1)*Length(n2))do begin
+    if(BIy=0)then break;
+    nf1:=(StrToInt(n1[BIx])*StrToInt(n2[BIy]))+Cr;
+    nf2:=(nf1-(RR(nf1/10)*10));
+    TArr1[Length(TArr1)-1]:=IntToStr(nf2)+TArr1[Length(TArr1)-1];
+    Cr:=RR(nf1/10);
+    BIx:=BIx-1;
+    if(BIx=0)then begin
+      BIx:=Length(n1);
+      BIy:=BIy-1;
+      if(Cr<>0)then TArr1[Length(TArr1)-1]:=IntToStr(Cr)+TArr1[Length(TArr1)-1];
+      TArr1[Length(TArr1)-1]:=TArr1[Length(TArr1)-1]+Result;
+      if(BIy<>0)then SetLength(TArr1,Length(TArr1)+1);
+      Result:=Result+'0';
+      Cr:=0;
+      nf1:=0;
+      nf2:=0;
+    end;
+  end;
+  if(Cr<>0)then TArr1[Length(TArr1)-1]:=IntToStr(Cr)+TArr1[Length(TArr1)-1];
+  Result:='0';
+  for i:=0 to (Length(TArr1)-1)do Result:=Sum(Result,TArr1[i]);
+  Result:=Reverse(Copy(Result,1,Length(Result)-2));
+  Result:=Copy(Result,1,Length(ADeci1+ADeci2))+'.'+
+  Copy(Result,Length(ADeci1+ADeci2)+1,Length(Result));
+  Result:=Reverse(Result);
+  SetLength(TArr1,0);
+end;
+
+function StringMath.DivA(const num1, num2: String;
+  const DeciDigitCountBaseOne: Integer): String;
+var
+  numv1,numv2:String;
+  AWhole1,ADeci1,AWhole2,ADeci2:String;
+  n1,n2:String;
+  i:Integer;
+  Ct,nf1,nf2:Integer;
+  n2V:Integer;
+procedure AddUp(var nf2,Ct:Integer;const n2V:Integer);
+begin
+  nf2:=nf2+n2V;
+  Ct:=Ct+1;
+end;
+begin
+  numv1:=num1;
+  numv2:=num2;
+  MoveDeciDiv(numv1,numv2);
+  getWholeDeci(numv1,AWhole1,ADeci1);
+  getWholeDeci(numv2,AWhole2,ADeci2);
+  if(DeciDigitCountBaseOne>Length(ADeci1))then begin
+    n1:=AWhole1+ADeci1;
+    for i:=1 to (DeciDigitCountBaseOne-Length(ADeci1))do n1:=n1+'0';
+  end else begin
+    ADeci1:=Copy(ADeci1,1,DeciDigitCountBaseOne);
+    n1:=AWhole1+ADeci1;
+  end;
+  n2:=AWhole2;
+  Ct:=0;
+  nf1:=0;
+  nf2:=0;
+  n2V:=StrToInt(n2);
+  Result:='';
+  for i:=1 to Length(n1) do begin
+    nf1:=StrToInt(IntToStr(nf1)+n1[i]);
+    if(nf1>=n2V)then begin
+      while(nf2<=nf1)do AddUp(nf2,Ct,n2V);
+      nf2:=nf2-n2V;
+      Ct:=Ct-1;
+      Result:=Result+IntToStr(Ct);
+      nf1:=nf1-nf2;
+      Ct:=0;
+      nf2:=0;
+    end else begin
+      Result:=Result+'0';
+    end;
+  end;
+  if(Length(Result)>Length(AWhole1))then Result:=Copy(Result,1,Length(AWhole1))+'.'+
+  Copy(Result,Length(AWhole1)+1,Length(Result));
+end;
+
+function StringMath.MulDiv(const num1, num2: String; const doMul: Boolean
+  ): String;
+var
+  n1,n2:String;
+begin
+  Result:='nan';
+  n1:=CleanNum(num1);
+  n2:=CleanNum(num2);
+  if(n1='nan')then Exit;
+  if(n2='nan')then Exit;
+  if(doMul=True)then begin
+    if(isPositive(n1)=True)and(isPositive(n2)=True)then begin
+      Result:=Mul(n1,n2);
+    end else
+    if(isPositive(n1)=False)and(isPositive(n2)=True)then begin
+      n1:=Copy(n1,2,Length(n1));
+      Result:='-'+Mul(n1,n2);
+    end else
+    if(isPositive(n1)=True)and(isPositive(n2)=False)then begin
+      n2:=Copy(n2,2,Length(n2));
+      Result:='-'+Mul(n1,n2);
+    end else
+    if(isPositive(n1)=False)and(isPositive(n2)=False)then begin
+      n1:=Copy(n1,2,Length(n1));
+      n2:=Copy(n2,2,Length(n2));
+      Result:=Mul(n1,n2);
+    end;
+  end else begin
+    if(isPositive(n1)=True)and(isPositive(n2)=True)then begin
+      Result:=DivA(n1,n2,TDeciDigitCountBaseOne);
+    end else
+    if(isPositive(n1)=False)and(isPositive(n2)=True)then begin
+      n1:=Copy(n1,2,Length(n1));
+      Result:='-'+DivA(n1,n2,TDeciDigitCountBaseOne);
+    end else
+    if(isPositive(n1)=True)and(isPositive(n2)=False)then begin
+      n2:=Copy(n2,2,Length(n2));
+      Result:='-'+DivA(n1,n2,TDeciDigitCountBaseOne);
+    end else
+    if(isPositive(n1)=False)and(isPositive(n2)=False)then begin
+      n1:=Copy(n1,2,Length(n1));
+      n2:=Copy(n2,2,Length(n2));
+      Result:=DivA(n1,n2,TDeciDigitCountBaseOne);
+    end;
   end;
   Result:=CleanNum(Result);
 end;
