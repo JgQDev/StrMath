@@ -13,7 +13,7 @@ unit StrMath;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, SyncObjs;
 
 function isNaN(const NumV:String):Boolean;
 function GetDeciCount:Integer;
@@ -22,10 +22,15 @@ procedure SetDeciCountDefault;
 procedure SetDeciCount(const CountBaseOne:Integer);
 procedure CleanNum(var NumV:String);
 function CleanNum(const NumV:String):String;
+function ToRound(const NumV:String):String;
+function ToRound(const NumV:String;out AAnswer:String):Boolean;
 function ToInt(const NumV:String):String;
+function ToInt(const NumV:String;out AAnswer:String):Boolean;
+function ToDeci(const NumV:String):String;
+function ToDeci(const NumV:String;out AAnswer:String):Boolean;
 function isPositiveAdvance(const NumV:String):Byte;
 function isPositive(const NumV:String):Boolean;
-function isNum1Bigger(const Num1,Num2:String):Byte;
+function Num1Bigger(const Num1,Num2:String):Byte;
 function SumSub(const Num1,Num2:String):String;
 function MulDiv(const Num1,Num2:String;const doMul:Boolean = True):String;
 function SumSub(const Num1,Num2:String;out AAnswer:String):Boolean;
@@ -39,6 +44,18 @@ function log(const num,Base:String):String;
 function log(const num,Base:String;out AAnswer:String):Boolean;
 function SqrRoot(const x:String):String;
 function SqrRoot(const x:String;out AAnswer:String):Boolean;
+function Sine(const Degrees:String):String;
+function Sine(const Degrees:String;out AAnswer:String):Boolean;
+function Cosine(const Degrees:String):String;
+function Cosine(const Degrees:String;out AAnswer:String):Boolean;
+function Tangent(const Degrees:String):String;
+function Tangent(const Degrees:String;out AAnswer:String):Boolean;
+function InSine(const SineX:String):String;
+function InSine(const SineX:String;out AAnswer:String):Boolean;
+function InCosine(const CosineX:String):String;
+function InCosine(const CosineX:String;out AAnswer:String):Boolean;
+function InTangent(const TangentX:String):String;
+function InTangent(const TangentX:String;out AAnswer:String):Boolean;
 
 implementation
 
@@ -67,6 +84,9 @@ type
     procedure Carrying(const num1,num2:String;var TArr1,TArr2:TNumArr);
     function Reverse(const Num1:String):String;
     function CutCountDeci(const WholeNum,DeciNum:String):String;
+    function RR(x:String):String;
+    function RD(x:String):String;
+    function RX(x:String):String;
     function Sum(const num1,num2:String):String;
     function Sub(const num1,num2:String):String;
     function SumSub(const num1,num2:String):String;
@@ -78,9 +98,16 @@ type
     function lnx(x:String):String;
     function log(num,base:String):String;
     function SqrRoot(x:String):String;
+    function Sine(Degrees:String):String;
+    function Cosine(Degrees:String):String;
+    function Tangent(Degrees:String):String;
+    function InSine(SineX:String):String;
+    function InCosine(CosineX:String):String;
+    function InTangent(TangentX:String):String;
   end;
 
 var AStrMath:StringMath;
+var ACtSec:TCriticalSection;
 
 function isNaN(const NumV: String): Boolean;
 var
@@ -93,7 +120,9 @@ end;
 
 function GetDeciCount: Integer;
 begin
+  if(ACtSec.TryEnter=False)then Exit;
   Result:=AStrMath.TDeciDigitCountBaseOne;
+  ACtSec.Leave;
 end;
 
 function CutDeciCount(const NumV: String; const DeciCountBaseOne: Integer
@@ -118,12 +147,16 @@ end;
 
 procedure SetDeciCountDefault;
 begin
+  if(ACtSec.TryEnter=False)then Exit;
   AStrMath.TDeciDigitCountBaseOne:=5;
+  ACtSec.Leave;
 end;
 
 procedure SetDeciCount(const CountBaseOne: Integer);
 begin
+  if(ACtSec.TryEnter=False)then Exit;
   AStrMath.TDeciDigitCountBaseOne:=CountBaseOne;
+  ACtSec.Leave;
 end;
 
 procedure CleanNum(var NumV: String);
@@ -139,16 +172,37 @@ begin
   Result:=AStrMath.CleanNum(NumV);
 end;
 
-function ToInt(const NumV: String): String;
-var
-  NV:String;
-  Wh,Dc:String;
+function ToRound(const NumV: String): String;
 begin
-  Result:='nan';
-  NV:=AStrMath.CleanNum(NumV);
-  if(NV='nan')then Exit;
-  AStrMath.getWholeDeci(NV,Wh,Dc);
-  Result:=Wh;
+  Result:=AStrMath.RX(NumV);
+end;
+
+function ToRound(const NumV: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.RX(NumV);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function ToInt(const NumV: String): String;
+begin
+  Result:=AStrMath.RR(NumV);
+end;
+
+function ToInt(const NumV: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.RR(NumV);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function ToDeci(const NumV: String): String;
+begin
+  Result:=AStrMath.RD(NumV);
+end;
+
+function ToDeci(const NumV: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.RD(NumV);
+  if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function isPositiveAdvance(const NumV: String): Byte;
@@ -171,7 +225,7 @@ begin
   Result:=AStrMath.isPositive(NV);
 end;
 
-function isNum1Bigger(const Num1, Num2: String): Byte;
+function Num1Bigger(const Num1, Num2: String): Byte;
 var
   N1,N2:String;
 begin
@@ -247,6 +301,72 @@ end;
 function SqrRoot(const x: String; out AAnswer: String): Boolean;
 begin
   AAnswer:=AStrMath.SqrRoot(x);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function Sine(const Degrees: String): String;
+begin
+  Result:=AStrMath.Sine(Degrees);
+end;
+
+function Sine(const Degrees: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.Sine(Degrees);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function Cosine(const Degrees: String): String;
+begin
+  Result:=AStrMath.Cosine(Degrees);
+end;
+
+function Cosine(const Degrees: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.Cosine(Degrees);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function Tangent(const Degrees: String): String;
+begin
+  Result:=AStrMath.Tangent(Degrees);
+end;
+
+function Tangent(const Degrees: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.Tangent(Degrees);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function InSine(const SineX: String): String;
+begin
+  Result:=AStrMath.InSine(SineX);
+end;
+
+function InSine(const SineX: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.InSine(SineX);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function InCosine(const CosineX: String): String;
+begin
+  Result:=AStrMath.InCosine(CosineX);
+end;
+
+function InCosine(const CosineX: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.InCosine(CosineX);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function InTangent(const TangentX: String): String;
+begin
+  Result:=AStrMath.InTangent(TangentX);
+end;
+
+function InTangent(const TangentX: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.InTangent(TangentX);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -341,6 +461,7 @@ var
   ASign:Byte;
 begin
   Result:='nan';
+  if(NumV='nan')then Exit;
   if(Length(NumV)=0)then Exit;
   getWholeDeci(NumV,AWhole,ADeci);
   if(AWhole[1]='+')then begin
@@ -489,6 +610,64 @@ begin
   end else begin
     Result:=WholeNum+'.'+DeciNum;
   end;
+end;
+
+function StringMath.RR(x: String): String;
+var
+  AWhole,ADeci:String;
+  ASign:Boolean;
+begin
+  x:=self.CleanNum(x);
+  if(x='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  if(self.isPositive(x)=False)then begin
+    x:=Copy(x,2,Length(x));
+    ASign:=False;
+  end else ASign:=True;
+  GetWholeDeci(x,AWhole,ADeci);
+  Result:=AWhole+'.0';
+  if(ASign=False)then Result:='-'+Result;
+end;
+
+function StringMath.RD(x: String): String;
+var
+  AWhole,ADeci:String;
+  ASign:Boolean;
+begin
+  x:=self.CleanNum(x);
+  if(x='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  if(self.isPositive(x)=False)then begin
+    x:=Copy(x,2,Length(x));
+    ASign:=False;
+  end else ASign:=True;
+  GetWholeDeci(x,AWhole,ADeci);
+  Result:=ADeci+'.0';
+  if(ASign=False)then Result:='-'+Result;
+end;
+
+function StringMath.RX(x: String): String;
+var
+  AWhole,ADeci:String;
+  ASign:Boolean;
+begin
+  x:=self.CleanNum(x);
+  if(x='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  if(self.isPositive(x)=False)then begin
+    x:=Copy(x,2,Length(x));
+    ASign:=False;
+  end else ASign:=True;
+  GetWholeDeci(x,AWhole,ADeci);
+  if(StrToInt(ADeci[1])<=5)then Result:=AWhole+'.0' else
+  if(StrToInt(ADeci[1])>5)then Result:=self.SumSub(AWhole,'1');
+  if(ASign=False)then Result:='-'+Result;
 end;
 
 function StringMath.Sum(const num1, num2: String): String;
@@ -906,7 +1085,7 @@ end;
 
 function StringMath.lyn(x: String): String;
 var
-  Og:String;
+  Og,Og2:String;
   Ct:String;
   Term:String;
   n1,n2:String;
@@ -915,8 +1094,9 @@ begin
   Term:=Og;
   Result:=Og;
   Ct:='3';
+  Og2:=self.MulDiv(Og,Og);
   While(Term<>'0.0')do begin
-    Term:=self.MulDiv(self.MulDiv(Term,Og),Og);
+    Term:=self.MulDiv(Term,Og2);
     Result:=self.SumSub(Result,self.MulDiv(Term,Ct,False));
     Ct:=self.SumSub(Ct,'2');
   end;
@@ -1009,10 +1189,134 @@ begin
     Result:=self.MulDiv(n1,self.SumSub(Result,self.MulDiv(x,Result,False)));
 end;
 
+function StringMath.Sine(Degrees: String): String;
+var
+  BigN1,BigN2:Byte;
+  BigN3,BigN4:Byte;
+  BigN5,BigN6:Byte;
+  BigN7,BigN8:Byte;
+begin
+  Degrees:=self.CleanNum(Degrees);
+  if(Degrees='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+
+  Degrees:=self.SumSub(Degrees,self.MulDiv('-1',
+  self.MulDiv('360',self.RR(self.MulDiv(Degrees,'360',False)))));
+
+  BigN1:=self.isNum1Bigger(Degrees,'0');
+  BigN2:=self.isNum1Bigger(Degrees,'90');
+
+  BigN3:=self.isNum1Bigger(Degrees,'91');
+  BigN4:=self.isNum1Bigger(Degrees,'180');
+
+  BigN5:=self.isNum1Bigger(Degrees,'181');
+  BigN6:=self.isNum1Bigger(Degrees,'270');
+
+  BigN7:=self.isNum1Bigger(Degrees,'271');
+  BigN8:=self.isNum1Bigger(Degrees,'360');
+
+  if((BigN1=1)or(BigN1=2))and((BigN2=0)or(BigN2=2))then
+    Result:=self.SqrRoot(self.MulDiv(Degrees,'90',False)) else
+  if((BigN3=1)or(BigN3=2))and((BigN4=0)or(BigN4=2))then
+    Result:=self.SqrRoot(self.SumSub('1',self.MulDiv('-1',self.MulDiv(
+    self.SumSub(Degrees,'-90'),'90',False)))) else
+  if((BigN5=1)or(BigN5=2))and((BigN6=0)or(BigN6=2))then
+    Result:=self.MulDiv('-1',self.SqrRoot(self.MulDiv(
+    self.SumSub(Degrees,'-180'),'90',False))) else
+  if((BigN7=1)or(BigN7=2))and((BigN8=0)or(BigN8=2))then
+    Result:=self.MulDiv('-1',self.SqrRoot(self.SumSub('1',
+    self.MulDiv('-1',self.MulDiv(self.SumSub(Degrees,'-270'),'90',False)))));
+end;
+
+function StringMath.Cosine(Degrees: String): String;
+var
+  BigN1,BigN2:Byte;
+  BigN3,BigN4:Byte;
+  BigN5,BigN6:Byte;
+  BigN7,BigN8:Byte;
+begin
+  Degrees:=self.CleanNum(Degrees);
+  if(Degrees='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+
+  BigN1:=self.isNum1Bigger(Degrees,'0');
+  BigN2:=self.isNum1Bigger(Degrees,'90');
+
+  BigN3:=self.isNum1Bigger(Degrees,'91');
+  BigN4:=self.isNum1Bigger(Degrees,'180');
+
+  BigN5:=self.isNum1Bigger(Degrees,'181');
+  BigN6:=self.isNum1Bigger(Degrees,'270');
+
+  BigN7:=self.isNum1Bigger(Degrees,'271');
+  BigN8:=self.isNum1Bigger(Degrees,'360');
+
+  if((BigN1=1)or(BigN1=2))and((BigN2=0)or(BigN2=2))then
+    Result:=self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
+    self.xPowerInt(self.Sine(Degrees),'2')))) else
+  if((BigN3=1)or(BigN3=2))and((BigN4=0)or(BigN4=2))then
+    Result:=self.MulDiv('-1',self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
+    self.xPowerInt(self.Sine(Degrees),'2'))))) else
+  if((BigN5=1)or(BigN5=2))and((BigN6=0)or(BigN6=2))then
+    Result:=self.MulDiv('-1',self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
+    self.xPowerInt(self.Sine(Degrees),'2'))))) else
+  if((BigN7=1)or(BigN7=2))and((BigN8=0)or(BigN8=2))then
+    Result:=self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
+    self.xPowerInt(self.Sine(Degrees),'2'))));
+end;
+
+function StringMath.Tangent(Degrees: String): String;
+begin
+  Degrees:=self.CleanNum(Degrees);
+  if(Degrees='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  Result:=self.MulDiv(self.Sine(Degrees),self.Cosine(Degrees),False);
+end;
+
+function StringMath.InSine(SineX: String): String;
+begin
+  SineX:=self.CleanNum(SineX);
+  if(SineX='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  Result:=self.MulDiv(self.xPowerInt(SineX,'2'),'90');
+end;
+
+function StringMath.InCosine(CosineX: String): String;
+begin
+  CosineX:=self.CleanNum(CosineX);
+  if(CosineX='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  Result:=self.MulDiv(self.xPowerInt(self.SqrRoot(
+  self.SumSub('1',self.MulDiv('-1',self.xPowerInt(CosineX,'2')))),'2'),'90');
+end;
+
+function StringMath.InTangent(TangentX: String): String;
+begin
+  TangentX:=self.CleanNum(TangentX);
+  if(TangentX='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  Result:=self.MulDiv(self.xPowerInt(self.MulDiv(TangentX,
+  self.SqrRoot(self.SumSub('1',self.xPowerInt(TangentX,'2'))),false),'2'),'90');
+end;
+
 initialization
   AStrMath:=StringMath.Create;
+  ACtSec:=TCriticalSection.Create;
 finalization
   AStrMath.Free;
+  ACtSec.Free;
 
 end.
 
