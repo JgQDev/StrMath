@@ -20,7 +20,6 @@ function GetDeciCount:Integer;
 function CutDeciCount(const NumV:String;const DeciCountBaseOne:Integer):String;
 procedure SetDeciCountDefault;
 procedure SetDeciCount(const CountBaseOne:Integer);
-procedure CleanNum(var NumV:String);
 function CleanNum(const NumV:String):String;
 function ToRound(const NumV:String):String;
 function ToRound(const NumV:String;out AAnswer:String):Boolean;
@@ -28,9 +27,9 @@ function ToInt(const NumV:String):String;
 function ToInt(const NumV:String;out AAnswer:String):Boolean;
 function ToDeci(const NumV:String):String;
 function ToDeci(const NumV:String;out AAnswer:String):Boolean;
-function isPositiveAdvance(const NumV:String):Byte;
+function isPositiveAdvance(const NumV:String):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
 function isPositive(const NumV:String):Boolean;
-function Num1Bigger(const Num1,Num2:String):Byte;
+function Num1Bigger(const Num1,Num2:String):Byte; // 0 = False, 1 = True, 2 = Same-Numbers, 3 = Error
 function SumSub(const Num1,Num2:String):String;
 function MulDiv(const Num1,Num2:String;const doMul:Boolean = True):String;
 function SumSub(const Num1,Num2:String;out AAnswer:String):Boolean;
@@ -56,6 +55,10 @@ function InCosine(const CosineX:String):String;
 function InCosine(const CosineX:String;out AAnswer:String):Boolean;
 function InTangent(const TangentX:String):String;
 function InTangent(const TangentX:String;out AAnswer:String):Boolean;
+function ePower(const Power:String):String;
+function ePower(const Power:String;out AAnswer:String):Boolean;
+function xPower(const Base,Power:String):String;
+function xPower(const Base,Power:String;out AAnswer:String):Boolean;
 
 implementation
 
@@ -96,6 +99,7 @@ type
     function xPowerInt(Abase,Apower:String):String;
     function lyn(x:String):String;
     function lnx(x:String):String;
+    function lnx2(x:String):String;
     function log(num,base:String):String;
     function SqrRoot(x:String):String;
     function Sine(Degrees:String):String;
@@ -104,6 +108,10 @@ type
     function InSine(SineX:String):String;
     function InCosine(CosineX:String):String;
     function InTangent(TangentX:String):String;
+    function FactorialInt(x:String):String;
+    function ePower(x:String):String;
+    function ePowerX(x:String):String;
+    function xPower(Abase,Apower:String):String;
   end;
 
 var AStrMath:StringMath;
@@ -157,14 +165,6 @@ begin
   if(ACtSec.TryEnter=False)then Exit;
   AStrMath.TDeciDigitCountBaseOne:=CountBaseOne;
   ACtSec.Leave;
-end;
-
-procedure CleanNum(var NumV: String);
-var
-  Nv:String;
-begin
-  Nv:=AStrMath.CleanNum(NumV);
-  NumV:=Nv;
 end;
 
 function CleanNum(const NumV: String): String;
@@ -228,13 +228,17 @@ end;
 function Num1Bigger(const Num1, Num2: String): Byte;
 var
   N1,N2:String;
+  Cal:String;
 begin
   Result:=3;
   N1:=AStrMath.CleanNum(Num1);
   N2:=AStrMath.CleanNum(Num2);
   if(N1='nan')then Exit;
   if(N2='nan')then Exit;
-  Result:=AStrMath.isNum1Bigger(N1,N2);
+  Cal:=AStrMath.SumSub(N1,AStrMath.MulDiv('-1',N2));
+  if(AStrMath.isPositiveAd(Cal)=1)then Result:=1 else
+  if(AStrMath.isPositiveAd(Cal)=0)then Result:=0 else
+  if(AStrMath.isPositiveAd(Cal)=2)then Result:=2;
 end;
 
 function SumSub(const Num1, Num2: String): String;
@@ -370,12 +374,34 @@ begin
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
+function ePower(const Power: String): String;
+begin
+  Result:=AStrMath.ePowerX(Power);
+end;
+
+function ePower(const Power: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.ePowerX(Power);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function xPower(const Base, Power: String): String;
+begin
+  Result:=AStrMath.xPower(Base,Power);
+end;
+
+function xPower(const Base, Power: String; out AAnswer: String): Boolean;
+begin
+  AAnswer:=AStrMath.xPower(Base,Power);
+  if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
 { StringMath }
 
 constructor StringMath.Create;
 begin
   //nothing...
-  self.TDeciDigitCountBaseOne:=5;
+  self.TDeciDigitCountBaseOne:=11;
   self.TDisableDeci:=False;
 end;
 
@@ -442,7 +468,7 @@ end;
 function StringMath.isPositiveAd(const NumV: String): Byte;
 begin
   Result:=2;
-  if(NumV='0')then Exit;
+  if(NumV='0')or(NumV='0.0')then Exit;
   if(Copy(NumV,1,1)='-')then Result:=0
   else Result:=1;
 end;
@@ -1120,7 +1146,6 @@ begin
     Result:='nan';
     Exit;
   end;
-
   DeciInt:=self.TDeciDigitCountBaseOne;
   self.TDeciDigitCountBaseOne:=DeciInt+10;
 
@@ -1130,6 +1155,12 @@ begin
   self.TDeciDigitCountBaseOne:=DeciInt;
   getWholeDeci(Result,n1,n2);
   Result:=CutCountDeci(n1,n2);
+end;
+
+function StringMath.lnx2(x: String): String;
+begin
+  Result:=self.SumSub(self.MulDiv('2',lyn('2')),
+  lyn(self.MulDiv(x,self.xPowerInt('2','2'),False)));
 end;
 
 function StringMath.log(num, base: String): String;
@@ -1309,6 +1340,94 @@ begin
   end;
   Result:=self.MulDiv(self.xPowerInt(self.MulDiv(TangentX,
   self.SqrRoot(self.SumSub('1',self.xPowerInt(TangentX,'2'))),false),'2'),'90');
+end;
+
+function StringMath.FactorialInt(x: String): String;
+var
+  Ct1:String;
+  BigN:Byte;
+begin
+  x:=self.CleanNum(x);
+  if(x='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  Ct1:=self.RR(x);
+  Result:=Ct1;
+  BigN:=self.isNum1Bigger(Ct1,'1');
+  While(BigN=1)do begin
+    Ct1:=self.SumSub(Ct1,'-1');
+    Result:=self.MulDiv(Result,Ct1);
+    BigN:=self.isNum1Bigger(Ct1,'1');
+  end;
+end;
+
+function StringMath.ePower(x: String): String;
+var
+  i:Integer;
+begin
+  Result:='1';
+  for i:=1 to 20 do begin
+    Result:=self.SumSub(Result,self.MulDiv(self.xPowerInt(x,IntToStr(i)),
+    self.FactorialInt(IntToStr(i)),False));
+  end;
+end;
+
+function StringMath.ePowerX(x: String): String;
+var
+  DeciInt:Integer;
+  n1,n2:String;
+begin
+  x:=self.CleanNum(x);
+  if(x='nan')then begin
+    Result:='nan';
+    Exit;
+  end;
+  DeciInt:=self.TDeciDigitCountBaseOne;
+  self.TDeciDigitCountBaseOne:=DeciInt+10;
+
+  Result:=self.ePower(x);
+
+  self.TDeciDigitCountBaseOne:=DeciInt;
+  getWholeDeci(Result,n1,n2);
+  Result:=CutCountDeci(n1,n2);
+end;
+
+function StringMath.xPower(Abase, Apower: String): String;
+var
+  DeciInt:Integer;
+  n1,n2:String;
+begin
+  Abase:=self.CleanNum(Abase);
+  Apower:=self.CleanNum(Apower);
+  if(Abase='nan')or(Apower='nan')then begin
+    Result:='nan';
+    Exit;
+  end else
+  if(Abase='0.0')and(Apower='0.0')then begin
+    Result:='nan';
+    Exit;
+  end else
+  if(Abase='0.0')and(self.isPositive(Apower)=True)then begin
+    Result:='0';
+    Exit;
+  end else
+  if(Abase='0.0')and(self.isPositive(Apower)=False)then begin
+    Result:='nan';
+    Exit;
+  end else
+  if(Abase='1.0')then begin
+    Result:='1.0';
+    Exit;
+  end;
+  DeciInt:=self.TDeciDigitCountBaseOne;
+  self.TDeciDigitCountBaseOne:=DeciInt+10;
+
+  Result:=self.ePower(self.MulDiv(self.lnx2(Abase),Apower));
+
+  self.TDeciDigitCountBaseOne:=DeciInt;
+  getWholeDeci(Result,n1,n2);
+  Result:=CutCountDeci(n1,n2);
 end;
 
 initialization
