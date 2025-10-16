@@ -20,13 +20,18 @@ function GetDeciCount:Integer;
 function CutDeciCount(const NumV:String;const DeciCountBaseOne:Integer):String;
 procedure SetDeciCountDefault;
 procedure SetDeciCount(const CountBaseOne:Integer);
+function isNumber(const NumV:String):Boolean;
+function isInt(const NumV:String):boolean;
 function CleanNum(const NumV:String):String;
-function ToRound(const NumV:String):String;
-function ToRound(const NumV:String;out AAnswer:String):Boolean;
-function ToInt(const NumV:String):String;
-function ToInt(const NumV:String;out AAnswer:String):Boolean;
-function ToDeci(const NumV:String):String;
-function ToDeci(const NumV:String;out AAnswer:String):Boolean;
+function ToRound(const NumV:String;const WithDeci:Boolean = True):String;
+function ToRound(const NumV:String;out AAnswer:String;
+  const WithDeci:Boolean = True):Boolean;
+function ToInt(const NumV:String;const WithDeci:Boolean = True):String;
+function ToInt(const NumV:String;out AAnswer:String;
+  const WithDeci:Boolean = True):Boolean;
+function ToDeci(const NumV:String;const WithDeci:Boolean = True):String;
+function ToDeci(const NumV:String;out AAnswer:String;
+  const WithDeci:Boolean = True):Boolean;
 function isPositiveAdvance(const NumV:String):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
 function isPositive(const NumV:String):Boolean;
 function Num1Bigger(const Num1,Num2:String):Byte; // 0 = False, 1 = True, 2 = Same-Numbers, 3 = Error
@@ -87,9 +92,9 @@ type
     procedure Carrying(const num1,num2:String;var TArr1,TArr2:TNumArr);
     function Reverse(const Num1:String):String;
     function CutCountDeci(const WholeNum,DeciNum:String):String;
-    function RR(x:String):String;
-    function RD(x:String):String;
-    function RX(x:String):String;
+    function RR(x:String;const WithDeci:Boolean = True):String;
+    function RD(x:String;const WithDeci:Boolean = True):String;
+    function RX(x:String;const WithDeci:Boolean = True):String;
     function Sum(const num1,num2:String):String;
     function Sub(const num1,num2:String):String;
     function SumSub(const num1,num2:String):String;
@@ -167,41 +172,63 @@ begin
   ACtSec.Leave;
 end;
 
+function isNumber(const NumV: String): Boolean;
+var
+  Cal:String;
+begin
+  Cal:=AStrMath.CleanNum(NumV);
+  if(Cal='nan')then Result:=False else Result:=True;
+end;
+
+function isInt(const NumV: String): boolean;
+var
+  Cal,AWhole,ADeci:String;
+begin
+  Result:=False;
+  Cal:=AStrMath.CleanNum(NumV);
+  if(Cal='nan')then Exit;
+  AStrMath.getWholeDeci(Cal,AWhole,ADeci);
+  if(ADeci='0')then Result:=True;
+end;
+
 function CleanNum(const NumV: String): String;
 begin
   Result:=AStrMath.CleanNum(NumV);
 end;
 
-function ToRound(const NumV: String): String;
+function ToRound(const NumV: String; const WithDeci: Boolean): String;
 begin
-  Result:=AStrMath.RX(NumV);
+  Result:=AStrMath.RX(NumV,WithDeci);
 end;
 
-function ToRound(const NumV: String; out AAnswer: String): Boolean;
+function ToRound(const NumV: String; out AAnswer: String;
+  const WithDeci: Boolean): Boolean;
 begin
-  AAnswer:=AStrMath.RX(NumV);
+  AAnswer:=AStrMath.RX(NumV,WithDeci);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
-function ToInt(const NumV: String): String;
+function ToInt(const NumV: String; const WithDeci: Boolean): String;
 begin
-  Result:=AStrMath.RR(NumV);
+  Result:=AStrMath.RR(NumV,WithDeci);
 end;
 
-function ToInt(const NumV: String; out AAnswer: String): Boolean;
+function ToInt(const NumV: String; out AAnswer: String; const WithDeci: Boolean
+  ): Boolean;
 begin
-  AAnswer:=AStrMath.RR(NumV);
+  AAnswer:=AStrMath.RR(NumV,WithDeci);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
-function ToDeci(const NumV: String): String;
+function ToDeci(const NumV: String; const WithDeci: Boolean): String;
 begin
-  Result:=AStrMath.RD(NumV);
+  Result:=AStrMath.RD(NumV,WithDeci);
 end;
 
-function ToDeci(const NumV: String; out AAnswer: String): Boolean;
+function ToDeci(const NumV: String; out AAnswer: String; const WithDeci: Boolean
+  ): Boolean;
 begin
-  AAnswer:=AStrMath.RD(NumV);
+  AAnswer:=AStrMath.RD(NumV,WithDeci);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -638,7 +665,7 @@ begin
   end;
 end;
 
-function StringMath.RR(x: String): String;
+function StringMath.RR(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
   ASign:Boolean;
@@ -653,11 +680,11 @@ begin
     ASign:=False;
   end else ASign:=True;
   GetWholeDeci(x,AWhole,ADeci);
-  Result:=AWhole+'.0';
+  if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
   if(ASign=False)then Result:='-'+Result;
 end;
 
-function StringMath.RD(x: String): String;
+function StringMath.RD(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
   ASign:Boolean;
@@ -672,11 +699,11 @@ begin
     ASign:=False;
   end else ASign:=True;
   GetWholeDeci(x,AWhole,ADeci);
-  Result:=ADeci+'.0';
+  if(WithDeci=True)then Result:=ADeci+'.0' else Result:=ADeci;
   if(ASign=False)then Result:='-'+Result;
 end;
 
-function StringMath.RX(x: String): String;
+function StringMath.RX(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
   ASign:Boolean;
@@ -691,8 +718,14 @@ begin
     ASign:=False;
   end else ASign:=True;
   GetWholeDeci(x,AWhole,ADeci);
-  if(StrToInt(ADeci[1])<=5)then Result:=AWhole+'.0' else
-  if(StrToInt(ADeci[1])>5)then Result:=self.SumSub(AWhole,'1');
+  if(StrToInt(ADeci[1])<=5)then begin
+    if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
+  end else
+  if(StrToInt(ADeci[1])>5)then begin
+    Result:=self.SumSub(AWhole,'1');
+    GetWholeDeci(Result,AWhole,ADeci);
+    if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
+  end;
   if(ASign=False)then Result:='-'+Result;
 end;
 
@@ -1423,7 +1456,9 @@ begin
   DeciInt:=self.TDeciDigitCountBaseOne;
   self.TDeciDigitCountBaseOne:=DeciInt+10;
 
-  Result:=self.ePower(self.MulDiv(self.lnx2(Abase),Apower));
+  getWholeDeci(Apower,n1,n2);
+  if(n2<>'0')then Result:=self.ePower(self.MulDiv(self.lnx2(Abase),Apower))
+  else Result:=self.xPowerInt(Abase,Apower);
 
   self.TDeciDigitCountBaseOne:=DeciInt;
   getWholeDeci(Result,n1,n2);
