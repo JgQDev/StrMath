@@ -15,6 +15,7 @@ interface
 uses
   Classes, SysUtils, SyncObjs;
 
+function Condition(Num1,Symbol,Num2:String):Boolean;
 function isNaN(const NumV:String):Boolean;
 function GetDeciCount:Integer;
 function CutDeciCount(const NumV:String;const DeciCountBaseOne:Integer):String;
@@ -122,6 +123,68 @@ type
 var AStrMath:StringMath;
 var ACtSec:TCriticalSection;
 
+function Condition(Num1, Symbol, Num2: String): Boolean;
+var
+  Cal:String;
+  i:Integer;
+  Bool1:Boolean;
+begin
+  Result:=False;
+  Num1:=AStrMath.CleanNum(Num1);
+  Num2:=AStrMath.CleanNum(Num2);
+  if(Num1='nan')and(Num2='nan')then begin
+    Result:=True;
+    Exit;
+  end else
+  if(Num1='nan')or(Num2='nan')then Exit;
+  bool1:=False;
+  for i:=1 to Length(Symbol)do
+    if(Symbol[i]<>' ')then begin
+      bool1:=True;
+      Break;
+    end;
+  if(bool1=False)then Exit;
+
+  for i:=1 to Length(Symbol)do
+    if(Symbol[i]<>' ')then begin
+      Symbol:=Copy(Symbol,i,Length(Symbol));
+      Break;
+    end;
+  for i:=1 to Length(Symbol)do
+    if(Symbol[i]=' ')then begin
+      Symbol:=Copy(Symbol,1,i-1);
+      Break;
+    end;
+
+  if(Symbol='=')or(Symbol='==')then begin
+    Cal:=SumSub(Num1,MulDiv('-1',Num2));
+    if(AStrMath.isPositiveAd(Cal)=2)then Result:=True;
+  end else
+  if(Symbol='<>')or(Symbol='!=')or(Symbol='=!')then begin
+    Cal:=SumSub(Num1,MulDiv('-1',Num2));
+    if(AStrMath.isPositiveAd(Cal)=0)or
+    (AStrMath.isPositiveAd(Cal)=1)then Result:=True;
+  end else
+  if(Symbol='>')then begin
+    Cal:=SumSub(Num1,MulDiv('-1',Num2));
+    if(AStrMath.isPositiveAd(Cal)=1)then Result:=True;
+  end else
+  if(Symbol='<')then begin
+    Cal:=SumSub(Num1,MulDiv('-1',Num2));
+    if(AStrMath.isPositiveAd(Cal)=0)then Result:=True;
+  end else
+  if(Symbol='>=')or(Symbol='=>')then begin
+    Cal:=SumSub(Num1,MulDiv('-1',Num2));
+    if(AStrMath.isPositiveAd(Cal)=1)or
+    (AStrMath.isPositiveAd(Cal)=2)then Result:=True;
+  end else
+  if(Symbol='<=')or(Symbol='=<')then begin
+    Cal:=SumSub(Num1,MulDiv('-1',Num2));
+    if(AStrMath.isPositiveAd(Cal)=0)or
+    (AStrMath.isPositiveAd(Cal)=2)then Result:=True;
+  end;
+end;
+
 function isNaN(const NumV: String): Boolean;
 var
   NV:String;
@@ -161,7 +224,7 @@ end;
 procedure SetDeciCountDefault;
 begin
   if(ACtSec.TryEnter=False)then Exit;
-  AStrMath.TDeciDigitCountBaseOne:=5;
+  AStrMath.TDeciDigitCountBaseOne:=11;
   ACtSec.Leave;
 end;
 
@@ -1306,6 +1369,9 @@ begin
     Result:='nan';
     Exit;
   end;
+
+  Degrees:=self.SumSub(Degrees,self.MulDiv('-1',
+  self.MulDiv('360',self.RR(self.MulDiv(Degrees,'360',False)))));
 
   BigN1:=self.isNum1Bigger(Degrees,'0');
   BigN2:=self.isNum1Bigger(Degrees,'90');
