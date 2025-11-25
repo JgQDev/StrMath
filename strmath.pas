@@ -41,6 +41,11 @@ function MulDiv(const Num1,Num2:String;const doMul:Boolean = True):String;
 function SumSub(const Num1,Num2:String;out AAnswer:String):Boolean;
 function MulDiv(const Num1,Num2:String;out AAnswer:String;
   const doMul:Boolean = True):Boolean;
+function isBinary(const Num:String):Boolean;
+function IntToBinary(const Num:String):String;
+function IntToBinary(const Num:String;out AAnswer:String):Boolean;
+function BinaryToInt(const Num:String):String;
+function BinaryToInt(const Num:String;out AAnswer:String):Boolean;
 function ln(const x:String):String;
 function ln(const x:String;out AAnswer:String):Boolean;
 function log(const num:String):String;
@@ -352,6 +357,84 @@ function MulDiv(const Num1, Num2: String; out AAnswer: String;
 begin
   AAnswer:=AStrMath.MulDiv(Num1,Num2,doMul);
   if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+function isBinary(const Num: String): Boolean;
+var
+  i:Integer;
+  NV:String;
+begin
+  Result:=False;
+  NV:=AStrMath.CleanNum(Num);
+  if(NV='nan')then Exit;
+  NV:=ToInt(NV,False);
+  for i:=1 to Length(NV)do if(((NV[i]='0')or(NV[i]='1'))=False)then Exit;
+  if(AStrMath.RR(Length(NV)/8)<>(Length(NV)/8))then Exit;
+  Result:=True;
+end;
+
+function IntToBinary(const Num: String): String;
+var
+  BigN:String;
+begin
+  Result:='00000000';
+  if(isNumber(Num)=False)or(isInt(Num)=False)then Exit;
+  BigN:=CleanNum(Num);
+  Result:='';
+  While(BigN<>'0.0')do begin
+    BigN:=MulDiv(BigN,'2',False);
+    if(IsInt(BigN)=False)then Result:=Result+'1' else Result:=Result+'0';
+    BigN:=ToInt(BigN);
+  end;
+  While(AStrMath.RR(Length(Result)/8)<>(Length(Result)/8))do Result:='0'+Result;
+end;
+
+function IntToBinary(const Num: String; out AAnswer: String): Boolean;
+var
+  BigN:String;
+begin
+  Result:=False;
+  AAnswer:='00000000';
+  if(isNumber(Num)=False)or(isInt(Num)=False)then Exit;
+  BigN:=CleanNum(Num);
+  AAnswer:='';
+  While(BigN<>'0.0')do begin
+    BigN:=MulDiv(BigN,'2',False);
+    if(IsInt(BigN)=False)then AAnswer:=AAnswer+'1' else AAnswer:=AAnswer+'0';
+    BigN:=ToInt(BigN);
+  end;
+  While(AStrMath.RR(Length(AAnswer)/8)<>(Length(AAnswer)/8))do AAnswer:='0'+AAnswer;
+  Result:=True;
+end;
+
+function BinaryToInt(const Num: String): String;
+var
+  NV:String;
+  i:Integer;
+begin
+  Result:='0';
+  if(isBinary(Num)=False)then Exit;
+  NV:=CleanNum(Num);
+  NV:=ToInt(NV,False);
+  if(NV[Length(NV)]='0')then Result:='0' else Result:='1';
+  for i:=(Length(NV)-1) downto 1 do
+    Result:=SumSub(Result,xPower(MulDiv(NV[i],'2'),IntToStr(Length(NV)-i)));
+end;
+
+function BinaryToInt(const Num: String; out AAnswer: String): Boolean;
+var
+  NV:String;
+  i:Integer;
+begin
+  Result:=False;
+  AAnswer:='0';
+  if(isBinary(Num)=False)then Exit;
+  NV:=CleanNum(Num);
+  NV:=ToInt(NV,False);
+  if(NV[Length(NV)]='0')then AAnswer:='0' else AAnswer:='1';
+  for i:=(Length(NV)-1) downto 1 do
+    AAnswer:=SumSub(AAnswer,xPower(MulDiv(NV[i],'2'),IntToStr(Length(NV)-i)));
+  Result:=True;
 end;
 
 function ln(const x: String): String;

@@ -17,6 +17,7 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 - GetDeciCount:Integer
 - CutDeciCount(NumV,DeciCountBaseOne):String
 - isNaN(NumV):Boolean
+- isBinary(Num):Boolean;
 
 ## Basic Number Calcus
 - SumSub(Num1,Num2):String
@@ -35,3 +36,7 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 - InTangent(TangentX):String
 - ePower(Power):String
 - xPower(Base,Power):String
+
+## Binary Calcus
+- IntToBinary(Num):String;
+- BinaryToInt(Num):String;
