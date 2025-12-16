@@ -15,6 +15,10 @@ interface
 uses
   Classes, SysUtils, SyncObjs;
 
+type
+
+  IntArr = Array of Byte;
+
 function Condition(Num1,Symbol,Num2:String):Boolean;
 function isNaN(const NumV:String):Boolean;
 function GetDeciCount:Integer;
@@ -76,6 +80,30 @@ implementation
 type
 
   TNumArr = Array of Integer;
+
+  { ArrMath }
+
+  ArrMath = class(TObject)
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SetBit(var B:Byte;const PosBaseZero:Byte);
+    procedure ClearBit(var B:Byte;const PosBaseZero:Byte);
+    procedure ReverseBit(var B:Byte;const PosBaseZero:Byte);
+    function IsBitSet(B:Byte;const PosBaseZero:Byte):Boolean;
+    procedure SetInt(const num:IntArr;var numResult:IntArr);
+    function isIntZero(const num:IntArr):Boolean;
+    procedure AddSign(const isNeg:Boolean;var num:IntArr);
+    procedure RemoveSign(const num:IntArr;var numResult:IntArr);
+    procedure RemoveSign(var num:IntArr);
+    function isPositiveAd(var num:IntArr):Byte;
+    function isPositive(var num:IntArr):Boolean;
+    function isNum1Bigger(var num1,num2:IntArr):Byte;
+    procedure AlignNums(var num1,num2:IntArr);
+    procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
+    procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
+    procedure SumSubInt(num1,num2:IntArr;var numResult:IntArr);
+  end;
 
   { StringMath }
 
@@ -567,6 +595,280 @@ function xPower(const Base, Power: String; out AAnswer: String): Boolean;
 begin
   AAnswer:=AStrMath.xPower(Base,Power);
   if(AAnswer='nan')then Result:=False else Result:=True;
+end;
+
+{ ArrMath }
+
+constructor ArrMath.Create;
+begin
+
+end;
+
+destructor ArrMath.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure ArrMath.SetBit(var B: Byte; const PosBaseZero: Byte);
+begin
+  B:=B or (1 shl PosBaseZero);
+end;
+
+procedure ArrMath.ClearBit(var B: Byte; const PosBaseZero: Byte);
+begin
+  B:=B and not (1 shl PosBaseZero);
+end;
+
+procedure ArrMath.ReverseBit(var B: Byte; const PosBaseZero: Byte);
+begin
+  B:=B xor (1 shl PosBaseZero);
+end;
+
+function ArrMath.IsBitSet(B: Byte; const PosBaseZero: Byte): Boolean;
+begin
+  Result:=(B and (1 shl PosBaseZero)) <> 0;
+end;
+
+procedure ArrMath.SetInt(const num: IntArr; var numResult: IntArr);
+var
+  i:Integer;
+begin
+  SetLength(numResult,Length(num));
+  for i:=0 to (Length(num)-1)do numResult[i]:=num[i];
+end;
+
+function ArrMath.isIntZero(const num: IntArr): Boolean;
+var
+  i:Integer;
+begin
+  Result:=True;
+  for i:=0 to (Length(num)-1)do if(num[i]<>0)then begin Result:=False; Exit; end;
+end;
+
+procedure ArrMath.AddSign(const isNeg: Boolean; var num: IntArr);
+var
+  i,j:Integer;
+  TArr1:IntArr;
+  bool1:Boolean;
+begin
+  TArr1:=nil;
+  bool1:=False;
+  for i:=0 to (Length(num)-1) do begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=0;
+    for j:=0 to 255 do begin
+      if(bool1=True)then begin self.SetBit(TArr1[i],j); bool1:=False end else
+      ///Start-Here...
+
+      if(j<255)then if(self.IsBitSet(num[i],j)=True)then self.SetBit(TArr1[i],j+1) else
+      if(j=255)then if(self.IsBitSet(num[i],j)=True)then bool1:=True;
+    end;
+  end;
+  if(bool1=True)then begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=0;
+    self.SetBit(TArr1[Length(TArr1)-1],0);
+  end;
+  if(isNeg=False)then self.SetBit(TArr1[0],0);
+end;
+
+procedure ArrMath.RemoveSign(const num: IntArr; var numResult: IntArr);
+var
+  i,j:Integer;
+begin
+  SetLength(numResult,Length(num));
+  for i:=0 to (Length(num)-1) do begin
+    numResult[i]:=0;
+    for j:=0 to 255 do begin
+      if(i>0)then if(self.IsBitSet(num[i],j)=True)then self.SetBit(numResult[i],j-1) else
+      if(i=0)and(j>0)then if(self.IsBitSet(num[i],j)=True)then self.SetBit(numResult[i],j-1);
+    end;
+  end;
+  if(numResult[Length(numResult)-1]=0)then SetLength(numResult,Length(numResult)-1);
+end;
+
+procedure ArrMath.RemoveSign(var num: IntArr);
+var
+  numResult:IntArr;
+begin
+  numResult:=nil;
+  self.RemoveSign(num,numResult);
+  self.SetInt(numResult,num);
+  SetLength(numResult,0);
+end;
+
+function ArrMath.isPositiveAd(var num: IntArr): Byte;
+var
+  bool1:Boolean;
+begin
+  bool1:=False;
+  if(self.IsBitSet(num[0],0)=True)then bool1:=True;
+  self.RemoveSign(num);
+  if(self.isIntZero(num)=True)then Result:=2 else
+  if(bool1=True)then Result:=1 else Result:=0;
+end;
+
+function ArrMath.isPositive(var num: IntArr): Boolean;
+var
+  ByteA:Byte;
+begin
+  ByteA:=self.isPositiveAd(num);
+  if(ByteA=1)then Result:=True else
+  if(ByteA=0)then Result:=False else Result:=False;
+end;
+
+function ArrMath.isNum1Bigger(var num1, num2: IntArr): Byte;
+var
+  i,j:Integer;
+  bool1,bool2:Boolean;
+begin
+  for i:=0 to (Length(num1)-1)do begin
+    for j:=0 to 255 do begin
+      bool1:=False;
+      bool2:=False;
+      if(self.IsBitSet(num1[i],j)=True)then bool1:=True;
+      if(self.IsBitSet(num2[i],j)=True)then bool2:=True;
+      if(bool1=True)and(bool2=False)then begin Result:=1; Exit; end else
+      if(bool1=False)and(bool2=True)then begin Result:=0; Exit; end;
+    end;
+  end;
+  Result:=2;
+end;
+
+procedure ArrMath.AlignNums(var num1, num2: IntArr);
+begin
+  if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
+  if(Length(num2)>Length(num1))then SetLength(num1,Length(num2));
+end;
+
+procedure ArrMath.SumInt(num1, num2: IntArr; var numResult: IntArr);
+var
+  i,j:Integer;
+  bool1,bool2,bool3:Boolean;
+begin
+  SetLength(numResult,0);
+  self.AlignNums(num1,num2);
+  bool3:=False;
+  for i:=0 to (Length(num1)-1)do begin
+    SetLength(numResult,Length(numResult)+1);
+    numResult[Length(numResult)-1]:=0;
+    for j:=0 to 255 do begin
+      bool1:=False;
+      bool2:=False;
+      if(self.IsBitSet(num1[i],j)=True)then bool1:=True;
+      if(self.IsBitSet(num2[i],j)=True)then bool2:=True;
+      if(bool1=False)and(bool2=False)then begin
+        if(bool3=True)then self.SetBit(numResult[Length(numResult)-1],j);
+        bool3:=False;
+      end else
+      if(bool1=True)and(bool2=False)then begin
+        if(bool3=False)then self.SetBit(numResult[Length(numResult)-1],j);
+      end else
+      if(bool1=False)and(bool2=True)then begin
+        if(bool3=False)then self.SetBit(numResult[Length(numResult)-1],j);
+      end else
+      if(bool1=True)and(bool2=True)then begin
+        if(bool3=True)then self.SetBit(numResult[Length(numResult)-1],j);
+        bool3:=True;
+      end;
+    end;
+  end;
+  if(bool3=True)and(numResult[Length(numResult)-1]=255)then begin
+    SetLength(numResult,Length(numResult)+1);
+    numResult[Length(numResult)-1]:=0;
+    self.SetBit(numResult[Length(numResult)-1],0);
+  end else
+  if(bool3=True)then begin
+    for j:=254 downto 0 do begin
+      if(self.IsBitSet(numResult[Length(numResult)-1],j)=True)then begin
+        self.SetBit(numResult[Length(numResult)-1],j+1);
+        Break;
+      end;
+    end;
+  end;
+  //End...
+end;
+
+procedure ArrMath.SubInt(num1, num2: IntArr; var numResult: IntArr; out
+  num1Bigger: Byte);
+var
+  i,j:Integer;
+  bool1,bool2,bool3:Boolean;
+  ByteA:Byte;
+  TArr1,TArr2:IntArr;
+begin
+  SetLength(numResult,0);
+  self.AlignNums(num1,num2);
+  ByteA:=self.isNum1Bigger(num1,num2);
+  TArr1:=nil;
+  TArr2:=nil;
+  num1Bigger:=ByteA;
+  if(ByteA=0)then begin
+    SetLength(TArr1,Length(num2));
+    for i:=0 to (Length(num2)-1)do TArr1[i]:=num2[i];
+    SetLength(TArr2,Length(num1));
+    for i:=0 to (Length(num1)-1)do TArr2[i]:=num1[i];
+  end else
+  if(ByteA=1)then begin
+    SetLength(TArr1,Length(num1));
+    for i:=0 to (Length(num1)-1)do TArr1[i]:=num1[i];
+    SetLength(TArr2,Length(num2));
+    for i:=0 to (Length(num2)-1)do TArr2[i]:=num2[i];
+  end else begin
+    SetLength(numResult,Length(num1));
+    for i:=0 to (Length(num1)-1)do numResult[i]:=0;
+    Exit;
+  end;
+  bool3:=False;
+  for i:=0 to (Length(TArr1)-1)do begin
+    SetLength(numResult,Length(numResult)+1);
+    numResult[Length(numResult)-1]:=0;
+    for j:=0 to 255 do begin
+      bool1:=False;
+      bool2:=False;
+      if(self.IsBitSet(TArr1[i],j)=True)then bool1:=True;
+      if(self.IsBitSet(TArr2[i],j)=True)then bool2:=True;
+      if(bool1=False)and(bool2=False)then begin
+        if(bool3=True)then self.SetBit(numResult[Length(numResult)-1],j);
+      end else
+      if(bool1=True)and(bool2=False)then begin
+        if(bool3=True)then bool3:=False else
+        if(bool3=False)then self.SetBit(numResult[Length(numResult)-1],j);
+      end else
+      if(bool1=False)and(bool2=True)then begin
+        if(bool3=False)then begin
+          self.SetBit(numResult[Length(numResult)-1],j);
+          bool3:=True;
+        end;
+      end else
+      if(bool1=True)and(bool2=True)then begin
+        //nothing...
+      end;
+    end;
+  end;
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+end;
+
+procedure ArrMath.SumSubInt(num1, num2: IntArr; var numResult: IntArr);
+var
+  bool1,bool2:Boolean;
+  ByteA:Byte;
+begin
+  SetLength(numResult,0);
+  if(Length(num1)=Length(num2))and(Length(num1)=0)then Exit;
+  bool1:=self.isPositive(num1);
+  bool2:=self.isPositive(num2);
+  if(bool1=False)and(bool2=False)then begin
+    self.SumInt(num1,num2,numResult);
+  end else
+  if(bool1=True)and(bool2=False)then begin
+    self.SubInt(num1,num2,numResult,ByteA);
+    //if(ByteA=0)then
+  end else
+  if(bool1=False)and(bool2=True)then begin
+    self.SubInt(num1,num2,numResult,ByteA);
+  end;
 end;
 
 { StringMath }
