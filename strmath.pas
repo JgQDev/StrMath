@@ -29,8 +29,13 @@ function isIntZero(const num:IntArr):Boolean;
 function isPositiveAd(const num:IntArr):Byte;
 function isPositive(const num:IntArr):Boolean;
 procedure SetZero(var num:IntArr);
+function AssignInt(const num:IntArr):IntArr;
 function SumSubInt(const num1,num2:IntArr):IntArr;
 procedure SumSubInt(const num1,num2:IntArr;var AAnswer:IntArr);
+function MulDivInt(const num1,num2:IntArr;const doMul:Boolean = True):IntArr;
+procedure MulDivInt(const num1,num2:IntArr;var AAnswer:IntArr;const doMul:Boolean = True);
+function InitInt(const num:String):IntArr;
+function InitStr(const num:IntArr):String;
 
 { String-Math }
 function Condition(Num1,Symbol,Num2:String):Boolean;
@@ -101,23 +106,34 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    function RR(const x:Real):Integer;
     procedure SetBit(var B:Byte;const PosBaseZero:Byte);
     procedure ClearBit(var B:Byte;const PosBaseZero:Byte);
     procedure ReverseBit(var B:Byte;const PosBaseZero:Byte);
     function IsBitSet(B:Byte;const PosBaseZero:Byte):Boolean;
     procedure BitsToStr(const num:IntArr;var AStrBits:String);
     procedure SetInt(const num:IntArr;var numResult:IntArr);
+    procedure ReverseInt(const num:IntArr;var numResult:IntArr);
     function isIntZero(const num:IntArr):Boolean;
+    procedure MatchLength(const isLeft:Boolean;const num:IntArr;var numResult:IntArr);
     procedure Shift(const isLeft,isSet:Boolean;var num:IntArr);
     function isPositiveAd(var num:IntArr):Byte;
     function isPositive(var num:IntArr):Boolean;
     function isNum1Bigger(var num1,num2:IntArr):Byte;
+    function isNum1BiggerToRaw(const num1,num2:IntArr):Byte;
+    function isIntNumber(const Digit:String):Boolean;
+    function GetIntDigit(const Digit:Byte):String;
     procedure InitZeroToNine(const isNeg:Boolean;const Digit:Byte;var num:IntArr);
     procedure AlignNums(var num1,num2:IntArr);
+    procedure AssignIntNum(num:IntArr;var numResult:IntArr);
     procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
     procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
     procedure SumSubInt(num1,num2:IntArr;var numResult:IntArr);
     procedure MulInt(num1,num2:IntArr;var numResult:IntArr);
+    procedure DivInt(num1,num2:IntArr;var numResult:IntArr);
+    procedure MulDivInt(num1,num2:IntArr;var numResult:IntArr;const doMul:Boolean);
+    procedure StrToIntArr(AStr:String;var numResult:IntArr);
+    procedure IntArrToStr(num:IntArr;var AStr:String);
   end;
 
   { StringMath }
@@ -176,6 +192,8 @@ var ACtSec:TCriticalSection;
 
 function IntBitToStr(const num: IntArr): String;
 begin
+  Result:='';
+  if(Length(num)=0)then Exit;
   AArrMath.BitsToStr(num,Result);
 end;
 
@@ -183,6 +201,7 @@ procedure Shift(const isLeft, isSet: Boolean; var num: IntArr);
 var
   i:Integer;
 begin
+  if(Length(num)=0)then Exit;
   i:=Length(num);
   AArrMath.Shift(isLeft,isSet,num);
   if(isLeft=False)then SetLength(num,i);
@@ -192,6 +211,7 @@ procedure Shift(const isLeft: Boolean; var num: IntArr);
 var
   i:Integer;
 begin
+  if(Length(num)=0)then Exit;
   i:=Length(num);
   AArrMath.Shift(isLeft,False,num);
   if(isLeft=False)then SetLength(num,i);
@@ -199,6 +219,7 @@ end;
 
 procedure ShiftLeft(var num: IntArr);
 begin
+  if(Length(num)=0)then Exit;
   AArrMath.Shift(True,False,num);
 end;
 
@@ -206,6 +227,7 @@ procedure ShiftRight(var num: IntArr);
 var
   i:Integer;
 begin
+  if(Length(num)=0)then Exit;
   i:=Length(num);
   AArrMath.Shift(False,False,num);
   SetLength(num,i);
@@ -215,7 +237,9 @@ function isIntZero(const num: IntArr): Boolean;
 var
   TArr1:IntArr;
 begin
+  Result:=False;
   TArr1:=nil;
+  if(Length(num)=0)then Exit;
   AArrMath.SetInt(num,TArr1);
   AArrMath.Shift(True,False,TArr1);
   Result:=AArrMath.isIntZero(TArr1);
@@ -226,7 +250,9 @@ function isPositiveAd(const num: IntArr): Byte;
 var
   TArr1:IntArr;
 begin
+  Result:=3;
   TArr1:=nil;
+  if(Length(num)=0)then Exit;
   AArrMath.SetInt(num,TArr1);
   Result:=AArrMath.isPositiveAd(TArr1);
   SetLength(TArr1,0);
@@ -236,7 +262,9 @@ function isPositive(const num: IntArr): Boolean;
 var
   TArr1:IntArr;
 begin
+  Result:=False;
   TArr1:=nil;
+  if(Length(num)=0)then Exit;
   AArrMath.SetInt(num,TArr1);
   Result:=AArrMath.isPositive(TArr1);
   SetLength(TArr1,0);
@@ -248,14 +276,45 @@ begin
   num[0]:=0;
 end;
 
+function AssignInt(const num: IntArr): IntArr;
+begin
+  Result:=nil;
+  AArrMath.AssignIntNum(num,Result);
+end;
+
 function SumSubInt(const num1, num2: IntArr): IntArr;
 begin
+  Result:=nil;
   AArrMath.SumSubInt(num1,num2,Result);
 end;
 
 procedure SumSubInt(const num1, num2: IntArr; var AAnswer: IntArr);
 begin
   AArrMath.SumSubInt(num1,num2,AAnswer);
+end;
+
+function MulDivInt(const num1, num2: IntArr; const doMul: Boolean): IntArr;
+begin
+  Result:=nil;
+  AArrMath.MulDivInt(num1,num2,Result,doMul);
+end;
+
+procedure MulDivInt(const num1, num2: IntArr; var AAnswer: IntArr;
+  const doMul: Boolean);
+begin
+  AArrMath.MulDivInt(num1,num2,AAnswer,doMul);
+end;
+
+function InitInt(const num: String): IntArr;
+begin
+  Result:=nil;
+  AArrMath.StrToIntArr(num,Result);
+end;
+
+function InitStr(const num: IntArr): String;
+begin
+  Result:='';
+  AArrMath.IntArrToStr(num,Result);
 end;
 
 { String-Math }
@@ -713,6 +772,12 @@ begin
   inherited Destroy;
 end;
 
+function ArrMath.RR(const x: Real): Integer;
+begin
+  Result:=Round(x);
+  if(Round(x)>x)then Result:=Round(x)-1;
+end;
+
 procedure ArrMath.SetBit(var B: Byte; const PosBaseZero: Byte);
 begin
   B:=B or (1 shl PosBaseZero);
@@ -737,8 +802,8 @@ procedure ArrMath.BitsToStr(const num: IntArr; var AStrBits: String);
 var
   i:Integer;
 begin
-  AStrBits:=nil;
-  for i:=0 to (Length(num)-1)do AStrBits:=AStrBits+BinStr(num[i],8)+' ';
+  AStrBits:='';
+  for i:=0 to (Length(num)-1)do AStrBits:=BinStr(num[i],8)+' '+AStrBits;
 end;
 
 procedure ArrMath.SetInt(const num: IntArr; var numResult: IntArr);
@@ -749,6 +814,16 @@ begin
   for i:=0 to (Length(num)-1)do numResult[i]:=num[i];
 end;
 
+procedure ArrMath.ReverseInt(const num: IntArr; var numResult: IntArr);
+var
+  i,j:Integer;
+begin
+  SetLength(numResult,0);
+  SetLength(numResult,Length(num));
+  for i:=0 to (Length(num)-1)do
+    for j:=0 to 7 do if(self.IsBitSet(num[i],j)=True)then self.SetBit(numResult[(Length(numResult)-1)-i],7-j);
+end;
+
 function ArrMath.isIntZero(const num: IntArr): Boolean;
 var
   i:Integer;
@@ -757,24 +832,52 @@ begin
   for i:=0 to (Length(num)-1)do if(num[i]<>0)then begin Result:=False; Exit; end;
 end;
 
+procedure ArrMath.MatchLength(const isLeft: Boolean; const num: IntArr;
+  var numResult: IntArr);
+var
+  i:Integer;
+  bool1:Boolean;
+  Int1,Int2:Integer;
+begin
+  bool1:=False;
+  SetLength(numResult,0);
+  for i:=0 to (Length(num)-1)do
+    if(num[i]<>0)then begin bool1:=True; break; end;
+  if(bool1=False)then begin SetLength(numResult,1); Exit; end;
+  Int1:=(Length(num)*7);
+  for i:=(Length(num)*7) downto 0 do
+    if(self.IsBitSet(num[self.RR(i/8)],i-(self.RR(i/8)*7))=True)then begin
+      Int1:=self.RR((i+1)/8)+1;
+      Int2:=self.RR((i-1)/8)+1;
+      if(isLeft=False)then SetLength(numResult,self.RR((i+1)/8)+1) else
+      if(isLeft=True)then SetLength(numResult,self.RR((i-1)/8)+1);
+      break;
+    end;
+end;
+
 procedure ArrMath.Shift(const isLeft, isSet: Boolean; var num: IntArr);
 var
   i,j:Integer;
   TArr1:IntArr;
   bool1:Boolean;
+  Str1,Str2:String;
 begin
   TArr1:=nil;
   bool1:=False;
+  Str1:='';
+  Str2:='';
   if(isLeft=False)then begin
+    self.MatchLength(isLeft,num,TArr1);
+    self.AlignNums(num,TArr1);
     for i:=0 to (Length(num)-1)do begin
-      SetLength(TArr1,Length(TArr1)+1);
-      TArr1[Length(TArr1)-1]:=0;
       if(bool1=True)then self.SetBit(TArr1[Length(TArr1)-1],0);
       bool1:=False;
-      for j:=0 to 255 do begin
-        if(j<255)then if(self.IsBitSet(num[i],j)=True)then
-          self.SetBit(TArr1[Length(TArr1)-1],j+1) else
-        if(j=255)then if(self.IsBitSet(num[i],j)=True)then bool1:=True;
+      for j:=0 to 7 do begin
+        if(j<7)and(self.IsBitSet(num[i],j)=True)then
+          self.SetBit(TArr1[i],j+1) else
+        if(j=7)and(self.IsBitSet(num[i],j)=True)then bool1:=True;
+        self.BitsToStr(num,Str1);
+        self.BitsToStr(TArr1,Str2);
       end;
     end;
     if(bool1=True)then begin
@@ -782,27 +885,36 @@ begin
       TArr1[Length(TArr1)-1]:=0;
       if(bool1=True)then self.SetBit(TArr1[Length(TArr1)-1],0);
     end;
-    if(isSet=True)then self.SetBit(TArr1[Length(TArr1)-1],0);
+    if(isSet=True)then self.SetBit(TArr1[0],0);
     bool1:=True;
   end else
   if(isLeft=True)then begin
+    self.MatchLength(isLeft,num,TArr1);
+    self.AlignNums(num,TArr1);
     for i:=0 to (Length(num)-1)do begin
-      SetLength(TArr1,Length(TArr1)+1);
-      TArr1[Length(TArr1)-1]:=0;
-      for j:=0 to 255 do begin
+      for j:=0 to 7 do begin
         if(j>0)then if(self.IsBitSet(num[i],j)=True)then
-          self.SetBit(TArr1[Length(TArr1)-1],j-1);
+          self.SetBit(TArr1[i],j-1);
+        self.BitsToStr(num,Str1);
+        self.BitsToStr(TArr1,Str2);
       end;
       if((i+1)<=(Length(num)-1))and(self.IsBitSet(num[i+1],0)=True)then
-        self.SetBit(TArr1[Length(TArr1)-1],255);
+        self.SetBit(TArr1[i],7);
+      self.BitsToStr(num,Str1);
+      self.BitsToStr(TArr1,Str2);
     end;
-    if(isSet=True)then self.SetBit(TArr1[Length(TArr1)-1],255);
+    if(isSet=True)then self.SetBit(TArr1[Length(TArr1)-1],7);
+
+    self.BitsToStr(num,Str1);
+    self.BitsToStr(TArr1,Str2);
     bool1:=True;
   end;
   if(bool1=True)then begin
     SetLength(num,Length(TArr1));
-    for i:=0 to (Length(TArr1)-1)then num[i]:=TArr1[i];
+    for i:=0 to (Length(TArr1)-1)do num[i]:=TArr1[i];
   end;
+  self.BitsToStr(num,Str1);
+  self.BitsToStr(TArr1,Str2);
   SetLength(TArr1,0);
 end;
 
@@ -831,8 +943,8 @@ var
   i,j:Integer;
   bool1,bool2:Boolean;
 begin
-  for i:=0 to (Length(num1)-1)do begin
-    for j:=0 to 255 do begin
+  for i:=(Length(num1)-1) downto 0 do begin
+    for j:=7 downto 0 do begin
       bool1:=False;
       bool2:=False;
       if(self.IsBitSet(num1[i],j)=True)then bool1:=True;
@@ -842,6 +954,53 @@ begin
     end;
   end;
   Result:=2;
+end;
+
+function ArrMath.isNum1BiggerToRaw(const num1, num2: IntArr): Byte;
+var
+  TArr1,TArr2:IntArr;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  self.SetInt(num1,TArr1);
+  self.SetInt(num2,TArr2);
+  self.Shift(True,False,TArr1);
+  self.Shift(True,False,TArr2);
+  Result:=self.isNum1Bigger(TArr1,TArr2);
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+end;
+
+function ArrMath.isIntNumber(const Digit: String): Boolean;
+begin
+  Result:=False;
+  if(Length(Digit)=0)then Exit;
+  if(Length(Digit)>1)then Exit;
+  if(Digit='0')then Result:=True else
+  if(Digit='1')then Result:=True else
+  if(Digit='2')then Result:=True else
+  if(Digit='3')then Result:=True else
+  if(Digit='4')then Result:=True else
+  if(Digit='5')then Result:=True else
+  if(Digit='6')then Result:=True else
+  if(Digit='7')then Result:=True else
+  if(Digit='8')then Result:=True else
+  if(Digit='9')then Result:=True;
+end;
+
+function ArrMath.GetIntDigit(const Digit: Byte): String;
+begin
+  Result:='';
+  if(Digit=0)then Result:='0' else
+  if(Digit=1)then Result:='1' else
+  if(Digit=2)then Result:='2' else
+  if(Digit=3)then Result:='3' else
+  if(Digit=4)then Result:='4' else
+  if(Digit=5)then Result:='5' else
+  if(Digit=6)then Result:='6' else
+  if(Digit=7)then Result:='7' else
+  if(Digit=8)then Result:='8' else
+  if(Digit=9)then Result:='9';
 end;
 
 procedure ArrMath.InitZeroToNine(const isNeg: Boolean; const Digit: Byte;
@@ -883,18 +1042,30 @@ begin
   if(Length(num2)>Length(num1))then SetLength(num1,Length(num2));
 end;
 
+procedure ArrMath.AssignIntNum(num: IntArr; var numResult: IntArr);
+begin
+  self.SetInt(num,numResult);
+end;
+
 procedure ArrMath.SumInt(num1, num2: IntArr; var numResult: IntArr);
 var
   i,j:Integer;
   bool1,bool2,bool3:Boolean;
+  Str1,Str2,Str3:String;
 begin
   SetLength(numResult,0);
   self.AlignNums(num1,num2);
   bool3:=False;
+  Str1:='';
+  Str2:='';
+  Str3:='';
   for i:=0 to (Length(num1)-1)do begin
     SetLength(numResult,Length(numResult)+1);
     numResult[Length(numResult)-1]:=0;
-    for j:=0 to 255 do begin
+    for j:=0 to 7 do begin
+      self.BitsToStr(num1,Str1);
+      self.BitsToStr(num2,Str2);
+      self.BitsToStr(numResult,Str3);
       bool1:=False;
       bool2:=False;
       if(self.IsBitSet(num1[i],j)=True)then bool1:=True;
@@ -921,13 +1092,16 @@ begin
     self.SetBit(numResult[Length(numResult)-1],0);
   end else
   if(bool3=True)then begin
-    for j:=254 downto 0 do begin
+    for j:=6 downto 0 do begin
       if(self.IsBitSet(numResult[Length(numResult)-1],j)=True)then begin
         self.SetBit(numResult[Length(numResult)-1],j+1);
         Break;
       end;
     end;
   end;
+  self.BitsToStr(num1,Str1);
+  self.BitsToStr(num2,Str2);
+  self.BitsToStr(numResult,Str3);
   //End...
 end;
 
@@ -965,7 +1139,7 @@ begin
   for i:=0 to (Length(TArr1)-1)do begin
     SetLength(numResult,Length(numResult)+1);
     numResult[Length(numResult)-1]:=0;
-    for j:=0 to 255 do begin
+    for j:=0 to 7 do begin
       bool1:=False;
       bool2:=False;
       if(self.IsBitSet(TArr1[i],j)=True)then bool1:=True;
@@ -1037,7 +1211,7 @@ begin
   bool1:=False;
   CountA:=0;
   for i:=0 to (Length(num1)-1)do begin
-    for j:=0 to 255 do begin
+    for j:=0 to 7 do begin
       bool1:=self.IsBitSet(num1[i],j);
       if(bool1=True)then begin
         self.SetInt(numResult,TArr1);
@@ -1050,6 +1224,221 @@ begin
   end;
   SetLength(TArr1,0);
   SetLength(TArr2,0);
+end;
+
+procedure ArrMath.DivInt(num1, num2: IntArr; var numResult: IntArr);
+var
+  i:Integer;
+  TArr1,TArr2,TArr3,TArr4:IntArr;
+  AMode,Num1Big:Byte;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  TArr4:=nil;
+  SetLength(numResult,1);
+  numResult[0]:=0;
+  SetLength(TArr2,1);
+  TArr2[0]:=0;
+  self.ReverseInt(num1,TArr1);
+  AMode:=0;
+  Num1Big:=0;
+  self.SetInt(num2,TArr4);
+  self.Shift(False,False,TArr4);
+  for i:=0 to (Length(TArr1)*7)do begin
+    if(self.IsBitSet(TArr1[self.RR(i/8)],i-(self.RR(i/8)*7))=True)
+    then self.Shift(False,True,TArr2) else self.Shift(False,False,TArr2);
+    AMode:=self.isNum1Bigger(num2,TArr2);
+    if(AMode=0)then begin
+      self.Shift(False,True,numResult);
+      self.Shift(False,True,TArr2);
+      self.SubInt(TArr2,TArr4,TArr3,Num1Big);
+      self.Shift(True,False,TArr3);
+      self.SetInt(TArr3,TArr2);
+    end else
+    if(AMode=1)then begin
+      self.Shift(False,False,numResult);
+    end else
+    if(AMode=2)then begin
+      self.Shift(False,True,numResult);
+    end;
+  end;
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+  SetLength(TArr4,0);
+end;
+
+procedure ArrMath.MulDivInt(num1, num2: IntArr; var numResult: IntArr;
+  const doMul: Boolean);
+var
+  bool1,bool2:Boolean;
+begin
+  SetLength(numResult,0);
+  if(Length(num1)=Length(num2))and(Length(num1)=0)then Exit;
+  if(Length(num1)=0)then self.InitZeroToNine(False,0,num1) else
+  if(Length(num2)=0)then self.InitZeroToNine(False,0,num2);
+  bool1:=self.isPositive(num1);
+  bool2:=self.isPositive(num2);
+  if(bool1=False)and(bool2=False)then begin
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,True,numResult);
+  end else
+  if(bool1=True)and(bool2=False)then begin
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,False,numResult);
+  end else
+  if(bool1=False)and(bool2=True)then begin
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,False,numResult);
+  end else
+  if(bool1=True)and(bool2=True)then begin
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,True,numResult);
+  end;
+end;
+
+procedure ArrMath.StrToIntArr(AStr: String; var numResult: IntArr);
+var
+  bool1:Boolean;
+  i:Integer;
+  TArr1,TArr2,TArr3,TArr4:IntArr;
+begin
+  SetLength(numResult,0);
+  if(Length(AStr)=0)then Exit;
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  TArr4:=nil;
+  bool1:=False;
+  if(AStr[1]='-')then begin
+    bool1:=True;
+    AStr:=Copy(AStr,2,Length(AStr));
+  end else
+  if(AStr[1]='+')then AStr:=Copy(AStr,2,Length(AStr));
+  for i:=1 to Length(AStr)do if(self.isIntNumber(AStr[i])=False)then Exit;
+  if(Length(AStr)=1)then begin
+    self.InitZeroToNine(bool1,StrToInt(AStr),numResult);
+  end else
+  if(Length(AStr)>1)then begin
+    self.InitZeroToNine(False,StrToInt(AStr[Length(AStr)]),numResult);
+    AStr:=Copy(AStr,1,Length(AStr)-1);
+    self.InitZeroToNine(False,5,TArr1);
+    self.InitZeroToNine(False,5,TArr2);
+    self.SumSubInt(TArr1,TArr2,TArr3);
+    self.SetInt(TArr3,TArr4);
+    for i:=Length(AStr) downto 1 do begin
+      self.InitZeroToNine(False,StrToInt(AStr[i]),TArr1);
+      self.MulDivInt(TArr3,TArr1,TArr2,True);
+      self.SetInt(numResult,TArr1);
+      self.SumSubInt(TArr1,TArr2,numResult);
+      self.SetInt(TArr3,TArr2);
+      self.MulDivInt(TArr2,TArr4,TArr3,True);
+    end;
+    if(bool1=True)then begin
+      self.SetInt(numResult,TArr1);
+      self.InitZeroToNine(True,1,TArr2);
+      self.MulDivInt(TArr1,TArr2,numResult,True);
+    end;
+  end;
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+  SetLength(TArr4,0);
+end;
+
+procedure ArrMath.IntArrToStr(num: IntArr; var AStr: String);
+var
+  TArr1,TArr2,TArr3,TArr4,TArr5:IntArr;
+  bool1:Byte;
+  AMode:Byte;
+  Str1,Str2,Str3:String;
+begin
+  AStr:='nil';
+  if(Length(num)=0)then Exit;
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  TArr4:=nil;
+  TArr5:=nil;
+  Str1:='';
+  Str2:='';
+  Str3:='';
+  AMode:=0;
+  AStr:='';
+  self.SetInt(num,TArr1);
+  bool1:=self.isPositiveAd(TArr1);
+  SetLength(TArr1,0);
+  self.InitZeroToNine(False,5,TArr1);
+  self.InitZeroToNine(False,5,TArr2);
+  self.SumSubInt(TArr1,TArr2,TArr3);
+  self.SetInt(TArr3,TArr4);
+  While(True)do begin
+    self.SetInt(num,TArr1);
+    While((AMode=0)or(AMode=2))do begin
+      self.SetInt(TArr3,TArr2);
+
+      self.Shift(True,False,TArr2);
+      Str1:=IntToStr(TArr2[0]);
+      self.SetInt(TArr3,TArr2);
+
+      self.MulDivInt(TArr2,TArr4,TArr3,True);
+      AMode:=self.isNum1BiggerToRaw(TArr3,TArr1);
+
+      self.SetInt(TArr3,TArr2);
+      self.Shift(True,False,TArr2);
+      Str1:=IntToStr(TArr2[0]);
+    end;
+    self.SetInt(TArr3,TArr2);
+    self.MulDivInt(TArr2,TArr4,TArr3,False);
+    self.SetInt(TArr3,TArr2);
+    self.Shift(True,False,TArr2);
+
+    Str1:=IntToStr(TArr2[0]);
+    if(TArr2[0]=1)then begin
+      self.SetInt(num,TArr1);
+      self.Shift(True,False,TArr1);
+      AStr:=AStr+self.GetIntDigit(TArr1[0]);
+      Break;
+    end else begin
+      self.InitZeroToNine(False,0,TArr2);
+      AMode:=0;
+      While((AMode=0)or(AMode=2))do begin
+        self.SumSubInt(TArr2,TArr3,TArr1);
+        self.SetInt(TArr1,TArr2);
+        AMode:=self.isNum1BiggerToRaw(TArr1,num);
+      end;
+      self.SetInt(TArr3,TArr5);
+      self.Shift(True,False,TArr5);
+      self.Shift(False,False,TArr5);
+      self.SumSubInt(TArr1,TArr5,TArr2);
+      self.SetInt(num,TArr1);
+      self.SetInt(TArr2,TArr5);
+      self.Shift(True,False,TArr5);
+      self.Shift(False,False,TArr5);
+      self.SumSubInt(TArr1,TArr5,num);
+      AMode:=1;
+      self.InitZeroToNine(False,9,TArr5);
+      while(AMode=1)do begin
+        self.SetInt(TArr2,TArr1);
+        self.MulDivInt(TArr1,TArr4,TArr2,False);
+        AMode:=self.isNum1BiggerToRaw(TArr2,TArr5);
+      end;
+      self.Shift(True,False,TArr2);
+      AStr:=AStr+self.GetIntDigit(TArr2[0]);
+    end;
+    AMode:=0;
+  end;
+  if(bool1=0)then AStr:=AStr+'-';
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+  SetLength(TArr4,0);
+  SetLength(TArr5,0);
 end;
 
 { StringMath }
