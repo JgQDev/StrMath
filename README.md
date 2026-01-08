@@ -3,6 +3,22 @@
 A FreePascal Unit for String Number Calculation and Accurate Results.
 
 ## Extra
+### IntArr-Math
+- ConditionInt(Num1,Symbol,Num2):Boolean
+- isNaNInt(num):Boolean
+- IntBitToStr(num):String
+- Shift(isLeft,isSet,num)
+- Shift(isLeft,num)
+- ShiftLeft(num)
+- ShiftRight(num)
+- isIntZero(num):Boolean
+- isPositiveIntAdvance(num):Byte
+- isPositiveInt(num):Boolean
+- SetZero(num)
+- AssignInt(num):IntArr 
+- InitInt(num):IntArr
+- InitStr(num):String
+### String-Math
 - Condition(Num1,Symbol,Num2):Boolean
 - CleanNum(NumV):String
 - isPositive(NumV):Boolean
@@ -20,6 +36,10 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 - isBinary(Num):Boolean;
 
 ## Basic Number Calcus
+### IntArr-Math
+- SumSubInt(num1,num2):IntArr
+- MulDivInt(num1,num2,doMul=True):IntArr
+### String-Math
 - SumSub(Num1,Num2):String
 - MulDiv(Num1,Num2,doMul=True):String
 
