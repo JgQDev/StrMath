@@ -5,6 +5,7 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 ## Extra
 ### IntArr-Math
 - ConditionInt(Num1,Symbol,Num2):Boolean
+- InRangeInt(varNum,fromNum,ToNum):Boolean
 - isNaNInt(num):Boolean
 - IntBitToStr(num):String
 - Shift(isLeft,isSet,num)
