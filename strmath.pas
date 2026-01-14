@@ -19,6 +19,7 @@ type
 
   Number = Array of Byte;
   IntArr = Number;
+  RealArr = Number;
 
 { IntArr-Math }
 function ConditionInt(Num1:IntArr;Symbol:String;Num2:IntArr):Boolean;
@@ -40,7 +41,7 @@ procedure SumSubInt(const num1,num2:IntArr;var AAnswer:IntArr);
 function MulDivInt(const num1,num2:IntArr;const doMul:Boolean = True):IntArr;
 procedure MulDivInt(const num1,num2:IntArr;var AAnswer:IntArr;const doMul:Boolean = True);
 function InitInt(const num:String):IntArr;
-function InitStr(const num:IntArr):String;
+function IntStr(const num:IntArr):String;
 
 { String-Math }
 function Condition(Num1,Symbol,Num2:String):Boolean;
@@ -141,6 +142,29 @@ type
     procedure MulDivInt(num1,num2:IntArr;var numResult:IntArr;const doMul:Boolean);
     procedure StrToIntArr(AStr:String;var numResult:IntArr);
     procedure IntArrToStr(num:IntArr;var AStr:String);
+  end;
+
+  { RealMath }
+
+  RealMath = class(TObject)
+  private
+    TTL:ArrMath;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function CheckIntegrity(num:RealArr):Boolean;
+    procedure CombineArr(FromNum1,FromNum2:IntArr;var ToNum:RealArr;var NumAt:IntArr);
+    procedure SplitArr(var FromNum1,FromNum2:IntArr;const ToNum:RealArr;const NumAt:IntArr);
+    procedure CombineIntToArr(FromNum:IntArr;var ToNum:RealArr);
+    procedure SplitIntToArr(var FromNum:IntArr;var ToNum:RealArr);
+    procedure StrToRealArr(AStr:String;var numResult:RealArr);
+    procedure RealArrToStr(num:RealArr;var AStr:String);
+    procedure AlignStr(var AStr1,AStr2:String;const APlace:String);
+    function isPositiveAd(num:RealArr):Byte;
+    function isPositive(num:RealArr):Boolean;
+    procedure SumReal(num1,num2:RealArr;var numResult:RealArr);
+    procedure SubReal(num1,num2:RealArr;var numResult:RealArr;out NumBiggerMode:Byte);
+    procedure SumSubReal(num1,num2:RealArr;var numResult:RealArr);
   end;
 
   { StringMath }
@@ -392,7 +416,7 @@ begin
   AArrMath.StrToIntArr(num,Result);
 end;
 
-function InitStr(const num: IntArr): String;
+function IntStr(const num: IntArr): String;
 begin
   Result:='';
   AArrMath.IntArrToStr(num,Result);
@@ -811,11 +835,437 @@ begin
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
+{ RealMath }
+
+constructor RealMath.Create;
+begin
+  self.TTL:=ArrMath.Create;
+end;
+
+destructor RealMath.Destroy;
+begin
+  inherited Destroy;
+  self.TTL.Free;
+end;
+
+function RealMath.CheckIntegrity(num: RealArr): Boolean;
+begin
+  Result:=True;
+  if(Length(num)<=4)then Result:=False else
+  if(Length(num)<6)then Result:=False;
+end;
+
+procedure RealMath.CombineArr(FromNum1, FromNum2: IntArr; var ToNum: RealArr;
+  var NumAt: IntArr);
+var
+  i:Integer;
+  TArr1:RealArr;
+  TArr2,TArr3:IntArr;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  self.TTL.StrToIntArr('0',NumAt);
+  self.TTL.StrToIntArr('1',TArr3);
+  for i:=0 to (Length(FromNum1)-1)do begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=FromNum1[i];
+
+    self.TTL.SetInt(NumAt,TArr2);
+    self.TTL.SumSubInt(TArr2,TArr3,NumAt);
+  end;
+  for i:=0 to (Length(FromNum2)-1)do begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=FromNum2[i];
+  end;
+  SetLength(ToNum,Length(TArr1));
+  for i:=0 to (Length(TArr1)-1)do ToNum[i]:=TArr1[i];
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+end;
+
+procedure RealMath.SplitArr(var FromNum1, FromNum2: IntArr;
+  const ToNum: RealArr; const NumAt: IntArr);
+var
+  i:Integer;
+  TArr2,TArr3:IntArr;
+begin
+  TArr2:=nil;
+  TArr3:=nil;
+  SetLength(FromNum1,0);
+  SetLength(FromNum2,0);
+  self.TTL.StrToIntArr('0',TArr2);
+  self.TTL.StrToIntArr('0',TArr3);
+  i:=0;
+  While(InRangeInt(TArr2,TArr3,NumAt)=True)do begin
+    SetLength(FromNum1,Length(FromNum1)+1);
+    FromNum1[Length(FromNum1)-1]:=ToNum[i];
+    i:=i+1;
+  end;
+  for i:=Length(FromNum1) to (Length(ToNum)-1)do begin
+    SetLength(FromNum2,Length(FromNum2)+1);
+    FromNum2[Length(FromNum2)-1]:=ToNum[i];
+  end;
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+end;
+
+procedure RealMath.CombineIntToArr(FromNum: IntArr; var ToNum: RealArr);
+var
+  i:Integer;
+  TArr1:RealArr;
+begin
+  SetLength(FromNum,4);
+  TArr1:=nil;
+  for i:=0 to (Length(FromNum)-1)do begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=FromNum[i];
+  end;
+  for i:=0 to (Length(ToNum)-1)do begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=ToNum[i];
+  end;
+  SetLength(ToNum,Length(TArr1));
+  for i:=0 to (Length(TArr1)-1)do ToNum[i]:=TArr1[i];
+  SetLength(TArr1,0);
+end;
+
+procedure RealMath.SplitIntToArr(var FromNum: IntArr; var ToNum: RealArr);
+var
+  i:Integer;
+  TArr1:RealArr;
+begin
+  SetLength(FromNum,4);
+  for i:=0 to 3 do FromNum[i]:=ToNum[i];
+  TArr1:=nil;
+  for i:=4 to (Length(ToNum)-1)do begin
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=ToNum[i];
+  end;
+  SetLength(ToNum,Length(TArr1));
+  for i:=0 to (Length(TArr1)-1)do ToNum[i]:=TArr1[i];
+  SetLength(TArr1,0);
+end;
+
+procedure RealMath.StrToRealArr(AStr: String; var numResult: RealArr);
+var
+  bool1,bool2:Boolean;
+  WholeN,DeciN:String;
+  i:Integer;
+  TArr1,TArr2,TArr3:IntArr;
+begin
+  SetLength(numResult,0);
+  bool1:=False;
+  if(AStr[1]='-')then begin
+    AStr:=Copy(AStr,2,Length(AStr));
+    bool1:=True;
+  end else
+  if(AStr[1]='+')then AStr:=Copy(AStr,2,Length(AStr));
+
+  bool2:=False;
+  for i:=1 to Length(AStr)do begin
+    if(AStr[i]='.')then begin
+      bool1:=True;
+      WholeN:=Copy(AStr,1,i-1);
+      DeciN:=Copy(AStr,i+1,Length(AStr));
+      break;
+    end;
+  end;
+  if(bool2=False)then begin
+    WholeN:=AStr;
+    DeciN:='0';
+  end;
+  if(WholeN='')then WholeN:='0';
+  if(DeciN='')then DeciN:='0';
+
+  bool2:=False;
+  for i:=Length(DeciN)downto 1 do begin
+    if(DeciN[i]<>'0')then begin
+      bool2:=True;
+      DeciN:=Copy(DeciN,1,i);
+      break;
+    end;
+  end;
+  if(bool2=False)then DeciN:='0';
+
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  DeciN:='10'+DeciN;
+  self.TTL.StrToIntArr(WholeN,TArr1);
+  self.TTL.StrToIntArr(DeciN,TArr2);
+
+  self.CombineArr(TArr1,TArr2,numResult,TArr3);
+  self.CombineIntToArr(TArr3,numResult);
+
+  if(bool1=False)then self.TTL.Shift(False,True,numResult) else
+  if(bool1=True)then self.TTL.Shift(False,False,numResult);
+
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+end;
+
+procedure RealMath.RealArrToStr(num: RealArr; var AStr: String);
+var
+  TArr1,TArr2,TArr3:IntArr;
+  bool1:Boolean;
+  Str1,Str2:String;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  Str1:='';
+  Str2:='';
+  AStr:='nil';
+  if(Length(num)=0)then Exit;
+  AStr:='';
+  if(self.TTL.IsBitSet(num[0],0)=True)then bool1:=False else bool1:=True;
+  self.TTL.Shift(True,False,num);
+
+  self.SplitIntToArr(TArr3,num);
+  self.SplitArr(TArr1,TArr2,num,TArr3);
+
+  self.TTL.IntArrToStr(TArr1,Str1);
+  self.TTL.IntArrToStr(TArr2,Str2);
+
+  AStr:=Str1+Copy(Str2,3,Length(Str2));
+  if(bool1=True)then AStr:='-'+AStr;
+
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+end;
+
+procedure RealMath.AlignStr(var AStr1, AStr2: String; const APlace: String);
+var
+  i:Integer;
+begin
+  if(Length(AStr1)>Length(AStr2))then begin
+    for i:=0 to (Length(AStr1)-Length(AStr2))do AStr2:=AStr2+APlace;
+  end else
+  if(Length(AStr1)<Length(AStr2))then begin
+    for i:=0 to (Length(AStr2)-Length(AStr1))do AStr1:=AStr1+APlace;
+  end;
+end;
+
+function RealMath.isPositiveAd(num: RealArr): Byte;
+var
+  TArr1,TArr2,TArr3:IntArr;
+  bool1:Boolean;
+  bool2,bool3,bool4:Boolean;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  bool1:=False;
+  bool2:=False;
+  bool3:=False;
+  bool4:=False;
+
+  if(self.TTL.IsBitSet(num[0],0)=True)then bool1=False else bool1:=True;
+  self.TTL.Shift(True,False,num);
+
+  self.SplitIntToArr(TArr3,num);
+  self.SplitArr(TArr1,TArr2,num,TArr3);
+
+  bool2:=isIntZero(TArr1);
+  bool3:=isIntZero(TArr2);
+
+  if(bool2=False)and(bool3=False)then bool4:=False else
+  if(bool2=True)and(bool3=False)then bool4:=False else
+  if(bool2=False)and(bool3=True)then bool4:=False else
+  if(bool2=True)and(bool3=True)then bool4:=True;
+
+  if(bool4=False)and(bool1=False)then Result:=1 else
+  if(bool4=True)and(bool1=False)then Result:=2 else
+  if(bool4=False)and(bool1=True)then Result:=0 else
+  if(bool4=True)and(bool1=True)then Result:=2;
+
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+end;
+
+function RealMath.isPositive(num: RealArr): Boolean;
+var
+  AMode:Byte;
+begin
+  AMode:=self.isPositiveAd(num);
+  if(AMode=0)then Result:=False else
+  if(AMode=1)then Result:=True else Result:=False;
+end;
+
+procedure RealMath.SumReal(num1, num2: RealArr; var numResult: RealArr);
+var
+  TArr1,TArr2,TArr3:IntArr;
+  TArr4,TArr5,TArr6:IntArr;
+  Str1,Str2,Str3:String;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  TArr4:=nil;
+  TArr5:=nil;
+  TArr6:=nil;
+  Str1:='';
+  Str2:='';
+  Str3:='';
+  SetLength(numResult,0);
+
+  self.SplitIntToArr(TArr3,num1);
+  self.SplitArr(TArr1,TArr2,num1,TArr3);
+
+  self.SplitIntToArr(TArr6,num2);
+  self.SplitArr(TArr4,TArr5,num2,TArr6);
+
+  self.TTL.IntArrToStr(TArr2,Str1);
+  self.TTL.IntArrToStr(TArr5,Str2);
+
+  self.AlignStr(Str1,Str2,'0');
+  self.TTL.StrToIntArr(Str1,TArr2);
+  self.TTL.StrToIntArr(Str2,TArr5);
+
+  self.TTL.SumSubInt(TArr2,TArr5,TArr6);
+  self.TTL.IntArrToStr(TArr6,Str1);
+  Str3:=Copy(Str1,3,Length(Str1));
+  Str3:='10'+Str3;
+  Str1:=Copy(Str1,1,2);
+  Str1:=Copy(Str1,2,Length(Str1));
+
+  self.TTL.StrToIntArr(Str3,TArr6);
+  self.TTL.StrToIntArr(Str1,TArr5);
+  self.TTL.SumSubInt(TArr1,TArr5,TArr2);
+  self.TTL.SumSubInt(TArr2,TArr4,TArr3);
+
+  self.CombineArr(TArr3,TArr6,numResult,TArr1);
+  self.CombineIntToArr(TArr1,numResult);
+
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+  SetLength(TArr4,0);
+  SetLength(TArr5,0);
+  SetLength(TArr6,0);
+end;
+
+procedure RealMath.SubReal(num1, num2: RealArr; var numResult: RealArr; out
+  NumBiggerMode: Byte);
+var
+  TArr1,TArr2,TArr3:IntArr;
+  TArr4,TArr5,TArr6:IntArr;
+  Str1,Str2,Str3:String;
+  Str4,Str5,Str6:String;
+  Int1:Integer;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  TArr4:=nil;
+  TArr5:=nil;
+  TArr6:=nil;
+  Str1:='';
+  Str2:='';
+  Str3:='';
+  Str4:='';
+  Str5:='';
+  Str6:='';
+  Int1:=0;
+  SetLength(numResult,0);
+
+  self.SplitIntToArr(TArr3,num1);
+  self.SplitArr(TArr1,TArr2,num1,TArr3);
+
+  self.SplitIntToArr(TArr6,num2);
+  self.SplitArr(TArr4,TArr5,num2,TArr6);
+
+  self.TTL.IntArrToStr(TArr1,Str4);
+  self.TTL.IntArrToStr(TArr4,Str5);
+
+  self.TTL.IntArrToStr(TArr2,Str1);
+  self.TTL.IntArrToStr(TArr5,Str2);
+
+  self.AlignStr(Str1,Str2,'0');
+  Str1:=Copy(Str1,3,Length(Str1));
+  Str2:=Copy(Str2,3,Length(Str2));
+  Int1:=Length(Str1);
+
+  Str1:=Str4+Str1;
+  Str2:=Str5+Str2;
+  self.TTL.StrToIntArr(Str1,TArr3);
+  self.TTL.StrToIntArr(Str2,TArr6);
+
+  if(ConditionInt(TArr3,'>',TArr6)=True)then NumBiggerMode:=1 else
+  if(ConditionInt(TArr3,'<',TArr6)=True)then NumBiggerMode:=0 else
+  if(ConditionInt(TArr3,'=',TArr6)=True)then NumBiggerMode:=2;
+
+  self.TTL.StrToIntArr('-1',TArr1);
+  self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
+  self.TTL.SumSubInt(TArr3,TArr4,TArr1);
+  self.TTL.IntArrToStr(TArr1,Str3);
+
+  if(Str3[1]='-')then Str3:=Copy(Str3,2,Length(Str3));
+  Str6:=Copy(Str3,Length(Str3)-Int1,Length(Str3));
+  Str6:='10'+Str6;
+  Str3:=Copy(Str3,1,Length(Str3)-Int1);
+
+  self.TTL.StrToIntArr(Str3,TArr3);
+  self.TTL.StrToIntArr(Str6,TArr6);
+  self.CombineArr(TArr3,TArr6,numResult,TArr1);
+  self.CombineIntToArr(TArr1,numResult);
+
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+  SetLength(TArr4,0);
+  SetLength(TArr5,0);
+  SetLength(TArr6,0);
+end;
+
+procedure RealMath.SumSubReal(num1, num2: RealArr; var numResult: RealArr);
+var
+  bool1,bool2:Boolean;
+  AMode:Byte;
+begin
+  SetLength(numResult,0):
+  if(Length(num1)=Length(num2))and(Length(num1)=0)then Exit;
+  if(Length(num1)=0)then self.StrToRealArr('0',num1);
+  if(Length(num2)=0)then self.StrToRealArr('0',num2);
+  bool1:=self.isPositive(num1);
+  bool2:=self.isPositive(num2);
+  self.TTL.Shift(True,False,num1);
+  self.TTL.Shift(True,False,num2);
+  if(self.CheckIntegrity(num1)=False)then Exit;
+  if(self.CheckIntegrity(num2)=False)then Exit;
+  AMode:=0;
+  if(bool1=False)and(bool2=False)then begin
+    self.SumReal(num1,num2,numResult);
+    self.TTL.Shift(False,False,numResult);
+  end else
+  if(bool1=True)and(bool2=False)then begin
+    self.SubReal(num1,num2,numResult,AMode);
+    if(AMode=1)then self.TTL.Shift(False,True,numResult) else
+    if(AMode=0)then self.TTL.Shift(False,False,numResult) else
+    if(AMode=2)then self.TTL.Shift(False,True,numResult);
+  end else
+  if(bool1=False)and(bool2=True)then begin
+    self.SubReal(num1,num2,numResult,AMode);
+    if(AMode=1)then self.TTL.Shift(False,False,numResult) else
+    if(AMode=0)then self.TTL.Shift(False,True,numResult) else
+    if(AMode=2)then self.TTL.Shift(False,True,numResult);
+  end else
+  if(bool1=True)and(bool2=True)then begin
+    self.SumReal(num1,num2,numResult);
+    self.TTL.Shift(False,True,numResult);
+  end;
+end;
+
 { ArrMath }
 
 constructor ArrMath.Create;
 begin
-
+  //nothing...
 end;
 
 destructor ArrMath.Destroy;
@@ -1202,7 +1652,7 @@ var
 begin
   SetLength(numResult,0);
   if(Length(num1)=Length(num2))and(Length(num1)=0)then Exit;
-  if(Length(num1)=0)then self.InitZeroToNine(False,0,num1) else
+  if(Length(num1)=0)then self.InitZeroToNine(False,0,num1);
   if(Length(num2)=0)then self.InitZeroToNine(False,0,num2);
   bool1:=self.isPositive(num1);
   bool2:=self.isPositive(num2);
@@ -1302,10 +1752,11 @@ var
 begin
   SetLength(numResult,0);
   if(Length(num1)=Length(num2))and(Length(num1)=0)then Exit;
-  if(Length(num1)=0)then self.InitZeroToNine(False,0,num1) else
-  if(Length(num2)=0)then self.InitZeroToNine(False,0,num2);
+  if(Length(num1)=0)then self.InitZeroToNine(False,0,num1);
+  if(Length(num2)=0)then Exit;
   bool1:=self.isPositive(num1);
   bool2:=self.isPositive(num2);
+  if(self.isIntZero(num2)=True)then Exit;
   if(bool1=False)and(bool2=False)then begin
     if(doMul=True)then self.MulInt(num1,num2,numResult) else
     if(doMul=False)then self.DivInt(num1,num2,numResult);
