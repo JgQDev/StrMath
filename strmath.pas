@@ -168,7 +168,9 @@ type
     procedure StrToRealArr(AStr:String;var numResult:RealArr);
     procedure RealArrToStr(num:RealArr;var AStr:String);
     procedure AlignStr(var AStr1,AStr2:String;const APlace:String);
+    procedure AlignStrLeft(var AStr1,AStr2:String;const APlace:String);
     procedure CutSomeR(var num:IntArr);
+    procedure CutSomeStr(var AStr:String);
     function isPositiveAd(num:RealArr):Byte;
     function isPositive(num:RealArr):Boolean;
     procedure SumReal(num1,num2:RealArr;var numResult:RealArr);
@@ -1097,10 +1099,22 @@ var
   i:Integer;
 begin
   if(Length(AStr1)>Length(AStr2))then begin
-    for i:=0 to (Length(AStr1)-Length(AStr2))do AStr2:=AStr2+APlace;
+    for i:=1 to (Length(AStr1)-Length(AStr2))do AStr2:=AStr2+APlace;
   end else
   if(Length(AStr1)<Length(AStr2))then begin
-    for i:=0 to (Length(AStr2)-Length(AStr1))do AStr1:=AStr1+APlace;
+    for i:=1 to (Length(AStr2)-Length(AStr1))do AStr1:=AStr1+APlace;
+  end;
+end;
+
+procedure RealMath.AlignStrLeft(var AStr1, AStr2: String; const APlace: String);
+var
+  i:Integer;
+begin
+  if(Length(AStr1)>Length(AStr2))then begin
+    for i:=1 to (Length(AStr1)-Length(AStr2))do AStr2:=APlace+AStr2;
+  end else
+  if(Length(AStr1)<Length(AStr2))then begin
+    for i:=1 to (Length(AStr2)-Length(AStr1))do AStr1:=APlace+AStr1;
   end;
 end;
 
@@ -1111,6 +1125,23 @@ begin
   TArr1:=nil;
   self.TTL.SetInt(num,TArr1);
   self.TTL.CutSome(TArr1,num);
+end;
+
+procedure RealMath.CutSomeStr(var AStr: String);
+var
+  i:Integer;
+  bool1:Boolean;
+begin
+  bool1:=False;
+  for i:=Length(AStr) downto 1 do begin
+    if(AStr[i]<>'0')then begin
+      bool1:=True;
+      AStr:=Copy(AStr,1,i);
+      break;
+    end;
+  end;
+  if(bool1=True)then Exit;
+  AStr:='0';
 end;
 
 function RealMath.isPositiveAd(num: RealArr): Byte;
@@ -1193,6 +1224,10 @@ begin
   self.TTL.SumSubInt(TArr2,TArr5,TArr6);
   self.TTL.IntArrToStr(TArr6,Str1);
   Str3:=Copy(Str1,3,Length(Str1));
+  self.CutSomeStr(Str3);
+  if(Length(Str3)>self.TDeciDigitCountBaseOne)then
+    Str3:=Copy(Str3,1,self.TDeciDigitCountBaseOne);
+  if(Str3='')then Str3:='0';
   Str3:='10'+Str3;
   Str1:=Copy(Str1,1,2);
   Str1:=Copy(Str1,2,Length(Str1));
@@ -1220,7 +1255,8 @@ var
   TArr4,TArr5,TArr6:IntArr;
   Str1,Str2,Str3:String;
   Str4,Str5,Str6:String;
-  Int1:Integer;
+  Str7,Str8:String;
+  Int1,Int2:Integer;
 begin
   TArr1:=nil;
   TArr2:=nil;
@@ -1234,7 +1270,10 @@ begin
   Str4:='';
   Str5:='';
   Str6:='';
+  Str7:='';
+  Str8:='';
   Int1:=0;
+  Int2:=0;
   SetLength(numResult,0);
 
   self.SplitIntToArr(TArr3,num1);
@@ -1250,18 +1289,27 @@ begin
   self.TTL.IntArrToStr(TArr5,Str2);
 
   self.AlignStr(Str1,Str2,'0');
-  Str1:=Copy(Str1,3,Length(Str1));
-  Str2:=Copy(Str2,3,Length(Str2));
-  Int1:=Length(Str1);
-
-  Str1:=Str4+Str1;
-  Str2:=Str5+Str2;
-  self.TTL.StrToIntArr(Str1,TArr3);
-  self.TTL.StrToIntArr(Str2,TArr6);
+  Str7:=Copy(Str1,3,Length(Str1));
+  Str8:=Copy(Str2,3,Length(Str2));
+  Str7:=Str4+Str7;
+  Str8:=Str5+Str8;
+  self.TTL.StrToIntArr(Str7,TArr3);
+  self.TTL.StrToIntArr(Str8,TArr6);
 
   if(ConditionInt(TArr3,'>',TArr6)=True)then NumBiggerMode:=1 else
   if(ConditionInt(TArr3,'<',TArr6)=True)then NumBiggerMode:=0 else
   if(ConditionInt(TArr3,'=',TArr6)=True)then NumBiggerMode:=2;
+
+  Str1:=Copy(Str1,3,Length(Str1));
+  Str2:=Copy(Str2,3,Length(Str2));
+  Int1:=Length(Str1);
+  Int2:=Length(Str4);
+  Str1:=Str4+Str1;
+  self.AlignStrLeft(Str1,Str2,'0');
+  Str1:='2'+Str1;
+  Str2:='1'+Str2;
+  self.TTL.StrToIntArr(Str1,TArr3);
+  self.TTL.StrToIntArr(Str2,TArr6);
 
   self.TTL.StrToIntArr('-1',TArr1);
   self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
@@ -1269,9 +1317,24 @@ begin
   self.TTL.IntArrToStr(TArr1,Str3);
 
   if(Str3[1]='-')then Str3:=Copy(Str3,2,Length(Str3));
-  Str6:=Copy(Str3,Length(Str3)-Int1,Length(Str3));
-  Str6:='10'+Str6;
+  Str6:=Copy(Str3,Int2+2,Length(Str3));
   Str3:=Copy(Str3,1,Length(Str3)-Int1);
+  Str3:=Copy(Str3,2,Length(Str3));
+
+  self.TTL.StrToIntArr(Str3,TArr3);
+  self.TTL.StrToIntArr(Str5,TArr6);
+
+  self.TTL.StrToIntArr('-1',TArr1);
+  self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
+  self.TTL.SumSubInt(TArr3,TArr4,TArr1);
+  self.TTL.IntArrToStr(TArr1,Str3);
+
+  if(Str3[1]='-')then Str3:=Copy(Str3,2,Length(Str3));
+  self.CutSomeStr(Str6);
+  if(Length(Str6)>self.TDeciDigitCountBaseOne)then
+    Str6:=Copy(Str6,1,self.TDeciDigitCountBaseOne);
+  if(Str6='')then Str6:='0';
+  Str6:='10'+Str6;
 
   self.TTL.StrToIntArr(Str3,TArr3);
   self.TTL.StrToIntArr(Str6,TArr6);
@@ -1331,7 +1394,6 @@ var
   TArr4,TArr5,TArr6:IntArr;
   Str1,Str2,Str3:String;
   Int1,Int2:Integer;
-  i,CountA:Integer;
 begin
   TArr1:=nil;
   TArr2:=nil;
@@ -1354,6 +1416,8 @@ begin
 
   self.TTL.IntArrToStr(TArr2,Str1);
   self.TTL.IntArrToStr(TArr5,Str2);
+  Str1:=Copy(Str1,3,Length(Str1));
+  Str2:=Copy(Str2,3,Length(Str2));
   Int1:=Length(Str1);
   Int2:=Length(Str2);
 
@@ -1367,17 +1431,13 @@ begin
 
   self.TTL.MulDivInt(TArr3,TArr6,TArr1,True);
   self.TTL.IntArrToStr(TArr1,Str3);
-  CountA:=1;
-  for i:=Length(Str3) to 1 do begin
-    if(CountA=(Int1+Int2))then begin
-      Str1:=Copy(Str3,1,i-1);
-      Str2:=Copy(Str3,i,Length(Str3));
-      break;
-    end;
-    CountA:=CountA+1;
-  end;
+  Str1:=Copy(Str3,1,Length(Str3)-(Int1+Int2));
+  Str2:=Copy(Str3,(Length(Str3)-(Int1+Int2))+1,Length(Str3));
+  self.CutSomeStr(Str2);
   if(Length(Str2)>self.TDeciDigitCountBaseOne)then
     Str2:=Copy(Str2,1,self.TDeciDigitCountBaseOne);
+  if(Str2='')then Str2:='0';
+  Str2:='10'+Str2;
 
   self.TTL.StrToIntArr(Str1,TArr3);
   self.TTL.StrToIntArr(Str2,TArr6);
@@ -1397,7 +1457,7 @@ var
   TArr1,TArr2,TArr3:IntArr;
   TArr4,TArr5,TArr6:IntArr;
   Str1,Str2,Str3:String;
-  Int1:Integer;
+  Int1,Int2:Integer;
   i:Integer;
 begin
   TArr1:=nil;
@@ -1410,6 +1470,7 @@ begin
   Str2:='';
   Str3:='';
   Int1:=0;
+  Int2:=0;
   SetLength(numResult,0);
 
   self.SplitIntToArr(TArr3,num1);
@@ -1420,6 +1481,8 @@ begin
 
   self.TTL.IntArrToStr(TArr2,Str1);
   self.TTL.IntArrToStr(TArr5,Str2);
+  Str1:=Copy(Str1,3,Length(Str1));
+  Str2:=Copy(Str2,3,Length(Str2));
 
   if(Length(Str1)>=self.TDeciDigitCountBaseOne)then begin
     Str1:=Copy(Str1,1,self.TDeciDigitCountBaseOne);
@@ -1432,6 +1495,7 @@ begin
   Int1:=Length(Str3);
   Str1:=Str3+Str1;
   self.TTL.IntArrToStr(TArr4,Str3);
+  Int2:=Length(Str3);
   Str2:=Str3+Str2;
 
   self.TTL.StrToIntArr(Str1,TArr3);
@@ -1440,13 +1504,19 @@ begin
   self.TTL.MulDivInt(TArr3,TArr6,TArr1,False);
   self.TTL.IntArrToStr(TArr1,Str3);
 
+  if(Int1>=Int2)then Int1:=Int1-Int2 else Int1:=Int2-Int1;
   if(Length(Str3)>Int1)then begin
     Str1:=Copy(Str3,1,Int1);
-    Str2:=Copy(Str3,Int1+1,Length(Str3));
+    Str2:=Copy(Str3,Int1+2,Length(Str3));
   end else begin
     Str1:=Str3;
     Str2:='0';
   end;
+  self.CutSomeStr(Str2);
+  if(Length(Str2)>self.TDeciDigitCountBaseOne)then
+    Str2:=Copy(Str2,1,self.TDeciDigitCountBaseOne);
+  if(Str2='')then Str2:='0';
+  Str2:='10'+Str2;
 
   self.TTL.StrToIntArr(Str1,TArr3);
   self.TTL.StrToIntArr(Str2,TArr6);
