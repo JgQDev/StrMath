@@ -21,21 +21,23 @@ type
   IntArr = type Number;
   RealArr = type Number;
 
+{ Extra-Math }
+function isNaNNumber(const num:Number):Boolean;
+procedure Shift(const isLeft,isSet:Boolean;var num:Number);
+procedure Shift(const isLeft:Boolean;var num:Number);
+procedure ShiftLeft(var num:Number);
+procedure ShiftRight(var num:Number);
+function NumToBitStr(const num:Number):String;
+function AssignNum(const num:Number):Number;
+
 { IntArr-Math }
 function ConditionInt(Num1:IntArr;Symbol:String;Num2:IntArr):Boolean;
 function InRangeInt(var varNum:IntArr;fromNum,ToNum,PaceNum:IntArr):Boolean;
 function InRangeInt(var varNum:IntArr;fromNum,ToNum:IntArr):Boolean;
-function isNaNInt(const num:IntArr):Boolean;
-function IntBitToStr(const num:IntArr):String;
-procedure Shift(const isLeft,isSet:Boolean;var num:IntArr);
-procedure Shift(const isLeft:Boolean;var num:IntArr);
-procedure ShiftLeft(var num:IntArr);
-procedure ShiftRight(var num:IntArr);
 function isIntZero(const num:IntArr):Boolean;
 function isPositiveIntAdvance(const num:IntArr):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
 function isPositiveInt(const num:IntArr):Boolean;
-procedure SetZero(var num:IntArr);
-function AssignInt(const num:IntArr):IntArr;
+procedure SetZeroInt(var num:IntArr);
 function SumSubInt(const num1,num2:IntArr):IntArr;
 procedure SumSubInt(const num1,num2:IntArr;var AAnswer:IntArr);
 function MulDivInt(const num1,num2:IntArr;const doMul:Boolean = True):IntArr;
@@ -44,6 +46,21 @@ function InitInt(const num:String):IntArr;
 function IntStr(const num:IntArr):String;
 
 { RealArr-Math }
+function ConditionReal(Num1:RealArr;Symbol:String;Num2:RealArr):Boolean;
+function InRangeReal(var varNum:RealArr;fromNum,ToNum,PaceNum:RealArr):Boolean;
+function InRangeReal(var varNum:RealArr;fromNum,ToNum:RealArr):Boolean;
+function IntReal(const num:IntArr):RealArr;
+function RoundReal(const num:RealArr):IntArr;
+function isPositiveRealAdvance(const num:RealArr):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
+function isPositiveReal(const num:RealArr):Boolean;
+function SumSubRealO(const num1,num2:RealArr):RealArr;
+procedure SumSubRealO(const num1,num2:RealArr;var AAnswer:RealArr);
+function SumSubRealO(const num1,num2:RealArr;const DeciCountBaseOne:Integer):RealArr;
+procedure SumSubRealO(const num1,num2:RealArr;var AAnswer:RealArr;const DeciCountBaseOne:Integer);
+function MulDivRealO(const num1,num2:RealArr;const doMul:Boolean = True):RealArr;
+procedure MulDivRealO(const num1,num2:RealArr;var AAnswer:RealArr;const doMul:Boolean = True);
+function MulDivRealO(const num1,num2:RealArr;const DeciCountBaseOne:Integer;const doMul:Boolean = True):RealArr;
+procedure MulDivRealO(const num1,num2:RealArr;var AAnswer:RealArr;const DeciCountBaseOne:Integer;const doMul:Boolean = True);
 function SumSubReal(const num1,num2:RealArr):RealArr;
 procedure SumSubReal(const num1,num2:RealArr;var AAnswer:RealArr);
 function SumSubReal(const num1,num2:RealArr;const DeciCountBaseOne:Integer):RealArr;
@@ -164,12 +181,16 @@ type
     constructor Create;
     destructor Destroy; override;
     function CheckIntegrity(num:RealArr):Boolean;
+    function DigitStr(const AStr:String):Boolean;
     procedure CombineArr(FromNum1,FromNum2:IntArr;var ToNum:RealArr;var NumAt:IntArr);
-    procedure SplitArr(var FromNum1,FromNum2:IntArr;const ToNum:RealArr;const NumAt:IntArr);
+    function SplitArr(var FromNum1,FromNum2:IntArr;const ToNum:RealArr;const NumAt:IntArr):Boolean;
     procedure CombineIntToArr(FromNum:IntArr;var ToNum:RealArr);
     procedure SplitIntToArr(var FromNum:IntArr;var ToNum:RealArr);
     procedure StrToRealArr(AStr:String;var numResult:RealArr);
     procedure RealArrToStr(num:RealArr;var AStr:String);
+    procedure IntArrToRealArrEqual(num:IntArr;var numResult:RealArr);
+    procedure RealArrToIntArrRound(num:RealArr;var numResult:IntArr);
+    procedure RealArrRound(var num:RealArr);
     procedure AlignStr(var AStr1,AStr2:String;const APlace:String);
     procedure AlignStrLeft(var AStr1,AStr2:String;const APlace:String);
     procedure CutSomeR(var num:IntArr);
@@ -235,6 +256,67 @@ type
 var AArrMath:ArrMath;
 var ARealMath:RealMath;
 var AStrMath:StringMath;
+
+{ Extra-Math }
+
+function isNaNNumber(const num: Number): Boolean;
+begin
+  Result:=True;
+  if(Length(num)>0)then Result:=False;
+end;
+
+procedure Shift(const isLeft, isSet: Boolean; var num: Number);
+var
+  i:Integer;
+begin
+  if(Length(num)=0)then Exit;
+  i:=Length(num);
+  AArrMath.Shift(isLeft,isSet,num);
+  if(isLeft=False)then SetLength(num,i);
+end;
+
+procedure Shift(const isLeft: Boolean; var num: Number);
+var
+  i:Integer;
+begin
+  if(Length(num)=0)then Exit;
+  i:=Length(num);
+  AArrMath.Shift(isLeft,False,num);
+  if(isLeft=False)then SetLength(num,i);
+end;
+
+procedure ShiftLeft(var num: Number);
+var
+  i:Integer;
+begin
+  if(Length(num)=0)then Exit;
+  i:=Length(num);
+  AArrMath.Shift(True,False,num);
+  SetLength(num,i);
+end;
+
+procedure ShiftRight(var num: Number);
+var
+  i:Integer;
+begin
+  if(Length(num)=0)then Exit;
+  i:=Length(num);
+  AArrMath.Shift(False,False,num);
+  SetLength(num,i);
+end;
+
+function NumToBitStr(const num: Number): String;
+begin
+  Result:='';
+  if(Length(num)=0)then Exit;
+  AArrMath.BitsToStr(num,Result);
+end;
+
+function AssignNum(const num: Number): Number;
+begin
+  Result:=nil;
+  AArrMath.AssignIntNum(num,Result);
+end;
 
 { Arr-Math }
 
@@ -308,55 +390,6 @@ begin
   Result:=InRangeInt(varNum,fromNum,ToNum,InitInt('1'));
 end;
 
-function isNaNInt(const num: IntArr): Boolean;
-begin
-  Result:=True;
-  if(Length(num)>0)then Result:=False;
-end;
-
-function IntBitToStr(const num: IntArr): String;
-begin
-  Result:='';
-  if(Length(num)=0)then Exit;
-  AArrMath.BitsToStr(num,Result);
-end;
-
-procedure Shift(const isLeft, isSet: Boolean; var num: IntArr);
-var
-  i:Integer;
-begin
-  if(Length(num)=0)then Exit;
-  i:=Length(num);
-  AArrMath.Shift(isLeft,isSet,num);
-  if(isLeft=False)then SetLength(num,i);
-end;
-
-procedure Shift(const isLeft: Boolean; var num: IntArr);
-var
-  i:Integer;
-begin
-  if(Length(num)=0)then Exit;
-  i:=Length(num);
-  AArrMath.Shift(isLeft,False,num);
-  if(isLeft=False)then SetLength(num,i);
-end;
-
-procedure ShiftLeft(var num: IntArr);
-begin
-  if(Length(num)=0)then Exit;
-  AArrMath.Shift(True,False,num);
-end;
-
-procedure ShiftRight(var num: IntArr);
-var
-  i:Integer;
-begin
-  if(Length(num)=0)then Exit;
-  i:=Length(num);
-  AArrMath.Shift(False,False,num);
-  SetLength(num,i);
-end;
-
 function isIntZero(const num: IntArr): Boolean;
 var
   TArr1:IntArr;
@@ -394,15 +427,9 @@ begin
   SetLength(TArr1,0);
 end;
 
-procedure SetZero(var num: IntArr);
+procedure SetZeroInt(var num: IntArr);
 begin
   num:=InitInt('0');
-end;
-
-function AssignInt(const num: IntArr): IntArr;
-begin
-  Result:=nil;
-  AArrMath.AssignIntNum(num,Result);
 end;
 
 function SumSubInt(const num1, num2: IntArr): IntArr;
@@ -442,53 +469,200 @@ end;
 
 { RealArr-Math }
 
-function SumSubReal(const num1, num2: RealArr): RealArr;
+function ConditionReal(Num1: RealArr; Symbol: String; Num2: RealArr): Boolean;
+var
+  Cal:RealArr;
+  i:Integer;
+  Bool1:Boolean;
+  AMode:Byte;
+begin
+  Result:=False;
+  if(Length(Num1)=0)and(Length(Num2)=0)then begin
+    Result:=True;
+    Exit;
+  end else
+  if(Length(Num1)=0)or(Length(Num2)=0)then Exit;
+  bool1:=False;
+  for i:=1 to Length(Symbol)do
+    if(Symbol[i]<>' ')then begin
+      bool1:=True;
+      Break;
+    end;
+  if(bool1=False)then Exit;
+
+  for i:=1 to Length(Symbol)do
+    if(Symbol[i]<>' ')then begin
+      Symbol:=Copy(Symbol,i,Length(Symbol));
+      Break;
+    end;
+  for i:=1 to Length(Symbol)do
+    if(Symbol[i]=' ')then begin
+      Symbol:=Copy(Symbol,1,i-1);
+      Break;
+    end;
+
+  Cal:=SumSubReal(Num1,MulDivReal(InitReal('-1'),Num2));
+  AMode:=isPositiveRealAdvance(Cal);
+  if((Symbol='=')or(Symbol='=='))and(AMode=2)then Result:=True else
+  if((Symbol='<>')or(Symbol='!=')or(Symbol='=!'))and((AMode=0)or(AMode=1))then Result:=True else
+  if(Symbol='>')and(AMode=1)then Result:=True else
+  if(Symbol='<')and(AMode=0)then Result:=True else
+  if((Symbol='>=')or(Symbol='=>'))and((AMode=1)or(AMode=2))then Result:=True else
+  if((Symbol='<=')or(Symbol='=<'))and((AMode=0)or(AMode=2))then Result:=True;
+  SetLength(Cal,0);
+end;
+
+function InRangeReal(var varNum: RealArr; fromNum, ToNum, PaceNum: RealArr
+  ): Boolean;
+begin
+
+end;
+
+function InRangeReal(var varNum: RealArr; fromNum, ToNum: RealArr): Boolean;
+begin
+
+end;
+
+function IntReal(const num: IntArr): RealArr;
+begin
+  Result:=nil;
+  ARealMath.IntArrToRealArrEqual(num,Result);
+end;
+
+function RoundReal(const num: RealArr): IntArr;
+begin
+  Result:=nil;
+  ARealMath.RealArrToIntArrRound(num,Result);
+end;
+
+function isPositiveRealAdvance(const num: RealArr): Byte;
+var
+  TArr1:RealArr;
+begin
+  Result:=3;
+  TArr1:=nil;
+  if(Length(num)=0)then Exit;
+  AArrMath.SetInt(num,TArr1);
+  Result:=ARealMath.isPositiveAd(TArr1);
+  SetLength(TArr1,0);
+end;
+
+function isPositiveReal(const num: RealArr): Boolean;
+var
+  TArr1:RealArr;
+begin
+  Result:=False;
+  TArr1:=nil;
+  if(Length(num)=0)then Exit;
+  AArrMath.SetInt(num,TArr1);
+  Result:=ARealMath.isPositive(TArr1);
+  SetLength(TArr1,0);
+end;
+
+function SumSubRealO(const num1, num2: RealArr): RealArr;
 begin
   Result:=nil;
   ARealMath.SumSubReal(num1,num2,Result,11);
 end;
 
-procedure SumSubReal(const num1, num2: RealArr; var AAnswer: RealArr);
+procedure SumSubRealO(const num1, num2: RealArr; var AAnswer: RealArr);
 begin
   ARealMath.SumSubReal(num1,num2,AAnswer,11);
 end;
 
-function SumSubReal(const num1, num2: RealArr; const DeciCountBaseOne: Integer
+function SumSubRealO(const num1, num2: RealArr; const DeciCountBaseOne: Integer
   ): RealArr;
 begin
   Result:=nil;
   ARealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne);
 end;
 
-procedure SumSubReal(const num1, num2: RealArr; var AAnswer: RealArr;
+procedure SumSubRealO(const num1, num2: RealArr; var AAnswer: RealArr;
   const DeciCountBaseOne: Integer);
 begin
   ARealMath.SumSubReal(num1,num2,AAnswer,DeciCountBaseOne);
 end;
 
-function MulDivReal(const num1, num2: RealArr; const doMul: Boolean): RealArr;
+function MulDivRealO(const num1, num2: RealArr; const doMul: Boolean): RealArr;
 begin
   Result:=nil;
   ARealMath.MulDivReal(num1,num2,Result,doMul,11);
 end;
 
-procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
+procedure MulDivRealO(const num1, num2: RealArr; var AAnswer: RealArr;
   const doMul: Boolean);
 begin
   ARealMath.MulDivReal(num1,num2,AAnswer,doMul,11);
 end;
 
-function MulDivReal(const num1, num2: RealArr; const DeciCountBaseOne: Integer;
+function MulDivRealO(const num1, num2: RealArr; const DeciCountBaseOne: Integer;
   const doMul: Boolean): RealArr;
 begin
   Result:=nil;
   ARealMath.MulDivReal(num1,num2,Result,doMul,DeciCountBaseOne);
 end;
 
-procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
+procedure MulDivRealO(const num1, num2: RealArr; var AAnswer: RealArr;
   const DeciCountBaseOne: Integer; const doMul: Boolean);
 begin
   ARealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne);
+end;
+
+function SumSubReal(const num1, num2: RealArr): RealArr;
+begin
+  Result:=nil;
+  ARealMath.SumSubReal(num1,num2,Result,12);
+  ARealMath.RealArrRound(Result);
+end;
+
+procedure SumSubReal(const num1, num2: RealArr; var AAnswer: RealArr);
+begin
+  ARealMath.SumSubReal(num1,num2,AAnswer,12);
+  ARealMath.RealArrRound(AAnswer);
+end;
+
+function SumSubReal(const num1, num2: RealArr; const DeciCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  ARealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne+1);
+  ARealMath.RealArrRound(Result);
+end;
+
+procedure SumSubReal(const num1, num2: RealArr; var AAnswer: RealArr;
+  const DeciCountBaseOne: Integer);
+begin
+  ARealMath.SumSubReal(num1,num2,AAnswer,DeciCountBaseOne+1);
+  ARealMath.RealArrRound(AAnswer);
+end;
+
+function MulDivReal(const num1, num2: RealArr; const doMul: Boolean): RealArr;
+begin
+  Result:=nil;
+  ARealMath.MulDivReal(num1,num2,Result,doMul,12);
+  ARealMath.RealArrRound(Result);
+end;
+
+procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
+  const doMul: Boolean);
+begin
+  ARealMath.MulDivReal(num1,num2,AAnswer,doMul,12);
+  ARealMath.RealArrRound(AAnswer);
+end;
+
+function MulDivReal(const num1, num2: RealArr;
+  const DeciCountBaseOne: Integer; const doMul: Boolean): RealArr;
+begin
+  Result:=nil;
+  ARealMath.MulDivReal(num1,num2,Result,doMul,DeciCountBaseOne+1);
+  ARealMath.RealArrRound(Result);
+end;
+
+procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
+  const DeciCountBaseOne: Integer; const doMul: Boolean);
+begin
+  ARealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne+1);
+  ARealMath.RealArrRound(AAnswer);
 end;
 
 function InitReal(const num: String): RealArr;
@@ -936,6 +1110,22 @@ begin
   if(Length(num)<6)then Result:=False;
 end;
 
+function RealMath.DigitStr(const AStr: String): Boolean;
+begin
+  Result:=False;
+  if(AStr='0')then Result:=True else
+  if(AStr='1')then Result:=True else
+  if(AStr='2')then Result:=True else
+  if(AStr='3')then Result:=True else
+  if(AStr='4')then Result:=True else
+  if(AStr='5')then Result:=True else
+  if(AStr='6')then Result:=True else
+  if(AStr='7')then Result:=True else
+  if(AStr='8')then Result:=True else
+  if(AStr='9')then Result:=True else
+  if(AStr='.')then Result:=True;
+end;
+
 procedure RealMath.CombineArr(FromNum1, FromNum2: IntArr; var ToNum: RealArr;
   var NumAt: IntArr);
 var
@@ -966,16 +1156,23 @@ begin
   SetLength(TArr3,0);
 end;
 
-procedure RealMath.SplitArr(var FromNum1, FromNum2: IntArr;
-  const ToNum: RealArr; const NumAt: IntArr);
+function RealMath.SplitArr(var FromNum1, FromNum2: IntArr;
+  const ToNum: RealArr; const NumAt: IntArr): Boolean;
 var
   i:Integer;
   TArr2,TArr3:IntArr;
 begin
+  Result:=False;
   TArr2:=nil;
   TArr3:=nil;
   SetLength(FromNum1,0);
   SetLength(FromNum2,0);
+
+  self.TTL.StrToIntArr(IntToStr(Length(ToNum)-1),TArr2);
+  self.TTL.StrToIntArr('-1',TArr3);
+  if(ConditionInt(NumAt,'<=',TArr3)=True)then Exit;
+  if(ConditionInt(NumAt,'>=',TArr2)=True)then Exit;
+
   self.TTL.StrToIntArr('0',TArr2);
   self.TTL.StrToIntArr('0',TArr3);
   i:=0;
@@ -990,6 +1187,7 @@ begin
   end;
   SetLength(TArr2,0);
   SetLength(TArr3,0);
+  Result:=True;
 end;
 
 procedure RealMath.CombineIntToArr(FromNum: IntArr; var ToNum: RealArr);
@@ -1033,7 +1231,7 @@ procedure RealMath.StrToRealArr(AStr: String; var numResult: RealArr);
 var
   bool1,bool2:Boolean;
   WholeN,DeciN:String;
-  i:Integer;
+  i,CountA:Integer;
   TArr1,TArr2,TArr3:IntArr;
 begin
   SetLength(numResult,0);
@@ -1043,6 +1241,14 @@ begin
     bool1:=True;
   end else
   if(AStr[1]='+')then AStr:=Copy(AStr,2,Length(AStr));
+
+  CountA:=0;
+  for i:=1 to Length(AStr)do begin
+    if(AStr[i]='.')then CountA:=CountA+1;
+  end;
+  if(CountA>1)then Exit;
+
+  for i:=1 to Length(AStr)do if(self.DigitStr(AStr[i])=False)then Exit;
 
   bool2:=False;
   for i:=1 to Length(AStr)do begin
@@ -1091,7 +1297,7 @@ end;
 procedure RealMath.RealArrToStr(num: RealArr; var AStr: String);
 var
   TArr1,TArr2,TArr3:IntArr;
-  bool1:Boolean;
+  bool1,bool2:Boolean;
   Str1,Str2:String;
 begin
   TArr1:=nil;
@@ -1101,15 +1307,17 @@ begin
   Str2:='';
   AStr:='nil';
   if(Length(num)=0)then Exit;
-  AStr:='';
   if(self.TTL.IsBitSet(num[0],0)=True)then bool1:=False else bool1:=True;
   self.TTL.Shift(True,False,num);
 
+  if(self.CheckIntegrity(num)=False)then Exit;
   self.TTL.SetInt(num,TArr3);
   self.TTL.CutSome(TArr3,num);
 
   self.SplitIntToArr(TArr3,num);
-  self.SplitArr(TArr1,TArr2,num,TArr3);
+  bool2:=self.SplitArr(TArr1,TArr2,num,TArr3);
+  if(bool2=False)then Exit;
+  AStr:='';
 
   self.TTL.IntArrToStr(TArr1,Str1);
   self.TTL.IntArrToStr(TArr2,Str2);
@@ -1120,6 +1328,129 @@ begin
   SetLength(TArr1,0);
   SetLength(TArr2,0);
   SetLength(TArr3,0);
+end;
+
+procedure RealMath.IntArrToRealArrEqual(num: IntArr; var numResult: RealArr);
+var
+  StrA:String;
+begin
+  SetLength(numResult,0);
+  StrA:='';
+  self.TTL.IntArrToStr(num,StrA);
+  StrA:=StrA+'.0';
+  self.StrToRealArr(StrA,numResult);
+end;
+
+procedure RealMath.RealArrToIntArrRound(num: RealArr; var numResult: IntArr);
+var
+  StrA:String;
+  Str2:String;
+  Str3,Str4:String;
+  i:Integer;
+  TArr1,TArr2:RealArr;
+begin
+  SetLength(numResult,0);
+  if(self.CheckIntegrity(num)=False)then Exit;
+  StrA:='';
+  self.RealArrToStr(num,StrA);
+  if(StrA='nil')then Exit;
+
+  Str2:='';
+  for i:=1 to Length(StrA)do begin
+    if(StrA[i]='.')then begin
+      Str2:=Copy(StrA,i+1,Length(StrA));
+      break;
+    end;
+  end;
+
+  Str4:='';
+  for i:=1 to Length(Str2)do begin
+    if(i=Length(Str2))then Str4:=Str4+'4'
+    else Str4:=Str4+'0';
+  end;
+
+  Str3:='';
+  for i:=1 to Length(Str2)do begin
+    if(i=1)then Str3:=Str3+'4'
+    else Str3:=Str3+'0';
+  end;
+
+  TArr1:=nil;
+  TArr2:=nil;
+  self.StrToRealArr('0.'+Str4,TArr2);
+  self.SumSubReal(num,TArr2,TArr1,Length(Str4)+1);
+  self.StrToRealArr('0.'+Str3,TArr2);
+  self.SumSubReal(TArr1,TArr2,num,Length(Str3)+1);
+  self.RealArrToStr(num,StrA);
+  if(StrA='nil')then Exit;
+
+  for i:=1 to Length(StrA)do begin
+    if(StrA[i]='.')then begin
+      StrA:=Copy(StrA,1,i-1);
+      break;
+    end;
+  end;
+  self.TTL.StrToIntArr(StrA,numResult);
+end;
+
+procedure RealMath.RealArrRound(var num: RealArr);
+var
+  TArr1,TArr2,TArr3:RealArr;
+  StrA:String;
+  Str1,Str2,Str4:String;
+  i,j:Integer;
+  Int1:Integer;
+begin
+  if(self.CheckIntegrity(num)=False)then Exit;
+  StrA:='';
+  Int1:=0;
+  TArr3:=nil;
+  self.TTL.SetInt(num,TArr3);
+  SetLength(num,0);
+  self.RealArrToStr(TArr3,StrA);
+  if(StrA='nil')then Exit;
+
+  Str1:='';
+  Str2:='';
+  for i:=1 to Length(StrA)do begin
+    if(StrA[i]='.')then begin
+      Str1:=Copy(StrA,1,i-1);
+      Str2:=Copy(StrA,i+1,Length(StrA));
+      Int1:=Length(Str2);
+      break;
+    end;
+  end;
+
+  Str4:='';
+  for i:=1 to Length(Str2)do begin
+    if(i=Length(Str2))then Str4:=Str4+'4'
+    else Str4:=Str4+'0';
+  end;
+
+  TArr1:=nil;
+  TArr2:=nil;
+  self.StrToRealArr('0.'+Str4,TArr2);
+  self.SumSubReal(TArr3,TArr2,TArr1,Length(Str4)+1);
+  self.RealArrToStr(TArr1,StrA);
+  if(StrA='nil')then Exit;
+
+  Str1:='';
+  Str2:='';
+  for i:=1 to Length(StrA)do begin
+    if(StrA[i]='.')then begin
+      Str1:=Copy(StrA,1,i-1);
+      Str2:=Copy(StrA,i+1,Length(StrA));
+      if(Length(Str2)>=(Int1-1))then begin
+        Str2:=Copy(Str2,1,Int1-1);
+      end else
+      if(Length(Str2)<(Int1-1))then begin
+        for j:=1 to ((Int1-1)-Length(Str2))do Str2:=Str2+'0';
+      end;
+      break;
+    end;
+  end;
+
+  self.StrToRealArr(Str1+'.'+Str2,num);
 end;
 
 procedure RealMath.AlignStr(var AStr1, AStr2: String; const APlace: String);
@@ -1491,7 +1822,6 @@ var
   TArr4,TArr5,TArr6:IntArr;
   Str1,Str2,Str3:String;
   Str4,Str5,Str6:String;
-  Int1,Int2,Int3:Integer;
   i:Integer;
   bool1:Boolean;
 begin
@@ -1507,9 +1837,6 @@ begin
   Str4:='';
   Str5:='';
   Str6:='';
-  Int1:=0;
-  Int2:=0;
-  Int3:=0;
   SetLength(numResult,0);
 
   self.SplitIntToArr(TArr3,num1);
@@ -1582,13 +1909,12 @@ end;
 procedure RealMath.MulDivReal(num1, num2: RealArr; var numResult: RealArr;
   const doMul: Boolean; ADeciDigitCountBaseOne: Integer);
 var
-  bool1,bool2,bool3:Boolean;
+  bool1,bool2:Boolean;
 begin
   SetLength(numResult,0);
   if(Length(num1)=0)then Exit;
   if(Length(num2)=0)then Exit;
-  bool3:=False;
-  if(self.isPositiveAd(num2)=2)then bool3:=True;
+  if(self.isPositiveAd(num2)=2)and(doMul=False)then Exit;
   bool1:=self.isPositive(num1);
   bool2:=self.isPositive(num2);
   self.TTL.Shift(True,False,num1);
@@ -1599,44 +1925,24 @@ begin
   if(self.CheckIntegrity(num2)=False)then Exit;
   if(ADeciDigitCountBaseOne<1)then ADeciDigitCountBaseOne:=1;
   if(bool1=False)and(bool2=False)then begin
-    if(doMul=True)then begin
-      self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,True,numResult);
-    end else
-    if(doMul=False)and(bool3=False)then begin
-      self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,True,numResult);
-    end;
+    if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
+    if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
+    self.TTL.Shift(False,True,numResult);
   end else
   if(bool1=True)and(bool2=False)then begin
-    if(doMul=True)then begin
-      self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,False,numResult);
-    end else
-    if(doMul=False)and(bool3=False)then begin
-      self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,False,numResult);
-    end;
+    if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
+    if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
+    self.TTL.Shift(False,False,numResult);
   end else
   if(bool1=False)and(bool2=True)then begin
-    if(doMul=True)then begin
-      self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,False,numResult);
-    end else
-    if(doMul=False)and(bool3=False)then begin
-      self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,False,numResult);
-    end;
+    if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
+    if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
+    self.TTL.Shift(False,False,numResult);
   end else
   if(bool1=True)and(bool2=True)then begin
-    if(doMul=True)then begin
-      self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,True,numResult);
-    end else
-    if(doMul=False)and(bool3=False)then begin
-      self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-      self.TTL.Shift(False,True,numResult);
-    end;
+    if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
+    if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
+    self.TTL.Shift(False,True,numResult);
   end;
   //End...
 end;
@@ -2136,45 +2442,26 @@ begin
   if(Length(num2)=0)then Exit;
   bool1:=self.isPositive(num1);
   bool2:=self.isPositive(num2);
+  if(self.isIntZero(num2)=True)and(doMul=False)then Exit;
   if(bool1=False)and(bool2=False)then begin
-    if(doMul=True)then begin
-      self.MulInt(num1,num2,numResult);
-      self.Shift(False,True,numResult);
-    end else
-    if(doMul=False)and(self.isIntZero(num2)=False)then begin
-      self.DivInt(num1,num2,numResult);
-      self.Shift(False,True,numResult);
-    end;
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,True,numResult);
   end else
   if(bool1=True)and(bool2=False)then begin
-    if(doMul=True)then begin
-      self.MulInt(num1,num2,numResult);
-      self.Shift(False,False,numResult);
-    end else
-    if(doMul=False)and(self.isIntZero(num2)=False)then begin
-      self.DivInt(num1,num2,numResult);
-      self.Shift(False,False,numResult);
-    end;
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,False,numResult);
   end else
   if(bool1=False)and(bool2=True)then begin
-    if(doMul=True)then begin
-      self.MulInt(num1,num2,numResult);
-      self.Shift(False,False,numResult);
-    end else
-    if(doMul=False)and(self.isIntZero(num2)=False)then begin
-      self.DivInt(num1,num2,numResult);
-      self.Shift(False,False,numResult);
-    end;
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,False,numResult);
   end else
   if(bool1=True)and(bool2=True)then begin
-    if(doMul=True)then begin
-      self.MulInt(num1,num2,numResult);
-      self.Shift(False,True,numResult);
-    end else
-    if(doMul=False)and(self.isIntZero(num2)=False)then begin
-      self.DivInt(num1,num2,numResult);
-      self.Shift(False,True,numResult);
-    end;
+    if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    if(doMul=False)then self.DivInt(num1,num2,numResult);
+    self.Shift(False,True,numResult);
   end;
   if(Length(numResult)>1)then begin
     self.CutSome(numResult,num1);
