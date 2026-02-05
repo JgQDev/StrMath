@@ -218,8 +218,8 @@ type
     function xPowerIntR(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
     procedure lynReal(num:RealArr;var numResult:RealArr;
       const LiterateBaseOne:RealArr;const ADeciDigitCountBaseOne:Integer);
-    procedure lynR(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
-    procedure lnxR(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    procedure lnxR(num:RealArr;var numResult:RealArr;
+      const LiterateBaseOne:RealArr;const ADeciDigitCountBaseOne:Integer);
   end;
 
   { StringMath }
@@ -864,9 +864,7 @@ begin
   Result:=nil;
   Int1:=ARealMath.GetDeciCountBaseOne(num);
   if(Int1<11)then Int1:=11;
-  ARealMath.lynReal(num,Result,LiterateBaseOne,Int1+5);
-  //ARealMath.lnxR(num,Result,Int1);
-  //ARealMath.lynR(num,Result,Int1);
+  ARealMath.lnxR(num,Result,LiterateBaseOne,Int1);
 end;
 
 procedure lnReal(const num, LiterateBaseOne: RealArr; var AAnswer: RealArr);
@@ -875,9 +873,7 @@ var
 begin
   Int1:=ARealMath.GetDeciCountBaseOne(num);
   if(Int1<11)then Int1:=11;
-  ARealMath.lynReal(num,AAnswer,LiterateBaseOne,Int1+5);
-  //ARealMath.lnxR(num,AAnswer,Int1);
-  //ARealMath.lynR(num,AAnswer,Int1);
+  ARealMath.lnxR(num,AAnswer,LiterateBaseOne,Int1);
 end;
 
 function InitReal(const num: String): RealArr;
@@ -1549,7 +1545,7 @@ begin
 
   Str2:=Copy(Str2,3,Length(Str2));
   AStr:=Str1+'.'+Str2;
-  if(bool1=True)and(Str1<>'0')and(Str2<>'0')then AStr:='-'+AStr;
+  if(bool1=True)and(AStr<>'0.0')then AStr:='-'+AStr;
 
   SetLength(TArr1,0);
   SetLength(TArr2,0);
@@ -1851,7 +1847,7 @@ var
 begin
   AMode:=self.isPositiveAd(num);
   if(AMode=0)then Result:=False else
-  if(AMode=1)then Result:=True else Result:=True;
+  if(AMode=1)then Result:=True else Result:=False;
 end;
 
 procedure RealMath.SumReal(num1, num2: RealArr; var numResult: RealArr;
@@ -1957,6 +1953,9 @@ begin
   Str8:=Copy(Str2,3,Length(Str2));
   Str7:=Str4+Str7;
   Str8:=Str5+Str8;
+  self.AlignStrLeft(Str7,Str8,'0');
+  Str7:='1'+Str7;
+  Str8:='1'+Str8;
   self.TTL.StrToIntArr(Str7,TArr3);
   self.TTL.StrToIntArr(Str8,TArr6);
 
@@ -1969,16 +1968,31 @@ begin
   Int1:=Length(Str1);
   Int2:=Length(Str4);
   Str1:=Str4+Str1;
+  Str2:=Str5+Str2;
   self.AlignStrLeft(Str1,Str2,'0');
-  Str1:='2'+Str1;
-  Str2:='1'+Str2;
-  self.TTL.StrToIntArr(Str1,TArr3);
-  self.TTL.StrToIntArr(Str2,TArr6);
 
-  self.TTL.StrToIntArr('-1',TArr1);
-  self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
-  self.TTL.SumSubInt(TArr3,TArr4,TArr1);
-  self.TTL.IntArrToStr(TArr1,Str3);
+  if(NumBiggerMode>=1)then begin
+    Str1:='2'+Str1;
+    Str2:='1'+Str2;
+    self.TTL.StrToIntArr(Str1,TArr3);
+    self.TTL.StrToIntArr(Str2,TArr6);
+
+    self.TTL.StrToIntArr('-1',TArr1);
+    self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
+    self.TTL.SumSubInt(TArr3,TArr4,TArr1);
+    self.TTL.IntArrToStr(TArr1,Str3);
+  end else
+  if(NumBiggerMode=0)then begin
+    Str1:='1'+Str1;
+    Str2:='2'+Str2;
+    self.TTL.StrToIntArr(Str1,TArr3);
+    self.TTL.StrToIntArr(Str2,TArr6);
+
+    self.TTL.StrToIntArr('-1',TArr1);
+    self.TTL.MulDivInt(TArr3,TArr1,TArr4,True);
+    self.TTL.SumSubInt(TArr6,TArr4,TArr1);
+    self.TTL.IntArrToStr(TArr1,Str3);
+  end;
 
   if(Str3[1]='-')then Str3:=Copy(Str3,2,Length(Str3));
   Str6:=Copy(Str3,Int2+2,Length(Str3));
@@ -1986,15 +2000,6 @@ begin
   Str3:=Copy(Str3,2,Length(Str3));
   if(Str3='')then Str3:='0';
 
-  self.TTL.StrToIntArr(Str3,TArr3);
-  self.TTL.StrToIntArr(Str5,TArr6);
-
-  self.TTL.StrToIntArr('-1',TArr1);
-  self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
-  self.TTL.SumSubInt(TArr3,TArr4,TArr1);
-  self.TTL.IntArrToStr(TArr1,Str3);
-
-  if(Str3[1]='-')then Str3:=Copy(Str3,2,Length(Str3));
   self.CutSomeStr(Str6);
   if(Length(Str6)>ADeciDigitCountBaseOne)then
     Str6:=Copy(Str6,1,ADeciDigitCountBaseOne);
@@ -2399,69 +2404,8 @@ begin
   Str6:=RealStr(numResult);
 end;
 
-procedure RealMath.lynR(num: RealArr; var numResult: RealArr;
-  const ADeciDigitCountBaseOne: Integer);
-var
-  Og,Og2:RealArr;
-  Ct:RealArr;
-  Term:RealArr;
-  n1,n2:RealArr;
-  Zero1:RealArr;
-
-  Str1,Str2,Str3,Str4:String;
-  Str5,Str6,Str7,Str8:String;
-begin
-  Str1:='';
-  Str2:='';
-  Str3:='';
-  Str4:='';
-  Str5:='';
-  Str6:='';
-  Str7:='';
-  Str8:='';
-  n1:=StrMath.SumSubReal(num,InitReal('-1.0'),ADeciDigitCountBaseOne);
-  Str5:=RealStr(n1);
-
-  n2:=StrMath.SumSubReal(num,InitReal('1.0'),ADeciDigitCountBaseOne);
-  Str5:=RealStr(n2);
-
-  Og:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne,False);
-
-  Str5:=RealStr(Og);
-
-  Term:=AssignNum(Og);
-  numResult:=AssignNum(Og);
-  Ct:=InitReal('3.0');
-  Og2:=StrMath.MulDivReal(Og,Og,ADeciDigitCountBaseOne);
-
-  Str6:=RealStr(Og2);
-
-  Str7:=RealStr(Term);
-  Str8:=RealStr(numResult);
-  Str4:=RealStr(Ct);
-
-  Zero1:=InitReal('0.0');
-  While(ConditionReal(Term,'<>',Zero1)=True)do begin
-    Term:=StrMath.MulDivReal(Term,Og2,ADeciDigitCountBaseOne);
-    Str1:=RealStr(Term);
-
-    n1:=StrMath.MulDivReal(Term,Ct,ADeciDigitCountBaseOne,False);
-    Str2:=RealStr(n1);
-
-    numResult:=StrMath.SumSubReal(numResult,n1,ADeciDigitCountBaseOne);
-    Str3:=RealStr(numResult);
-
-    Ct:=StrMath.SumSubReal(Ct,InitReal('2.0'),ADeciDigitCountBaseOne);
-    Str4:=RealStr(Ct);
-  end;
-  numResult:=StrMath.MulDivReal(numResult,InitReal('2.0'),
-  ADeciDigitCountBaseOne);
-
-  Str2:=RealStr(numResult);
-end;
-
 procedure RealMath.lnxR(num: RealArr; var numResult: RealArr;
-  const ADeciDigitCountBaseOne: Integer);
+  const LiterateBaseOne: RealArr; const ADeciDigitCountBaseOne: Integer);
 var
   n3,n4:RealArr;
   n5,n6:RealArr;
@@ -2474,14 +2418,14 @@ begin
   n5:=nil;
   n6:=nil;
 
-  lynR(InitReal('2.0'),n3,ADeciDigitCountBaseOne+5);
+  lynReal(InitReal('2.0'),n3,LiterateBaseOne,ADeciDigitCountBaseOne+5);
 
   n5:=xPowerIntR(InitReal('2.0'),InitReal('2.0'),
   ADeciDigitCountBaseOne+5);
 
   n6:=StrMath.MulDivReal(num,n5,ADeciDigitCountBaseOne+5,False);
 
-  lynR(n6,n4,ADeciDigitCountBaseOne+5);
+  lynReal(n6,n4,LiterateBaseOne,ADeciDigitCountBaseOne+5);
 
   numResult:=StrMath.SumSubReal(StrMath.MulDivReal(InitReal('2.0'),n3,
   ADeciDigitCountBaseOne+5),n4,ADeciDigitCountBaseOne+5);
