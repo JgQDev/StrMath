@@ -80,6 +80,20 @@ function logReal(const num:RealArr):RealArr;
 procedure logReal(const num:RealArr;var AAnswer:RealArr);
 function logReal(const num,base:RealArr):RealArr;
 procedure logReal(const num,base:RealArr;var AAnswer:RealArr);
+function SqrRootReal(const num:RealArr):RealArr;
+procedure SqrRootReal(const num:RealArr;var AAnswer:RealArr);
+function SineReal(const Degrees:RealArr):RealArr;
+procedure SineReal(const Degrees:RealArr;var AAnswer:RealArr);
+function CosineReal(const Degrees:RealArr):RealArr;
+procedure CosineReal(const Degrees:RealArr;var AAnswer:RealArr);
+function TangentReal(const Degrees:RealArr):RealArr;
+procedure TangentReal(const Degrees:RealArr;var AAnswer:RealArr);
+function InSineReal(const SineX:RealArr):RealArr;
+procedure InSineReal(const SineX:RealArr;var AAnswer:RealArr);
+function InCosineReal(const CosineX:RealArr):RealArr;
+procedure InCosineReal(const CosineX:RealArr;var AAnswer:RealArr);
+function InTangentReal(const TangentX:RealArr):RealArr;
+procedure InTangentReal(const TangentX:RealArr;var AAnswer:RealArr);
 function InitReal(const num:String):RealArr;
 function RealStr(const num:RealArr):String;
 function RealMod(const num1,num2:RealArr):RealArr;
@@ -231,6 +245,16 @@ type
       const ADeciDigitCountBaseOne:Integer);
     procedure logaReal(num,base:RealArr;var numResult:RealArr;
       const ADeciDigitCountBaseOne:Integer);
+    procedure Root2Real(num:RealArr;var numResult:RealArr;
+      const ADeciDigitCountBaseOne:Integer);
+    function SinReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function CosReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function TanReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function InSinReal(SinX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function InCosReal(CosX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function InTanReal(TanX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function RealFactorialIntStr(num:RealArr;
+      const ADeciDigitCountBaseOne:Integer):RealArr;
   end;
 
   { StringMath }
@@ -936,6 +960,153 @@ begin
   Int1:=ARealMath.GetDeciCountBaseOne(num);
   if(Int1<11)then Int1:=11;
   ARealMath.logaReal(num,base,AAnswer,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function SqrRootReal(const num: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  ARealMath.Root2Real(num,Result,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure SqrRootReal(const num: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  ARealMath.Root2Real(num,AAnswer,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function SineReal(const Degrees: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=ARealMath.SinReal(Degrees,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure SineReal(const Degrees: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=ARealMath.SinReal(Degrees,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function CosineReal(const Degrees: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=ARealMath.CosReal(Degrees,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure CosineReal(const Degrees: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=ARealMath.CosReal(Degrees,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function TangentReal(const Degrees: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=ARealMath.TanReal(Degrees,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure TangentReal(const Degrees: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=ARealMath.TanReal(Degrees,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function InSineReal(const SineX: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=ARealMath.InSinReal(SineX,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure InSineReal(const SineX: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=ARealMath.InSinReal(SineX,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function InCosineReal(const CosineX: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=ARealMath.InCosReal(CosineX,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure InCosineReal(const CosineX: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=ARealMath.InCosReal(CosineX,Int1+1);
+  AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
+end;
+
+function InTangentReal(const TangentX: RealArr): RealArr;
+var
+  Int1:Integer;
+begin
+  Result:=nil;
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=ARealMath.InTanReal(TangentX,Int1+1);
+  Result:=CutRealDeciCountBaseOneR(Result,Int1);
+end;
+
+procedure InTangentReal(const TangentX: RealArr; var AAnswer: RealArr);
+var
+  Int1:Integer;
+begin
+  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=ARealMath.InTanReal(TangentX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2432,7 +2603,7 @@ begin
   Apower:=IntReal(RoundRealR(Apower));
   Str1:=RealStr(Abase);
   Str2:=RealStr(Apower);
-  StrA.TDeciDigitCountBaseOne:=ADeciDigitCountBaseOne;
+  StrA.TDeciDigitCountBaseOne:=ADeciDigitCountBaseOne+5;
   Str3:=StrA.xPowerInt(Str1,Str2);
   Result:=InitReal(Str3);
   Result:=StrMath.CutRealDeciCountBaseOneR(Result,ADeciDigitCountBaseOne);
@@ -2477,6 +2648,185 @@ procedure RealMath.logaReal(num, base: RealArr; var numResult: RealArr;
 begin
   numResult:=StrMath.MulDivReal(lnReal(num),lnReal(base),
   ADeciDigitCountBaseOne,False);
+end;
+
+procedure RealMath.Root2Real(num: RealArr; var numResult: RealArr;
+  const ADeciDigitCountBaseOne: Integer);
+var
+  i:Integer;
+  n1,n2,n3,n4,n5:RealArr;
+begin
+  n1:=nil;
+  n2:=nil;
+  n3:=nil;
+  n4:=nil;
+  n5:=nil;
+  SetLength(numResult,0);
+  if(Length(num)=0)then Exit else
+  if(ConditionReal(num,'<',InitReal('0.0'))=True)then Exit else
+  if(ConditionReal(num,'=',InitReal('0.0'))=True)then begin
+    numResult:=AssignNum(num);
+    Exit;
+  end;
+  numResult:=InitReal('1.0');
+  n1:=StrMath.MulDivReal(InitReal('1.0'),InitReal('2.0'),ADeciDigitCountBaseOne,False);
+  n5:=AssignNum(n1);
+  n4:=StrMath.MulDivReal(n1,n1,ADeciDigitCountBaseOne,True);
+  While(ConditionReal(n5,'<>',InitReal('0.0'))=True)do begin
+    n5:=StrMath.MulDivReal(n5,n4,ADeciDigitCountBaseOne,True);
+    n3:=StrMath.MulDivReal(num,numResult,ADeciDigitCountBaseOne,False);
+    n2:=StrMath.SumSubReal(numResult,n3,ADeciDigitCountBaseOne);
+    numResult:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne,True);
+  end;
+  SetLength(n1,0);
+  SetLength(n2,0);
+  SetLength(n3,0);
+  SetLength(n4,0);
+  SetLength(n5,0);
+end;
+
+function RealMath.SinReal(Degrees: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
+begin
+  Result:=nil;
+  SetLength(Result,0);
+  if(Length(Degrees)=0)then Exit;
+
+  Degrees:=StrMath.SumSubReal(Degrees,StrMath.MulDivReal(InitReal('-1'),
+  StrMath.MulDivReal(InitReal('360.0'),RoundRealR(StrMath.MulDivReal(Degrees,
+  InitReal('360.0'),ADeciDigitCountBaseOne,False)),ADeciDigitCountBaseOne,True),
+  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne);
+
+  if(ConditionReal(Degrees,'>=',InitReal('0.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('90.0'))=True)then
+    Result:=StrMath.SqrRootReal(StrMath.MulDivReal(Degrees,InitReal('90.0'),
+    ADeciDigitCountBaseOne,False)) else
+  if(ConditionReal(Degrees,'>=',InitReal('91.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('180.0'))=True)then
+    Result:=StrMath.SqrRootReal(StrMath.SumSubReal(InitReal('1.0'),
+    StrMath.MulDivReal(InitReal('-1.0'),StrMath.MulDivReal(StrMath.SumSubReal
+    (Degrees,InitReal('-90'),ADeciDigitCountBaseOne),InitReal('90.0'),
+    ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne,True),
+    ADeciDigitCountBaseOne)) else
+  if(ConditionReal(Degrees,'>=',InitReal('181.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('270.0'))=True)then
+    Result:=StrMath.MulDivReal(InitReal('-1.0'),StrMath.SqrRootReal
+    (StrMath.MulDivReal(StrMath.SumSubReal(Degrees,InitReal('-180.0'),
+    ADeciDigitCountBaseOne),InitReal('90.0'),ADeciDigitCountBaseOne,False)),
+    ADeciDigitCountBaseOne,True) else
+  if(ConditionReal(Degrees,'>=',InitReal('271.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('360.0'))=True)then
+    Result:=StrMath.MulDivReal(InitReal('-1.0'),StrMath.SqrRootReal
+    (StrMath.SumSubReal(InitReal('1.0'),StrMath.MulDivReal(InitReal('-1.0'),
+    StrMath.MulDivReal(StrMath.SumSubReal(Degrees,InitReal('-270'),
+    ADeciDigitCountBaseOne),InitReal('90.0'),ADeciDigitCountBaseOne,False),
+    ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne)),
+    ADeciDigitCountBaseOne,True);
+end;
+
+function RealMath.CosReal(Degrees: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
+begin
+  Result:=nil;
+  SetLength(Result,0);
+  if(Length(Degrees)=0)then Exit;
+
+  Degrees:=StrMath.SumSubReal(Degrees,StrMath.MulDivReal(InitReal('-1'),
+  StrMath.MulDivReal(InitReal('360.0'),RoundRealR(StrMath.MulDivReal(Degrees,
+  InitReal('360.0'),ADeciDigitCountBaseOne,False)),ADeciDigitCountBaseOne,True),
+  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne);
+
+  if(ConditionReal(Degrees,'>=',InitReal('0.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('90.0'))=True)then
+    Result:=StrMath.SqrRootReal(StrMath.SumSubReal(InitReal('1.0'),
+    StrMath.MulDivReal(InitReal('-1.0'),self.RealXPowerIntStr(self.SinReal
+    (Degrees,ADeciDigitCountBaseOne),InitReal('2.0'),ADeciDigitCountBaseOne),
+    ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne)) else
+  if(ConditionReal(Degrees,'>=',InitReal('91.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('180.0'))=True)then
+    Result:=StrMath.MulDivReal(InitReal('-1.0'),StrMath.SqrRootReal(
+    StrMath.SumSubReal(InitReal('1.0'),StrMath.MulDivReal(InitReal('-1.0'),
+    self.RealXPowerIntStr(self.SinReal(Degrees,ADeciDigitCountBaseOne),InitReal('2.0'),
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne)),
+    ADeciDigitCountBaseOne,True) else
+  if(ConditionReal(Degrees,'>=',InitReal('181.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('270.0'))=True)then
+    Result:=StrMath.MulDivReal(InitReal('-1.0'),StrMath.SqrRootReal(
+    StrMath.SumSubReal(InitReal('1.0'),StrMath.MulDivReal(InitReal('-1.0'),
+    self.RealXPowerIntStr(self.SinReal(Degrees,ADeciDigitCountBaseOne),InitReal('2.0'),
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne)),
+    ADeciDigitCountBaseOne,True) else
+  if(ConditionReal(Degrees,'>=',InitReal('271.0'))=True)and
+  (ConditionReal(Degrees,'<=',InitReal('360.0'))=True)then
+    Result:=StrMath.SqrRootReal(StrMath.SumSubReal(InitReal('1.0'),
+    StrMath.MulDivReal(InitReal('-1.0'),self.RealXPowerIntStr(self.SinReal
+    (Degrees,ADeciDigitCountBaseOne),InitReal('2.0'),ADeciDigitCountBaseOne),
+    ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne));
+end;
+
+function RealMath.TanReal(Degrees: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
+begin
+  Result:=nil;
+  SetLength(Result,0);
+  if(Length(Degrees)=0)then Exit;
+  Result:=StrMath.MulDivReal(self.SinReal(Degrees,ADeciDigitCountBaseOne),
+  self.CosReal(Degrees,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False);
+end;
+
+function RealMath.InSinReal(SinX: RealArr; const ADeciDigitCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  SetLength(Result,0);
+  if(Length(SinX)=0)then Exit;
+  Result:=StrMath.MulDivReal(self.RealXPowerIntStr(SinX,InitReal('2.0'),
+  ADeciDigitCountBaseOne),InitReal('90.0'),ADeciDigitCountBaseOne,True);
+end;
+
+function RealMath.InCosReal(CosX: RealArr; const ADeciDigitCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  SetLength(Result,0);
+  if(Length(CosX)=0)then Exit;
+  Result:=StrMath.MulDivReal(self.RealXPowerIntStr(StrMath.SqrRootReal(
+  StrMath.SumSubReal(InitReal('1.0'),StrMath.MulDivReal(InitReal('-1.0'),
+  self.RealXPowerIntStr(CosX,InitReal('2.0'),ADeciDigitCountBaseOne),
+  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne)),InitReal('2.0'),
+  ADeciDigitCountBaseOne),InitReal('90.0'),ADeciDigitCountBaseOne,True);
+end;
+
+function RealMath.InTanReal(TanX: RealArr; const ADeciDigitCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  SetLength(Result,0);
+  if(Length(TanX)=0)then Exit;
+  Result:=StrMath.MulDivReal(self.RealXPowerIntStr(StrMath.MulDivReal(TanX,
+  StrMath.SqrRootReal(StrMath.SumSubReal(InitReal('1.0'),self.RealXPowerIntStr
+  (TanX,InitReal('2.0'),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),
+  ADeciDigitCountBaseOne,False),InitReal('2.0'),ADeciDigitCountBaseOne),
+  InitReal('90.0'),ADeciDigitCountBaseOne,True);
+end;
+
+function RealMath.RealFactorialIntStr(num: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
+var
+  StrA:StringMath;
+  Str1,Str2:String;
+begin
+  Result:=nil;
+  Str1:='';
+  Str2:='';
+  StrA:=nil;
+  StrA:=StringMath.Create;
+  Str1:=RealStr(num);
+  StrA.TDeciDigitCountBaseOne:=ADeciDigitCountBaseOne+5;
+  Str2:=StrA.FactorialInt(Str1);
+  Result:=InitReal(Str2);
+  Result:=StrMath.CutRealDeciCountBaseOneR(Result,ADeciDigitCountBaseOne);
+  StrA.Free;
 end;
 
 { ArrMath }
