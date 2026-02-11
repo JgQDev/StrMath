@@ -27,13 +27,13 @@ procedure Shift(const isLeft,isSet:Boolean;var num:Number);
 procedure Shift(const isLeft:Boolean;var num:Number);
 procedure ShiftLeft(var num:Number);
 procedure ShiftRight(var num:Number);
-function NumToBitStr(const num:Number):String;        //<-----
 function AssignNum(const num:Number):Number;
 
 { IntArr-Math }
 function ConditionInt(Num1:IntArr;Symbol:String;Num2:IntArr):Boolean;
 function InRangeInt(var varNum:IntArr;fromNum,ToNum,PaceNum:IntArr):Boolean;
 function InRangeInt(var varNum:IntArr;fromNum,ToNum:IntArr):Boolean;
+function IntToBitStr(const num:IntArr):String;
 function isIntZero(const num:IntArr):Boolean;
 function isPositiveIntAdvance(const num:IntArr):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
 function isPositiveInt(const num:IntArr):Boolean;
@@ -50,6 +50,7 @@ function IntMod(const num1,num2:IntArr):IntArr;
 function ConditionReal(Num1:RealArr;Symbol:String;Num2:RealArr):Boolean;
 function InRangeReal(var varNum:RealArr;fromNum,ToNum,PaceNum:RealArr):Boolean;
 function InRangeReal(var varNum:RealArr;fromNum,ToNum:RealArr):Boolean;
+function RealToBitStr(const num:RealArr):String;
 function IntReal(const num:IntArr):RealArr;
 function RoundReal(const num:RealArr):IntArr;
 function RoundRealR(const num:RealArr):IntArr;
@@ -101,10 +102,7 @@ function RealMod(const num1,num2:RealArr):RealArr;
 { String-Math }
 function Condition(Num1,Symbol,Num2:String):Boolean;
 function isNaN(const NumV:String):Boolean;
-function GetDeciCount:Integer;
 function CutDeciCount(const NumV:String;const DeciCountBaseOne:Integer):String;
-procedure SetDeciCountDefault;
-procedure SetDeciCount(const CountBaseOne:Integer);
 function isNumber(const NumV:String):Boolean;
 function isInt(const NumV:String):boolean;
 function CleanNum(const NumV:String):String;
@@ -193,6 +191,7 @@ type
     procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
     procedure SumSubInt(num1,num2:IntArr;var numResult:IntArr);
     procedure MulInt(num1,num2:IntArr;var numResult:IntArr);
+    procedure MulIntSum(num1,num2:IntArr;var numResult:IntArr);
     procedure DivInt(num1,num2:IntArr;var numResult:IntArr);
     procedure MulDivInt(num1,num2:IntArr;var numResult:IntArr;const doMul:Boolean);
     procedure StrToIntArr(AStr:String;var numResult:IntArr);
@@ -261,8 +260,6 @@ type
 
   StringMath = class(TObject)
   public
-    TDeciDigitCountBaseOne:Integer;
-    TDisableDeci:Boolean;
     constructor Create;
     destructor Destroy; override;
     function RR(const x:Real):Integer;
@@ -277,32 +274,34 @@ type
     function isNum1Bigger(const num1,num2:String):Byte;
     procedure Carrying(const num1,num2:String;var TArr1,TArr2:TNumArr);
     function Reverse(const Num1:String):String;
-    function CutCountDeci(const WholeNum,DeciNum:String):String;
     function RR(x:String;const WithDeci:Boolean = True):String;
     function RD(x:String;const WithDeci:Boolean = True):String;
     function RX(x:String;const WithDeci:Boolean = True):String;
+    function GetDeciCountBaseOne(num:String):Integer;
+    procedure RealCutDeciCountBaseOne(var num:String;CutAt:Integer);
+    procedure RealCutDeciCountBaseOneR(var num:String;CutAt:Integer);
     function Sum(const num1,num2:String):String;
     function Sub(const num1,num2:String):String;
     function SumSub(const num1,num2:String):String;
     function Mul(const num1,num2:String):String;
     function DivA(const num1,num2:String;const DeciDigitCountBaseOne:Integer):String;
-    function MulDiv(const num1,num2:String;const doMul:Boolean = True):String;
-    function xPowerInt(Abase,Apower:String):String;
-    function lyn(x:String):String;
-    function lnx(x:String):String;
-    function lnx2(x:String):String;
-    function log(num,base:String):String;
-    function SqrRoot(x:String):String;
-    function Sine(Degrees:String):String;
-    function Cosine(Degrees:String):String;
-    function Tangent(Degrees:String):String;
-    function InSine(SineX:String):String;
-    function InCosine(CosineX:String):String;
-    function InTangent(TangentX:String):String;
-    function FactorialInt(x:String):String;
-    function ePower(x:String):String;
-    function ePowerX(x:String):String;
-    function xPower(Abase,Apower:String):String;
+    function MulDiv(const num1,num2:String;const ADeciDigitCountBaseOne:Integer;const doMul:Boolean = True):String;
+    function xPowerInt(Abase,Apower:String;const ADeciDigitCountBaseOne:Integer):String;
+    function lyn(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    function lnx(x:String;ADeciDigitCountBaseOne:Integer):String;
+    function lnx2(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    function log(num,base:String;ADeciDigitCountBaseOne:Integer):String;
+    function SqrRoot(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    function Sine(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
+    function Cosine(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
+    function Tangent(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
+    function InSine(SineX:String;const ADeciDigitCountBaseOne:Integer):String;
+    function InCosine(CosineX:String;const ADeciDigitCountBaseOne:Integer):String;
+    function InTangent(TangentX:String;const ADeciDigitCountBaseOne:Integer):String;
+    function FactorialInt(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    function ePower(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    function ePowerX(x:String;ADeciDigitCountBaseOne:Integer):String;
+    function xPower(Abase,Apower:String;ADeciDigitCountBaseOne:Integer):String;
   end;
 
 var AArrMath:ArrMath;
@@ -355,13 +354,6 @@ begin
   i:=Length(num);
   AArrMath.Shift(False,False,num);
   SetLength(num,i);
-end;
-
-function NumToBitStr(const num: Number): String;
-begin
-  Result:='';
-  if(Length(num)=0)then Exit;
-  AArrMath.BitsToStr(num,Result);
 end;
 
 function AssignNum(const num: Number): Number;
@@ -442,6 +434,13 @@ end;
 function InRangeInt(var varNum: IntArr; fromNum, ToNum: IntArr): Boolean;
 begin
   Result:=InRangeInt(varNum,fromNum,ToNum,InitInt('1'));
+end;
+
+function IntToBitStr(const num: IntArr): String;
+begin
+  Result:='';
+  if(Length(num)=0)then Exit;
+  AArrMath.BitsToStr(num,Result);
 end;
 
 function isIntZero(const num: IntArr): Boolean;
@@ -681,6 +680,38 @@ end;
 function InRangeReal(var varNum: RealArr; fromNum, ToNum: RealArr): Boolean;
 begin
   Result:=InRangeReal(varNum,fromNum,ToNum,InitReal('1.0'));
+end;
+
+function RealToBitStr(const num: RealArr): String;
+var
+  i:Integer;
+  Str1,Str2:String;
+  bool1:Boolean;
+  TArr1,TArr2:IntArr;
+begin
+  Result:='nil';
+  Str1:='';
+  Str2:='';
+  TArr1:=nil;
+  TArr2:=nil;
+  Str1:=RealStr(num);
+  bool1:=False;
+  for i:=1 to Length(Str1)do begin
+    if(Str1[i]='.')then begin
+      Str2:=Copy(Str1,i+1,Length(Str1));
+      Str1:=Copy(Str1,1,i-1);
+      bool1:=True;
+      break;
+    end;
+  end;
+  if(bool1=False)then Exit;
+  TArr1:=InitInt(Str1);
+  TArr2:=InitInt(Str2);
+  Str1:=IntToBitStr(TArr1);
+  Str2:=IntToBitStr(TArr2);
+  Result:=Str2+'.'+Str1;
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
 end;
 
 function IntReal(const num: IntArr): RealArr;
@@ -989,7 +1020,7 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<11)then Int1:=11;
   Result:=ARealMath.SinReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
@@ -999,7 +1030,7 @@ procedure SineReal(const Degrees: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<11)then Int1:=11;
   AAnswer:=ARealMath.SinReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
@@ -1010,7 +1041,7 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<11)then Int1:=11;
   Result:=ARealMath.CosReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
@@ -1020,7 +1051,7 @@ procedure CosineReal(const Degrees: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<11)then Int1:=11;
   AAnswer:=ARealMath.CosReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
@@ -1031,7 +1062,7 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<11)then Int1:=11;
   Result:=ARealMath.TanReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
@@ -1041,7 +1072,7 @@ procedure TangentReal(const Degrees: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<11)then Int1:=11;
   AAnswer:=ARealMath.TanReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
@@ -1052,7 +1083,7 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(SineX);
   if(Int1<11)then Int1:=11;
   Result:=ARealMath.InSinReal(SineX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
@@ -1062,7 +1093,7 @@ procedure InSineReal(const SineX: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(SineX);
   if(Int1<11)then Int1:=11;
   AAnswer:=ARealMath.InSinReal(SineX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
@@ -1073,7 +1104,7 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(CosineX);
   if(Int1<11)then Int1:=11;
   Result:=ARealMath.InCosReal(CosineX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
@@ -1083,7 +1114,7 @@ procedure InCosineReal(const CosineX: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(CosineX);
   if(Int1<11)then Int1:=11;
   AAnswer:=ARealMath.InCosReal(CosineX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
@@ -1094,7 +1125,7 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(TangentX);
   if(Int1<11)then Int1:=11;
   Result:=ARealMath.InTanReal(TangentX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
@@ -1104,7 +1135,7 @@ procedure InTangentReal(const TangentX: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=ARealMath.GetDeciCountBaseOne(TangentX);
   if(Int1<11)then Int1:=11;
   AAnswer:=ARealMath.InTanReal(TangentX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
@@ -1184,11 +1215,6 @@ begin
   else Result:=False;
 end;
 
-function GetDeciCount: Integer;
-begin
-  Result:=AStrMath.TDeciDigitCountBaseOne;
-end;
-
 function CutDeciCount(const NumV: String; const DeciCountBaseOne: Integer
   ): String;
 var
@@ -1207,16 +1233,6 @@ begin
     Result:=AWhole+'.'+ADeci;
   end;
   Result:=AStrMath.CleanNum(Result);
-end;
-
-procedure SetDeciCountDefault;
-begin
-  AStrMath.TDeciDigitCountBaseOne:=11;
-end;
-
-procedure SetDeciCount(const CountBaseOne: Integer);
-begin
-  AStrMath.TDeciDigitCountBaseOne:=CountBaseOne;
 end;
 
 function isNumber(const NumV: String): Boolean;
@@ -1309,32 +1325,60 @@ begin
   N2:=AStrMath.CleanNum(Num2);
   if(N1='nan')then Exit;
   if(N2='nan')then Exit;
-  Cal:=AStrMath.SumSub(N1,AStrMath.MulDiv('-1',N2));
+  Cal:=SumSub(N1,MulDiv('-1',N2));
   if(AStrMath.isPositiveAd(Cal)=1)then Result:=1 else
   if(AStrMath.isPositiveAd(Cal)=0)then Result:=0 else
   if(AStrMath.isPositiveAd(Cal)=2)then Result:=2;
 end;
 
 function SumSub(const Num1, Num2: String): String;
+var
+  Int1,Int2,Int3:Integer;
 begin
+  Int1:=AStrMath.GetDeciCountBaseOne(num1);
+  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
   Result:=AStrMath.SumSub(Num1,Num2);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int3-1);
 end;
 
 function MulDiv(const Num1, Num2: String; const doMul: Boolean): String;
+var
+  Int1,Int2,Int3:Integer;
 begin
-  Result:=AStrMath.MulDiv(Num1,Num2,doMul);
+  Int1:=AStrMath.GetDeciCountBaseOne(num1);
+  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
+  Result:=AStrMath.MulDiv(Num1,Num2,Int3+1,doMul);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int3-1);
 end;
 
 function SumSub(const Num1, Num2: String; out AAnswer: String): Boolean;
+var
+  Int1,Int2,Int3:Integer;
 begin
+  Int1:=AStrMath.GetDeciCountBaseOne(num1);
+  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
   AAnswer:=AStrMath.SumSub(Num1,Num2);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function MulDiv(const Num1, Num2: String; out AAnswer: String;
   const doMul: Boolean): Boolean;
+var
+  Int1,Int2,Int3:Integer;
 begin
-  AAnswer:=AStrMath.MulDiv(Num1,Num2,doMul);
+  Int1:=AStrMath.GetDeciCountBaseOne(num1);
+  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
+  AAnswer:=AStrMath.MulDiv(Num1,Num2,Int3+1,doMul);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -1410,134 +1454,262 @@ begin
 end;
 
 function ln(const x: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.lnx(x);
+  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.lnx(x,Int1+10);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-10);
 end;
 
 function ln(const x: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.lnx(x);
+  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.lnx(x,Int1+10);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-10);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function log(const num: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.log(num,'10');
+  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.log(num,'10',Int1+10);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-10);
 end;
 
 function log(const num: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.log(num,'10');
+  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.log(num,'10',Int1+10);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-10);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function log(const num, Base: String): String;
+var
+  Int1,Int2,Int3:Integer;
 begin
-  Result:=AStrMath.log(num,base);
+  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  Int2:=AStrMath.GetDeciCountBaseOne(base);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
+  Result:=AStrMath.log(num,base,Int3+10);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int3-10);
 end;
 
 function log(const num, Base: String; out AAnswer: String): Boolean;
+var
+  Int1,Int2,Int3:Integer;
 begin
-  AAnswer:=AStrMath.log(num,Base);
+  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  Int2:=AStrMath.GetDeciCountBaseOne(base);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
+  AAnswer:=AStrMath.log(num,Base,Int3+10);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3-10);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function SqrRoot(const x: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.SqrRoot(x);
+  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.SqrRoot(x,Int1+2);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-2);
 end;
 
 function SqrRoot(const x: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.SqrRoot(x);
+  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.SqrRoot(x,Int1+2);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-2);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function Sine(const Degrees: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.Sine(Degrees);
+  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.Sine(Degrees,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-1);
 end;
 
 function Sine(const Degrees: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.Sine(Degrees);
+  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.Sine(Degrees,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function Cosine(const Degrees: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.Cosine(Degrees);
+  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.Cosine(Degrees,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-1);
 end;
 
 function Cosine(const Degrees: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.Cosine(Degrees);
+  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.Cosine(Degrees,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function Tangent(const Degrees: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.Tangent(Degrees);
+  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.Tangent(Degrees,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-1);
 end;
 
 function Tangent(const Degrees: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.Tangent(Degrees);
+  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.Tangent(Degrees,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function InSine(const SineX: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.InSine(SineX);
+  Int1:=AStrMath.GetDeciCountBaseOne(SineX);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.InSine(SineX,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-1);
 end;
 
 function InSine(const SineX: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.InSine(SineX);
+  Int1:=AStrMath.GetDeciCountBaseOne(SineX);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.InSine(SineX,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function InCosine(const CosineX: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.InCosine(CosineX);
+  Int1:=AStrMath.GetDeciCountBaseOne(CosineX);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.InCosine(CosineX,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-1);
 end;
 
 function InCosine(const CosineX: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.InCosine(CosineX);
+  Int1:=AStrMath.GetDeciCountBaseOne(CosineX);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.InCosine(CosineX,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function InTangent(const TangentX: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.InTangent(TangentX);
+  Int1:=AStrMath.GetDeciCountBaseOne(TangentX);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.InTangent(TangentX,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-1);
 end;
 
 function InTangent(const TangentX: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.InTangent(TangentX);
+  Int1:=AStrMath.GetDeciCountBaseOne(TangentX);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.InTangent(TangentX,Int1+1);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function ePower(const Power: String): String;
+var
+  Int1:Integer;
 begin
-  Result:=AStrMath.ePowerX(Power);
+  Int1:=AStrMath.GetDeciCountBaseOne(Power);
+  if(Int1<11)then Int1:=11;
+  Result:=AStrMath.ePowerX(Power,Int1+10);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int1-10);
 end;
 
 function ePower(const Power: String; out AAnswer: String): Boolean;
+var
+  Int1:Integer;
 begin
-  AAnswer:=AStrMath.ePowerX(Power);
+  Int1:=AStrMath.GetDeciCountBaseOne(Power);
+  if(Int1<11)then Int1:=11;
+  AAnswer:=AStrMath.ePowerX(Power,Int1+10);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1-10);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function xPower(const Base, Power: String): String;
+var
+  Int1,Int2,Int3:Integer;
 begin
-  Result:=AStrMath.xPower(Base,Power);
+  Int1:=AStrMath.GetDeciCountBaseOne(base);
+  Int2:=AStrMath.GetDeciCountBaseOne(power);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
+  Result:=AStrMath.xPower(Base,Power,Int3+10);
+  AStrMath.RealCutDeciCountBaseOneR(Result,Int3-10);
 end;
 
 function xPower(const Base, Power: String; out AAnswer: String): Boolean;
+var
+  Int1,Int2,Int3:Integer;
 begin
-  AAnswer:=AStrMath.xPower(Base,Power);
+  Int1:=AStrMath.GetDeciCountBaseOne(base);
+  Int2:=AStrMath.GetDeciCountBaseOne(power);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<11)then Int3:=11;
+  AAnswer:=AStrMath.xPower(Base,Power,Int3+10);
+  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3-10);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2603,8 +2775,7 @@ begin
   Apower:=IntReal(RoundRealR(Apower));
   Str1:=RealStr(Abase);
   Str2:=RealStr(Apower);
-  StrA.TDeciDigitCountBaseOne:=ADeciDigitCountBaseOne+5;
-  Str3:=StrA.xPowerInt(Str1,Str2);
+  Str3:=StrA.xPowerInt(Str1,Str2,ADeciDigitCountBaseOne+5);
   Result:=InitReal(Str3);
   Result:=StrMath.CutRealDeciCountBaseOneR(Result,ADeciDigitCountBaseOne);
   StrA.Free;
@@ -2654,13 +2825,11 @@ procedure RealMath.Root2Real(num: RealArr; var numResult: RealArr;
   const ADeciDigitCountBaseOne: Integer);
 var
   i:Integer;
-  n1,n2,n3,n4,n5:RealArr;
+  n1,n2,n3:RealArr;
 begin
   n1:=nil;
   n2:=nil;
   n3:=nil;
-  n4:=nil;
-  n5:=nil;
   SetLength(numResult,0);
   if(Length(num)=0)then Exit else
   if(ConditionReal(num,'<',InitReal('0.0'))=True)then Exit else
@@ -2670,10 +2839,7 @@ begin
   end;
   numResult:=InitReal('1.0');
   n1:=StrMath.MulDivReal(InitReal('1.0'),InitReal('2.0'),ADeciDigitCountBaseOne,False);
-  n5:=AssignNum(n1);
-  n4:=StrMath.MulDivReal(n1,n1,ADeciDigitCountBaseOne,True);
-  While(ConditionReal(n5,'<>',InitReal('0.0'))=True)do begin
-    n5:=StrMath.MulDivReal(n5,n4,ADeciDigitCountBaseOne,True);
+  for i:=0 to 10 do begin
     n3:=StrMath.MulDivReal(num,numResult,ADeciDigitCountBaseOne,False);
     n2:=StrMath.SumSubReal(numResult,n3,ADeciDigitCountBaseOne);
     numResult:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne,True);
@@ -2681,8 +2847,6 @@ begin
   SetLength(n1,0);
   SetLength(n2,0);
   SetLength(n3,0);
-  SetLength(n4,0);
-  SetLength(n5,0);
 end;
 
 function RealMath.SinReal(Degrees: RealArr;
@@ -2693,9 +2857,10 @@ begin
   if(Length(Degrees)=0)then Exit;
 
   Degrees:=StrMath.SumSubReal(Degrees,StrMath.MulDivReal(InitReal('-1'),
-  StrMath.MulDivReal(InitReal('360.0'),RoundRealR(StrMath.MulDivReal(Degrees,
-  InitReal('360.0'),ADeciDigitCountBaseOne,False)),ADeciDigitCountBaseOne,True),
-  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne);
+  StrMath.MulDivReal(InitReal('360.0'),IntReal(RoundRealR(StrMath.MulDivReal
+  (Degrees,InitReal('360.0'),ADeciDigitCountBaseOne,False))),
+  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne,True),
+  ADeciDigitCountBaseOne);
 
   if(ConditionReal(Degrees,'>=',InitReal('0.0'))=True)and
   (ConditionReal(Degrees,'<=',InitReal('90.0'))=True)then
@@ -2732,9 +2897,10 @@ begin
   if(Length(Degrees)=0)then Exit;
 
   Degrees:=StrMath.SumSubReal(Degrees,StrMath.MulDivReal(InitReal('-1'),
-  StrMath.MulDivReal(InitReal('360.0'),RoundRealR(StrMath.MulDivReal(Degrees,
-  InitReal('360.0'),ADeciDigitCountBaseOne,False)),ADeciDigitCountBaseOne,True),
-  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne);
+  StrMath.MulDivReal(InitReal('360.0'),IntReal(RoundRealR(StrMath.MulDivReal
+  (Degrees,InitReal('360.0'),ADeciDigitCountBaseOne,False))),
+  ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne,True),
+  ADeciDigitCountBaseOne);
 
   if(ConditionReal(Degrees,'>=',InitReal('0.0'))=True)and
   (ConditionReal(Degrees,'<=',InitReal('90.0'))=True)then
@@ -2822,8 +2988,7 @@ begin
   StrA:=nil;
   StrA:=StringMath.Create;
   Str1:=RealStr(num);
-  StrA.TDeciDigitCountBaseOne:=ADeciDigitCountBaseOne+5;
-  Str2:=StrA.FactorialInt(Str1);
+  Str2:=StrA.FactorialInt(Str1,ADeciDigitCountBaseOne+5);
   Result:=InitReal(Str2);
   Result:=StrMath.CutRealDeciCountBaseOneR(Result,ADeciDigitCountBaseOne);
   StrA.Free;
@@ -3278,6 +3443,46 @@ begin
   SetLength(TArr2,0);
 end;
 
+procedure ArrMath.MulIntSum(num1, num2: IntArr; var numResult: IntArr);
+var
+  AMode:Byte;
+  TArr1,TArr2,TArr3,TArr4:IntArr;
+begin
+  TArr1:=nil;
+  TArr2:=nil;
+  TArr3:=nil;
+  TArr4:=nil;
+  SetLength(numResult,1);
+  numResult[0]:=0;
+  AMode:=self.isNum1BiggerAlign(num1,num2);
+  if(AMode=1)or(AMode=2)then begin
+    self.SetInt(num1,TArr1);
+    self.SetInt(num2,TArr2);
+  end else
+  if(AMode=0)then begin
+    self.SetInt(num2,TArr1);
+    self.SetInt(num1,TArr2);
+  end;
+  self.InitZeroToNine(False,1,TArr3);
+  self.Shift(True,False,TArr3);
+  self.InitZeroToNine(False,1,TArr4);
+  self.Shift(True,False,TArr4);
+  self.SetInt(numResult,num2);
+  AMode:=self.isNum1BiggerAlign(TArr3,TArr2);
+  While((AMode=0)or(AMode=2))do begin
+    self.SumInt(num2,TArr1,numResult);
+    self.SetInt(numResult,num2);
+
+    self.SumInt(TArr3,TArr4,num1);
+    self.SetInt(num1,TArr3);
+    AMode:=self.isNum1BiggerAlign(TArr3,TArr2);
+  end;
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+  SetLength(TArr3,0);
+  SetLength(TArr4,0);
+end;
+
 procedure ArrMath.DivInt(num1, num2: IntArr; var numResult: IntArr);
 var
   i:Integer;
@@ -3327,21 +3532,25 @@ begin
   if(self.isIntZero(num2)=True)and(doMul=False)then Exit;
   if(bool1=False)and(bool2=False)then begin
     if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
     if(doMul=False)then self.DivInt(num1,num2,numResult);
     self.Shift(False,True,numResult);
   end else
   if(bool1=True)and(bool2=False)then begin
     if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
     if(doMul=False)then self.DivInt(num1,num2,numResult);
     self.Shift(False,False,numResult);
   end else
   if(bool1=False)and(bool2=True)then begin
     if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
     if(doMul=False)then self.DivInt(num1,num2,numResult);
     self.Shift(False,False,numResult);
   end else
   if(bool1=True)and(bool2=True)then begin
     if(doMul=True)then self.MulInt(num1,num2,numResult) else
+    //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
     if(doMul=False)then self.DivInt(num1,num2,numResult);
     self.Shift(False,True,numResult);
   end;
@@ -3541,8 +3750,7 @@ end;
 
 constructor StringMath.Create;
 begin
-  self.TDeciDigitCountBaseOne:=11;
-  self.TDisableDeci:=False;
+  //nothing...
 end;
 
 destructor StringMath.Destroy;
@@ -3768,16 +3976,6 @@ begin
   for i:=1 to Length(Num1)do Result:=Num1[i]+Result;
 end;
 
-function StringMath.CutCountDeci(const WholeNum, DeciNum: String): String;
-begin
-  if(self.TDisableDeci=True)then Exit;
-  if(Length(DeciNum)>self.TDeciDigitCountBaseOne)then begin
-    Result:=WholeNum+'.'+Copy(DeciNum,1,self.TDeciDigitCountBaseOne);
-  end else begin
-    Result:=WholeNum+'.'+DeciNum;
-  end;
-end;
-
 function StringMath.RR(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
@@ -3840,6 +4038,38 @@ begin
     if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
   end;
   if(ASign=False)then Result:='-'+Result;
+end;
+
+function StringMath.GetDeciCountBaseOne(num: String): Integer;
+var
+  Str1,Str2:String;
+begin
+  Str1:='';
+  Str2:='';
+  self.getWholeDeci(num,Str1,Str2);
+  Result:=Length(Str2);
+end;
+
+procedure StringMath.RealCutDeciCountBaseOne(var num: String; CutAt: Integer);
+var
+  TArr1:RealArr;
+begin
+  TArr1:=nil;
+  TArr1:=InitReal(num);
+  ARealMath.RealCutDeciCountBaseOne(TArr1,CutAt);
+  num:=RealStr(TArr1);
+  SetLength(TArr1,0);
+end;
+
+procedure StringMath.RealCutDeciCountBaseOneR(var num: String; CutAt: Integer);
+var
+  TArr1:RealArr;
+begin
+  TArr1:=nil;
+  TArr1:=InitReal(num);
+  ARealMath.RealCutDeciCountBaseOneR(TArr1,CutAt);
+  num:=RealStr(TArr1);
+  SetLength(TArr1,0);
 end;
 
 function StringMath.Sum(const num1, num2: String): String;
@@ -3942,8 +4172,6 @@ begin
     Result:='-'+Sum(n1,n2);
   end;
   Result:=CleanNum(Result);
-  getWholeDeci(Result,n1,n2);
-  Result:=CutCountDeci(n1,n2);
 end;
 
 function StringMath.Mul(const num1, num2: String): String;
@@ -4137,8 +4365,8 @@ begin
   Copy(Result,Length(AWhole1)+1,Length(Result));
 end;
 
-function StringMath.MulDiv(const num1, num2: String; const doMul: Boolean
-  ): String;
+function StringMath.MulDiv(const num1, num2: String;
+  const ADeciDigitCountBaseOne: Integer; const doMul: Boolean): String;
 var
   n1,n2:String;
 begin
@@ -4166,30 +4394,27 @@ begin
     end;
   end else begin
     if(isPositive(n1)=True)and(isPositive(n2)=True)then begin
-      Result:=DivA(n1,n2,TDeciDigitCountBaseOne);
+      Result:=DivA(n1,n2,ADeciDigitCountBaseOne);
     end else
     if(isPositive(n1)=False)and(isPositive(n2)=True)then begin
       n1:=Copy(n1,2,Length(n1));
-      Result:='-'+DivA(n1,n2,TDeciDigitCountBaseOne);
+      Result:='-'+DivA(n1,n2,ADeciDigitCountBaseOne);
     end else
     if(isPositive(n1)=True)and(isPositive(n2)=False)then begin
       n2:=Copy(n2,2,Length(n2));
-      Result:='-'+DivA(n1,n2,TDeciDigitCountBaseOne);
+      Result:='-'+DivA(n1,n2,ADeciDigitCountBaseOne);
     end else
     if(isPositive(n1)=False)and(isPositive(n2)=False)then begin
       n1:=Copy(n1,2,Length(n1));
       n2:=Copy(n2,2,Length(n2));
-      Result:=DivA(n1,n2,TDeciDigitCountBaseOne);
+      Result:=DivA(n1,n2,ADeciDigitCountBaseOne);
     end;
   end;
   Result:=CleanNum(Result);
-  if(doMul=True)then begin
-    getWholeDeci(Result,n1,n2);
-    Result:=CutCountDeci(n1,n2);
-  end;
 end;
 
-function StringMath.xPowerInt(Abase, Apower: String): String;
+function StringMath.xPowerInt(Abase, Apower: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 var
   BigN:Byte;
   Count1:String;
@@ -4249,38 +4474,36 @@ begin
   BigN:=Num1Bigger(Count1,AWhole1);
   While(BigN=0)do begin
     Count1:=AddSum(Count1,'1');
-    Result:=self.MulDiv(Result,ABase);
+    Result:=self.MulDiv(Result,ABase,ADeciDigitCountBaseOne);
     BigN:=Num1Bigger(Count1,AWhole1);
   end;
   if(ASign=False)then Result:='-'+Result;
 end;
 
-function StringMath.lyn(x: String): String;
+function StringMath.lyn(x: String; const ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   Og,Og2:String;
   Ct:String;
   Term:String;
   n1,n2:String;
 begin
-  Og:=self.MulDiv(self.SumSub(x,'-1'),self.SumSub(x,'1'),False);
+  Og:=self.MulDiv(self.SumSub(x,'-1'),self.SumSub(x,'1'),
+  ADeciDigitCountBaseOne,False);
   Term:=Og;
   Result:=Og;
   Ct:='3';
-  Og2:=self.MulDiv(Og,Og);
+  Og2:=self.MulDiv(Og,Og,ADeciDigitCountBaseOne);
   While(Term<>'0.0')do begin
-    Term:=self.MulDiv(Term,Og2);
-    Result:=self.SumSub(Result,self.MulDiv(Term,Ct,False));
+    Term:=self.MulDiv(Term,Og2,ADeciDigitCountBaseOne);
+    Result:=self.SumSub(Result,self.MulDiv(Term,Ct,ADeciDigitCountBaseOne,False));
     Ct:=self.SumSub(Ct,'2');
   end;
-  Result:=self.MulDiv(Result,'2');
-
-  getWholeDeci(Result,n1,n2);
-  Result:=CutCountDeci(n1,n2);
+  Result:=self.MulDiv(Result,'2',ADeciDigitCountBaseOne);
 end;
 
-function StringMath.lnx(x: String): String;
+function StringMath.lnx(x: String; ADeciDigitCountBaseOne: Integer): String;
 var
-  DeciInt:Integer;
   n1,n2:String;
 begin
   x:=CleanNum(x);
@@ -4292,27 +4515,21 @@ begin
     Result:='nan';
     Exit;
   end;
-  DeciInt:=self.TDeciDigitCountBaseOne;
-  self.TDeciDigitCountBaseOne:=DeciInt+10;
-
-  Result:=self.SumSub(self.MulDiv('2',lyn('2')),
-  lyn(self.MulDiv(x,self.xPowerInt('2','2'),False)));
-
-  self.TDeciDigitCountBaseOne:=DeciInt;
-  getWholeDeci(Result,n1,n2);
-  Result:=CutCountDeci(n1,n2);
+  Result:=self.SumSub(self.MulDiv('2',lyn('2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),
+  lyn(self.MulDiv(x,self.xPowerInt('2','2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne));
 end;
 
-function StringMath.lnx2(x: String): String;
+function StringMath.lnx2(x: String; const ADeciDigitCountBaseOne: Integer
+  ): String;
 begin
-  Result:=self.SumSub(self.MulDiv('2',lyn('2')),
-  lyn(self.MulDiv(x,self.xPowerInt('2','2'),False)));
+  Result:=self.SumSub(self.MulDiv('2',lyn('2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),
+  lyn(self.MulDiv(x,self.xPowerInt('2','2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne));
 end;
 
-function StringMath.log(num, base: String): String;
+function StringMath.log(num, base: String; ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   numV1,numV2:String;
-  DeciInt:Integer;
   n1,n2:String;
 begin
   num:=CleanNum(num);
@@ -4325,24 +4542,17 @@ begin
     Result:='nan';
     Exit;
   end;
+  numV1:=self.SumSub(self.MulDiv('2',lyn('2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),
+  lyn(self.MulDiv(num,self.xPowerInt('2','2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne));
 
-  DeciInt:=self.TDeciDigitCountBaseOne;
-  self.TDeciDigitCountBaseOne:=DeciInt+10;
+  numV2:=self.SumSub(self.MulDiv('2',lyn('2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),
+  lyn(self.MulDiv(base,self.xPowerInt('2','2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne));
 
-  numV1:=self.SumSub(self.MulDiv('2',lyn('2')),
-  lyn(self.MulDiv(num,self.xPowerInt('2','2'),False)));
-
-  numV2:=self.SumSub(self.MulDiv('2',lyn('2')),
-  lyn(self.MulDiv(base,self.xPowerInt('2','2'),False)));
-
-  Result:=self.MulDiv(numV1,numV2,False);
-
-  self.TDeciDigitCountBaseOne:=DeciInt;
-  getWholeDeci(Result,n1,n2);
-  Result:=CutCountDeci(n1,n2);
+  Result:=self.MulDiv(numV1,numV2,ADeciDigitCountBaseOne,False);
 end;
 
-function StringMath.SqrRoot(x: String): String;
+function StringMath.SqrRoot(x: String; const ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   i:Integer;
   n1:String;
@@ -4361,12 +4571,13 @@ begin
     Exit;
   end;
   Result:='1';
-  n1:=self.MulDiv('1','2',false);
+  n1:=self.MulDiv('1','2',ADeciDigitCountBaseOne,false);
   for i:=0 to 20 do
-    Result:=self.MulDiv(n1,self.SumSub(Result,self.MulDiv(x,Result,False)));
+    Result:=self.MulDiv(n1,self.SumSub(Result,self.MulDiv(x,Result,ADeciDigitCountBaseOne,False)),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.Sine(Degrees: String): String;
+function StringMath.Sine(Degrees: String; const ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   BigN1,BigN2:Byte;
   BigN3,BigN4:Byte;
@@ -4380,7 +4591,8 @@ begin
   end;
 
   Degrees:=self.SumSub(Degrees,self.MulDiv('-1',
-  self.MulDiv('360',self.RR(self.MulDiv(Degrees,'360',False)))));
+  self.MulDiv('360',self.RR(self.MulDiv(Degrees,'360',ADeciDigitCountBaseOne,
+  False)),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne));
 
   BigN1:=self.isNum1Bigger(Degrees,'0');
   BigN2:=self.isNum1Bigger(Degrees,'90');
@@ -4395,19 +4607,25 @@ begin
   BigN8:=self.isNum1Bigger(Degrees,'360');
 
   if((BigN1=1)or(BigN1=2))and((BigN2=0)or(BigN2=2))then
-    Result:=self.SqrRoot(self.MulDiv(Degrees,'90',False)) else
+    Result:=self.SqrRoot(self.MulDiv(Degrees,'90',ADeciDigitCountBaseOne,False),
+    ADeciDigitCountBaseOne) else
   if((BigN3=1)or(BigN3=2))and((BigN4=0)or(BigN4=2))then
     Result:=self.SqrRoot(self.SumSub('1',self.MulDiv('-1',self.MulDiv(
-    self.SumSub(Degrees,'-90'),'90',False)))) else
+    self.SumSub(Degrees,'-90'),'90',ADeciDigitCountBaseOne,False),
+    ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne) else
   if((BigN5=1)or(BigN5=2))and((BigN6=0)or(BigN6=2))then
     Result:=self.MulDiv('-1',self.SqrRoot(self.MulDiv(
-    self.SumSub(Degrees,'-180'),'90',False))) else
+    self.SumSub(Degrees,'-180'),'90',ADeciDigitCountBaseOne,False),
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne) else
   if((BigN7=1)or(BigN7=2))and((BigN8=0)or(BigN8=2))then
     Result:=self.MulDiv('-1',self.SqrRoot(self.SumSub('1',
-    self.MulDiv('-1',self.MulDiv(self.SumSub(Degrees,'-270'),'90',False)))));
+    self.MulDiv('-1',self.MulDiv(self.SumSub(Degrees,'-270'),'90',
+    ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne)),
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.Cosine(Degrees: String): String;
+function StringMath.Cosine(Degrees: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 var
   BigN1,BigN2:Byte;
   BigN3,BigN4:Byte;
@@ -4421,7 +4639,8 @@ begin
   end;
 
   Degrees:=self.SumSub(Degrees,self.MulDiv('-1',
-  self.MulDiv('360',self.RR(self.MulDiv(Degrees,'360',False)))));
+  self.MulDiv('360',self.RR(self.MulDiv(Degrees,'360',ADeciDigitCountBaseOne,
+  False)),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne));
 
   BigN1:=self.isNum1Bigger(Degrees,'0');
   BigN2:=self.isNum1Bigger(Degrees,'90');
@@ -4437,39 +4656,50 @@ begin
 
   if((BigN1=1)or(BigN1=2))and((BigN2=0)or(BigN2=2))then
     Result:=self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
-    self.xPowerInt(self.Sine(Degrees),'2')))) else
+    self.xPowerInt(self.Sine(Degrees,ADeciDigitCountBaseOne),'2',
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne) else
   if((BigN3=1)or(BigN3=2))and((BigN4=0)or(BigN4=2))then
     Result:=self.MulDiv('-1',self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
-    self.xPowerInt(self.Sine(Degrees),'2'))))) else
+    self.xPowerInt(self.Sine(Degrees,ADeciDigitCountBaseOne),'2',
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne),
+    ADeciDigitCountBaseOne) else
   if((BigN5=1)or(BigN5=2))and((BigN6=0)or(BigN6=2))then
     Result:=self.MulDiv('-1',self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
-    self.xPowerInt(self.Sine(Degrees),'2'))))) else
+    self.xPowerInt(self.Sine(Degrees,ADeciDigitCountBaseOne),'2',
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne),
+    ADeciDigitCountBaseOne) else
   if((BigN7=1)or(BigN7=2))and((BigN8=0)or(BigN8=2))then
     Result:=self.SqrRoot(self.SumSub('1',self.MulDiv('-1',
-    self.xPowerInt(self.Sine(Degrees),'2'))));
+    self.xPowerInt(self.Sine(Degrees,ADeciDigitCountBaseOne),'2',
+    ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.Tangent(Degrees: String): String;
+function StringMath.Tangent(Degrees: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 begin
   Degrees:=self.CleanNum(Degrees);
   if(Degrees='nan')then begin
     Result:='nan';
     Exit;
   end;
-  Result:=self.MulDiv(self.Sine(Degrees),self.Cosine(Degrees),False);
+  Result:=self.MulDiv(self.Sine(Degrees,ADeciDigitCountBaseOne),
+  self.Cosine(Degrees,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False);
 end;
 
-function StringMath.InSine(SineX: String): String;
+function StringMath.InSine(SineX: String; const ADeciDigitCountBaseOne: Integer
+  ): String;
 begin
   SineX:=self.CleanNum(SineX);
   if(SineX='nan')then begin
     Result:='nan';
     Exit;
   end;
-  Result:=self.MulDiv(self.xPowerInt(SineX,'2'),'90');
+  Result:=self.MulDiv(self.xPowerInt(SineX,'2',ADeciDigitCountBaseOne),'90',
+  ADeciDigitCountBaseOne);
 end;
 
-function StringMath.InCosine(CosineX: String): String;
+function StringMath.InCosine(CosineX: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 begin
   CosineX:=self.CleanNum(CosineX);
   if(CosineX='nan')then begin
@@ -4477,10 +4707,13 @@ begin
     Exit;
   end;
   Result:=self.MulDiv(self.xPowerInt(self.SqrRoot(
-  self.SumSub('1',self.MulDiv('-1',self.xPowerInt(CosineX,'2')))),'2'),'90');
+  self.SumSub('1',self.MulDiv('-1',self.xPowerInt(CosineX,'2',
+  ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne),'2',
+  ADeciDigitCountBaseOne),'90',ADeciDigitCountBaseOne);
 end;
 
-function StringMath.InTangent(TangentX: String): String;
+function StringMath.InTangent(TangentX: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 begin
   TangentX:=self.CleanNum(TangentX);
   if(TangentX='nan')then begin
@@ -4488,10 +4721,13 @@ begin
     Exit;
   end;
   Result:=self.MulDiv(self.xPowerInt(self.MulDiv(TangentX,
-  self.SqrRoot(self.SumSub('1',self.xPowerInt(TangentX,'2'))),false),'2'),'90');
+  self.SqrRoot(self.SumSub('1',self.xPowerInt(TangentX,'2',
+  ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,
+  false),'2',ADeciDigitCountBaseOne),'90',ADeciDigitCountBaseOne);
 end;
 
-function StringMath.FactorialInt(x: String): String;
+function StringMath.FactorialInt(x: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 var
   Ct1:String;
   BigN:Byte;
@@ -4506,23 +4742,25 @@ begin
   BigN:=self.isNum1Bigger(Ct1,'1');
   While(BigN=1)do begin
     Ct1:=self.SumSub(Ct1,'-1');
-    Result:=self.MulDiv(Result,Ct1);
+    Result:=self.MulDiv(Result,Ct1,ADeciDigitCountBaseOne);
     BigN:=self.isNum1Bigger(Ct1,'1');
   end;
 end;
 
-function StringMath.ePower(x: String): String;
+function StringMath.ePower(x: String; const ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   i:Integer;
 begin
   Result:='1';
   for i:=1 to 20 do begin
-    Result:=self.SumSub(Result,self.MulDiv(self.xPowerInt(x,IntToStr(i)),
-    self.FactorialInt(IntToStr(i)),False));
+    Result:=self.SumSub(Result,self.MulDiv(self.xPowerInt(x,IntToStr(i),
+    ADeciDigitCountBaseOne),self.FactorialInt(IntToStr(i),ADeciDigitCountBaseOne),
+    ADeciDigitCountBaseOne,False));
   end;
 end;
 
-function StringMath.ePowerX(x: String): String;
+function StringMath.ePowerX(x: String; ADeciDigitCountBaseOne: Integer): String;
 var
   DeciInt:Integer;
   n1,n2:String;
@@ -4532,17 +4770,11 @@ begin
     Result:='nan';
     Exit;
   end;
-  DeciInt:=self.TDeciDigitCountBaseOne;
-  self.TDeciDigitCountBaseOne:=DeciInt+10;
-
-  Result:=self.ePower(x);
-
-  self.TDeciDigitCountBaseOne:=DeciInt;
-  getWholeDeci(Result,n1,n2);
-  Result:=CutCountDeci(n1,n2);
+  Result:=self.ePower(x,ADeciDigitCountBaseOne);
 end;
 
-function StringMath.xPower(Abase, Apower: String): String;
+function StringMath.xPower(Abase, Apower: String;
+  ADeciDigitCountBaseOne: Integer): String;
 var
   DeciInt:Integer;
   n1,n2:String;
@@ -4569,16 +4801,10 @@ begin
     Result:='1.0';
     Exit;
   end;
-  DeciInt:=self.TDeciDigitCountBaseOne;
-  self.TDeciDigitCountBaseOne:=DeciInt+10;
-
   getWholeDeci(Apower,n1,n2);
-  if(n2<>'0')then Result:=self.ePower(self.MulDiv(self.lnx2(Abase),Apower))
-  else Result:=self.xPowerInt(Abase,Apower);
-
-  self.TDeciDigitCountBaseOne:=DeciInt;
-  getWholeDeci(Result,n1,n2);
-  Result:=CutCountDeci(n1,n2);
+  if(n2<>'0')then Result:=self.ePower(self.MulDiv(self.lnx2(Abase,
+  ADeciDigitCountBaseOne),Apower,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)
+  else Result:=self.xPowerInt(Abase,Apower,ADeciDigitCountBaseOne);
 end;
 
 initialization
