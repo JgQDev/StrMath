@@ -152,3 +152,53 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 - function IntToBinary (const Num: String; out AAnswer: String): Boolean;
 - function BinaryToInt (const Num: String): String;
 - function BinaryToInt (const Num: String; out AAnswer: String): Boolean;
+
+
+## Code-Example
+```freepascal
+procedure TForm1.Test;
+var
+  StrResult: String;
+  Int1, Int2, Int3, Int4: IntArr;
+  Real1, Real2, Real3, Real4: RealArr;
+  Str1, Str2, Str3, Str4: String;
+begin
+  StrResult := '';
+
+  Int1 := nil;
+  Int2 := nil;
+  Int3 := nil;
+  Int4 := nil;
+
+  Real1 := nil;
+  Real2 := nil;
+  Real3 := nil;
+  Real4 := nil;
+
+  Int1 := InitInt ('1');                           // Declaring Variable
+  Int2 := InitInt ('1');                           // Declaring Variable
+  Int4 := InitInt ('-1');                          // Declaring Variable
+  Int3 := SumSubInt (Int1, Int2);                  // (Int1 + Int2) = Int3
+  Int3 := SumSubInt (Int1, Int4);                  // (Int1 - Int4) = Int3
+  Int3 := MulDivInt (Int1, Int2);                  // (Int1 * Int2) = Int3
+  Int3 := MulDivInt (Int1, Int2, False);           // (Int1 / Int2) = Int3
+  StrResult := IntStr (Int3);                      // Int3 to String
+
+  Real1 := InitReal ('1.0');                       // Declaring Variable
+  Real2 := InitReal ('1.0');                       // Declaring Variable
+  Real4 := InitReal ('-1.0');                      // Declaring Variable
+  Real3 := SumSubReal (Real1, Real2);              // (Real1 + Real2) = Real3
+  Real3 := SumSubReal (Real1, Real4);              // (Real1 - Real4) = Real3
+  Real3 := MulDivReal (Real1, Real2);              // (Real1 * Real2) = Real3
+  Real3 := MulDivReal (Real1, Real2, False);       // (Real1 / Real2) = Real3
+  StrResult := RealStr (Real3);                    // Real3 to String
+
+  Str1 := '1.0';                                   // Declaring Variable
+  Str2 := '1.0';                                   // Declaring Variable
+  Str4 := '-1.0';                                  // Declaring Variable
+  Str3 := SumSub (Str1, Str2);                     // (Str1 + Str2) = Str3
+  Str3 := SumSub (Str1, Str4);                     // (Str1 - Str4) = Str3
+  Str3 := MulDiv (Str1, Str2);                     // (Str1 * Str2) = Str3
+  Str3 := MulDiv (Str1, Str2, False);              // (Str1 / Str2) = Str3
+end; 
+```

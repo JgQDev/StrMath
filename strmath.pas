@@ -1276,12 +1276,12 @@ var
 begin
   Result:=False;
   if(varNum<>'')or(varNum<>'nil')then Exit;
-  TArr1:=nil;
-  TArr2:=nil;
-  TArr3:=nil;
-  TArr4:=nil;
-  TArr5:=nil;
-  TArr6:=nil;
+  TArr1:='';
+  TArr2:='';
+  TArr3:='';
+  TArr4:='';
+  TArr5:='';
+  TArr6:='';
   if(Condition(fromNum,'<=',ToNum)=True)then begin
     TArr1:=fromNum;
     TArr2:=ToNum;
