@@ -155,7 +155,7 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 
 
 ## Code-Example
-```freepascal
+```pascal
 procedure TForm1.Test;
 var
   StrResult: String;
