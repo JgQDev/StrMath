@@ -4,15 +4,15 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 
 ## Extra
 ### Extra-Math
-- function isNaNNumber(const num: Number): Boolean;
-- procedure Shift (const isLeft, isSet: Boolean; var num: Number);
-- procedure Shift (const isLeft: Boolean; var num: Number);
-- procedure ShiftPace (const isLeft: Boolean; const PaceBaseOne: Integer; var num: Number);
+- function isNaNNumber (const num: Number): Boolean;
+- procedure Shift (isLeft, isSet: Boolean; var num: Number);
+- procedure Shift (isLeft: Boolean; var num: Number);
+- procedure ShiftPace (isLeft: Boolean; const PaceBaseOne: Integer; var num: Number);
 - procedure ShiftLeft (var num: Number);
 - procedure ShiftRight (var num: Number);
 - procedure ShiftPaceLeft (const PaceBaseOne: Integer; var num: Number);
 - procedure ShiftPaceRight (const PaceBaseOne: Integer; var num: Number);
-- function AssignNum (const num: Number): Number; 
+- function AssignNum (const num: Number): Number;
 ### IntArr-Math
 - function ConditionInt (Num1: IntArr; Symbol: String; Num2: IntArr): Boolean;
 - function InRangeInt (var varNum: IntArr; fromNum, ToNum, PaceNum: IntArr): Boolean;
@@ -95,56 +95,113 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 - function MulDiv (const Num1, Num2: String; out AAnswer: String; const DeciCountBaseOne: Integer; const doMul: Boolean = True): Boolean; 
 
 ## Advance Number Calcus
+### IntArr-Math
+- function unNumInt (const num: IntArr): IntArr;
+- procedure unNumInt (const num: IntArr; var AAnswer: IntArr);
+- function xPowerInt (const Base, Power: IntArr): IntArr;
+- procedure xPowerInt (const Base, Power: IntArr; var AAnswer: IntArr);
 ### RealArr-Math
+- function unNumReal (const num: RealArr): RealArr;
+- procedure unNumReal (const num: RealArr; var AAnswer: RealArr);
 - function lnReal (const num: RealArr): RealArr;
 - procedure lnReal (const num: RealArr; var AAnswer: RealArr);
+- function lnReal (const num: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure lnReal (const num: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function logReal (const num: RealArr): RealArr;
 - procedure logReal (const num: RealArr; var AAnswer: RealArr);
+- function logReal (const num: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure logReal (const num: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function logReal (const num, base: RealArr): RealArr;
 - procedure logReal (const num, base: RealArr; var AAnswer: RealArr);
+- function logReal (const num, base: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure logReal (const num, base: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function SqrRootReal (const num: RealArr): RealArr;
 - procedure SqrRootReal (const num: RealArr; var AAnswer: RealArr);
+- function SqrRootReal (const num: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure SqrRootReal (const num: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function SineReal (const Degrees: RealArr): RealArr;
 - procedure SineReal (const Degrees: RealArr; var AAnswer: RealArr);
+- function SineReal (const Degrees: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure SineReal (const Degrees: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function CosineReal (const Degrees: RealArr): RealArr;
 - procedure CosineReal (const Degrees: RealArr; var AAnswer: RealArr);
+- function CosineReal (const Degrees: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure CosineReal (const Degrees: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function TangentReal (const Degrees: RealArr): RealArr;
 - procedure TangentReal (const Degrees: RealArr; var AAnswer: RealArr);
+- function TangentReal (const Degrees: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure TangentReal (const Degrees: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function InSineReal (const SineX: RealArr): RealArr;
 - procedure InSineReal (const SineX: RealArr; var AAnswer: RealArr);
+- function InSineReal (const SineX: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure InSineReal (const SineX: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function InCosineReal (const CosineX: RealArr): RealArr;
 - procedure InCosineReal (const CosineX: RealArr; var AAnswer: RealArr);
+- function InCosineReal (const CosineX: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure InCosineReal (const CosineX: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function InTangentReal (const TangentX: RealArr): RealArr;
 - procedure InTangentReal (const TangentX: RealArr; var AAnswer: RealArr);
+- function InTangentReal (const TangentX: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure InTangentReal (const TangentX: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function ePowerReal (const Power: RealArr): RealArr;
 - procedure ePowerReal (const Power: RealArr; var AAnswer: RealArr);
+- function ePowerReal (const Power: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure ePowerReal (const Power: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer);
 - function xPowerReal (const Base, Power: RealArr): RealArr;
 - procedure xPowerReal (const Base, Power: RealArr; var AAnswer: RealArr);
+- function xPowerReal (const Base, Power: RealArr; DeciCountBaseOne: Integer): RealArr;
+- procedure xPowerReal (const Base, Power: RealArr; var AAnswer: RealArr; DeciCountBaseOne: Integer); 
 ### String-Math
+- function unNum (const num: String): String;
+- function unNum (const num: String; var AAnswer: String): Boolean;
 - function ln (const x: String): String;
 - function ln (const x: String; out AAnswer: String): Boolean;
+- function ln (const x: String; DeciCountBaseOne: Integer): String;
+- function ln (const x: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function log (const num: String): String;
 - function log (const num: String; out AAnswer: String): Boolean;
+- function log (const num: String; DeciCountBaseOne: Integer): String;
+- function log (const num: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function log (const num, Base: String): String;
 - function log (const num, Base: String; out AAnswer: String): Boolean;
+- function log (const num, Base: String; DeciCountBaseOne: Integer): String;
+- function log (const num, Base: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function SqrRoot (const x: String): String;
 - function SqrRoot (const x: String; out AAnswer: String): Boolean;
+- function SqrRoot (const x: String; DeciCountBaseOne: Integer): String;
+- function SqrRoot (const x: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function Sine (const Degrees: String): String;
 - function Sine (const Degrees: String; out AAnswer: String): Boolean;
+- function Sine (const Degrees: String; DeciCountBaseOne: Integer): String;
+- function Sine (const Degrees: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function Cosine (const Degrees: String): String;
 - function Cosine (const Degrees: String; out AAnswer: String): Boolean;
+- function Cosine (const Degrees: String; DeciCountBaseOne: Integer): String;
+- function Cosine (const Degrees: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function Tangent (const Degrees: String): String;
 - function Tangent (const Degrees: String; out AAnswer: String): Boolean;
+- function Tangent (const Degrees: String; DeciCountBaseOne: Integer): String;
+- function Tangent (const Degrees: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function InSine (const SineX: String): String;
 - function InSine (const SineX: String; out AAnswer: String): Boolean;
+- function InSine (const SineX: String; DeciCountBaseOne: Integer): String;
+- function InSine (const SineX: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function InCosine (const CosineX: String): String;
 - function InCosine (const CosineX: String; out AAnswer: String): Boolean;
+- function InCosine (const CosineX: String; DeciCountBaseOne: Integer): String;
+- function InCosine (const CosineX: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function InTangent (const TangentX: String): String;
 - function InTangent (const TangentX: String; out AAnswer: String): Boolean;
+- function InTangent (const TangentX: String; DeciCountBaseOne: Integer): String;
+- function InTangent (const TangentX: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function ePower (const Power: String): String;
 - function ePower (const Power: String; out AAnswer: String): Boolean;
+- function ePower (const Power: String; DeciCountBaseOne: Integer): String;
+- function ePower (const Power: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 - function xPower (const Base, Power: String): String;
-- function xPower (const Base, Power: String; out AAnswer: String): Boolean; 
+- function xPower (const Base, Power: String; out AAnswer: String): Boolean;
+- function xPower (const Base, Power: String; DeciCountBaseOne: Integer): String;
+- function xPower (const Base, Power: String; out AAnswer: String; DeciCountBaseOne: Integer): Boolean;
 
 ## Binary Calcus
 - function isBinary (const Num: String): Boolean;
