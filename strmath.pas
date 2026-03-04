@@ -23,9 +23,9 @@ type
 
 { Extra-Math }
 function isNaNNumber(const num:Number):Boolean;
-procedure Shift(const isLeft,isSet:Boolean;var num:Number);
-procedure Shift(const isLeft:Boolean;var num:Number);
-procedure ShiftPace(const isLeft:Boolean;const PaceBaseOne:Integer;var num:Number);
+procedure Shift(isLeft,isSet:Boolean;var num:Number);
+procedure Shift(isLeft:Boolean;var num:Number);
+procedure ShiftPace(isLeft:Boolean;const PaceBaseOne:Integer;var num:Number);
 procedure ShiftLeft(var num:Number);
 procedure ShiftRight(var num:Number);
 procedure ShiftPaceLeft(const PaceBaseOne:Integer;var num:Number);
@@ -49,6 +49,9 @@ procedure MulDivInt(const num1,num2:IntArr;var AAnswer:IntArr;const doMul:Boolea
 
 function unNumInt(const num:IntArr):IntArr;
 procedure unNumInt(const num:IntArr;var AAnswer:IntArr);
+
+function xPowerInt(const Base,Power:IntArr):IntArr;
+procedure xPowerInt(const Base,Power:IntArr;var AAnswer:IntArr);
 
 function InitInt(const num:String):IntArr;
 function IntStr(const num:IntArr):String;
@@ -418,6 +421,8 @@ type
     function ePower(x:String;ADeciDigitCountBaseOne:Integer):String;
     function ePowerX(x:String;ADeciDigitCountBaseOne:Integer):String;
     function xPower(Abase,Apower:String;ADeciDigitCountBaseOne:Integer):String;
+    {function xPowerDiv2(Abase,Apower:String;var AAnswer:String;
+      ADeciDigitCountBaseOne:Integer):Boolean;}
     function xModX(num1,num2:String):String;
   end;
 
@@ -433,31 +438,34 @@ begin
   if(Length(num)>0)then Result:=False;
 end;
 
-procedure Shift(const isLeft, isSet: Boolean; var num: Number);
+procedure Shift(isLeft, isSet: Boolean; var num: Number);
 var
   i:Integer;
 begin
+  if(isLeft=True)then isLeft:=False else isLeft:=True;
   if(Length(num)=0)then Exit;
   i:=Length(num);
   AArrMath.Shift(isLeft,isSet,num);
   if(isLeft=False)then SetLength(num,i);
 end;
 
-procedure Shift(const isLeft: Boolean; var num: Number);
+procedure Shift(isLeft: Boolean; var num: Number);
 var
   i:Integer;
 begin
+  if(isLeft=True)then isLeft:=False else isLeft:=True;
   if(Length(num)=0)then Exit;
   i:=Length(num);
   AArrMath.Shift(isLeft,False,num);
   if(isLeft=False)then SetLength(num,i);
 end;
 
-procedure ShiftPace(const isLeft: Boolean; const PaceBaseOne: Integer;
-  var num: Number);
+procedure ShiftPace(isLeft: Boolean; const PaceBaseOne: Integer; var num: Number
+  );
 var
   i:Integer;
 begin
+  if(isLeft=True)then isLeft:=False else isLeft:=True;
   if(Length(num)=0)then Exit;
   i:=Length(num);
   AArrMath.Shift(isLeft,PaceBaseOne,num);
@@ -470,7 +478,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(True,False,num);
+  AArrMath.Shift(False,False,num);
   SetLength(num,i);
 end;
 
@@ -480,7 +488,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(False,False,num);
+  AArrMath.Shift(True,False,num);
   SetLength(num,i);
 end;
 
@@ -490,7 +498,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(True,PaceBaseOne,num);
+  AArrMath.Shift(False,PaceBaseOne,num);
   SetLength(num,i);
 end;
 
@@ -500,7 +508,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(False,PaceBaseOne,num);
+  AArrMath.Shift(True,PaceBaseOne,num);
   SetLength(num,i);
 end;
 
@@ -669,6 +677,32 @@ begin
   AAnswer:=AssignNum(num);
   if(ConditionInt(AAnswer,'<',InitInt('0'))=True)then
     AAnswer:=MulDivInt(AAnswer,InitInt('-1'));
+end;
+
+function xPowerInt(const Base, Power: IntArr): IntArr;
+var
+  n1,n2,n3:RealArr;
+begin
+  n1:=nil;
+  n2:=nil;
+  n3:=nil;
+  n1:=IntReal(Base);
+  n2:=IntReal(Power);
+  n3:=ARealMath.RealXPowerInt(n1,n2,3);
+  Result:=StrMath.RoundRealR(n3);
+end;
+
+procedure xPowerInt(const Base, Power: IntArr; var AAnswer: IntArr);
+var
+  n1,n2,n3:RealArr;
+begin
+  n1:=nil;
+  n2:=nil;
+  n3:=nil;
+  n1:=IntReal(Base);
+  n2:=IntReal(Power);
+  n3:=ARealMath.RealXPowerInt(n1,n2,3);
+  AAnswer:=StrMath.RoundRealR(n3);
 end;
 
 function InitInt(const num: String): IntArr;
@@ -1240,7 +1274,7 @@ begin
   Int1:=ARealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,Result,Int1+1);
+  ARealMath.Root2Real(num,Result,Int1+2);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1251,7 +1285,7 @@ begin
   Int1:=ARealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,AAnswer,Int1+1);
+  ARealMath.Root2Real(num,AAnswer,Int1+2);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1264,7 +1298,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,Result,Int1+1);
+  ARealMath.Root2Real(num,Result,Int1+2);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1277,7 +1311,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,AAnswer,Int1+1);
+  ARealMath.Root2Real(num,AAnswer,Int1+2);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2131,7 +2165,7 @@ begin
   Int1:=AStrMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.lnx(x,Int1+10);
+  Result:=AStrMath.lnx(x,Int1+5);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2143,7 +2177,7 @@ begin
   Int1:=AStrMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.lnx(x,Int1+10);
+  AAnswer:=AStrMath.lnx(x,Int1+5);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2157,7 +2191,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.lnx(x,Int1+10);
+  Result:=AStrMath.lnx(x,Int1+5);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2171,7 +2205,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.lnx(x,Int1+10);
+  AAnswer:=AStrMath.lnx(x,Int1+5);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2184,7 +2218,7 @@ begin
   Int1:=AStrMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.log(num,'10',Int1+10);
+  Result:=AStrMath.log(num,'10',Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2196,7 +2230,7 @@ begin
   Int1:=AStrMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.log(num,'10',Int1+10);
+  AAnswer:=AStrMath.log(num,'10',Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2210,7 +2244,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.log(num,'10',Int1+10);
+  Result:=AStrMath.log(num,'10',Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2224,7 +2258,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.log(num,'10',Int1+10);
+  AAnswer:=AStrMath.log(num,'10',Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2239,7 +2273,7 @@ begin
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=AStrMath.log(num,base,Int3+10);
+  Result:=AStrMath.log(num,base,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -2253,7 +2287,7 @@ begin
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.log(num,Base,Int3+10);
+  AAnswer:=AStrMath.log(num,Base,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2269,7 +2303,7 @@ begin
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  Result:=AStrMath.log(num,base,Int3+10);
+  Result:=AStrMath.log(num,base,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -2285,7 +2319,7 @@ begin
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.log(num,Base,Int3+10);
+  AAnswer:=AStrMath.log(num,Base,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2669,7 +2703,7 @@ begin
   Int1:=AStrMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.ePowerX(Power,Int1+10);
+  Result:=AStrMath.ePowerX(Power,Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2681,7 +2715,7 @@ begin
   Int1:=AStrMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.ePowerX(Power,Int1+10);
+  AAnswer:=AStrMath.ePowerX(Power,Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2695,7 +2729,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.ePowerX(Power,Int1+10);
+  Result:=AStrMath.ePowerX(Power,Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2709,7 +2743,7 @@ begin
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.ePowerX(Power,Int1+10);
+  AAnswer:=AStrMath.ePowerX(Power,Int1+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2724,7 +2758,7 @@ begin
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=AStrMath.xPower(Base,Power,Int3+10);
+  Result:=AStrMath.xPower(Base,Power,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -2738,7 +2772,7 @@ begin
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.xPower(Base,Power,Int3+10);
+  AAnswer:=AStrMath.xPower(Base,Power,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -2754,7 +2788,7 @@ begin
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  Result:=AStrMath.xPower(Base,Power,Int3+10);
+  Result:=AStrMath.xPower(Base,Power,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -2770,7 +2804,7 @@ begin
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.xPower(Base,Power,Int3+10);
+  AAnswer:=AStrMath.xPower(Base,Power,Int3+1);
   AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
@@ -3895,9 +3929,16 @@ end;
 
 procedure RealMath.logaReal(num, base: RealArr; var numResult: RealArr;
   const ADeciDigitCountBaseOne: Integer);
+var
+  n1,n2:RealArr;
 begin
-  numResult:=StrMath.MulDivReal(lnReal(num),lnReal(base),
-  ADeciDigitCountBaseOne,False);
+  numResult:=nil;
+  if(Length(num)=0)or(Length(base)=0)then Exit else
+  if(ConditionReal(num,'=',InitReal('0.0'))=True)or
+  (ConditionReal(base,'=',InitReal('0.0'))=True)then Exit;
+  n1:=StrMath.lnReal(num,ADeciDigitCountBaseOne);
+  n2:=StrMath.lnReal(base,ADeciDigitCountBaseOne);
+  numResult:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne,False);
 end;
 
 procedure RealMath.Root2Real(num: RealArr; var numResult: RealArr;
@@ -4122,9 +4163,7 @@ function RealMath.xPower(Abase, Apower: RealArr; ADeciDigitCountBaseOne: Integer
   ): RealArr;
 var
   AMode:Byte;
-  i:Integer;
-  Str1:String;
-  bool1:Boolean;
+  n1,n2:RealArr;
 begin
   Result:=nil;
   AMode:=self.isPositiveAd(Apower);
@@ -4139,23 +4178,16 @@ begin
     Result:=InitReal('1.0');
     Exit;
   end;
-  Str1:=RealStr(Apower);
-  bool1:=False;
-  for i:=1 to Length(Str1)do begin
-    if(Str1[i]='.')then begin
-      bool1:=True;
-      Str1:=Copy(Str1,i+1,Length(Str1));
-      break;
-    end;
-  end;
-  if(bool1=False)then Str1:='0';
-  if(Str1<>'0')then begin
-    Result:=StrMath.ePowerReal(StrMath.MulDivReal(StrMath.lnReal(Abase,
-    ADeciDigitCountBaseOne),Apower,ADeciDigitCountBaseOne,True),
-    ADeciDigitCountBaseOne);
-  end else begin
-    Result:=self.RealXPowerInt(Abase,Apower,ADeciDigitCountBaseOne);
-  end;
+  n1:=nil;
+  n2:=nil;
+
+  n1:=StrMath.IntReal(StrMath.RoundRealR(Apower));
+  n2:=StrMath.SumSubReal(Apower,StrMath.MulDivReal(n1,InitReal('-1'),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
+
+  n1:=self.RealXPowerInt(Abase,n1,ADeciDigitCountBaseOne);
+  n2:=StrMath.ePowerReal(StrMath.MulDivReal(n2,StrMath.lnReal(Abase,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
+
+  Result:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne);
 end;
 
 { ArrMath }
@@ -5713,7 +5745,7 @@ end;
 function StringMath.log(num, base: String; ADeciDigitCountBaseOne: Integer
   ): String;
 var
-  numV1,numV2:String;
+  n1,n2:String;
 begin
   num:=CleanNum(num);
   base:=CleanNum(base);
@@ -5725,13 +5757,9 @@ begin
     Result:='nan';
     Exit;
   end;
-  numV1:=self.SumSub(self.MulDiv('2',lnx('2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),
-  lnx(self.MulDiv(num,self.xPowerInt('2','2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne));
-
-  numV2:=self.SumSub(self.MulDiv('2',lnx('2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),
-  lnx(self.MulDiv(base,self.xPowerInt('2','2',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False),ADeciDigitCountBaseOne));
-
-  Result:=self.MulDiv(numV1,numV2,ADeciDigitCountBaseOne,False);
+  n1:=StrMath.ln(num,ADeciDigitCountBaseOne);
+  n2:=StrMath.ln(base,ADeciDigitCountBaseOne);
+  Result:=StrMath.MulDiv(n1,n2,ADeciDigitCountBaseOne,False);
 end;
 
 function StringMath.SqrRoot(x: String; const ADeciDigitCountBaseOne: Integer
@@ -5997,10 +6025,13 @@ begin
     Result:='1.0';
     Exit;
   end;
-  getWholeDeci(Apower,n1,n2);
-  if(n2<>'0')then Result:=StrMath.ePower(self.MulDiv(StrMath.ln(Abase,
-  ADeciDigitCountBaseOne),Apower,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)
-  else Result:=self.xPowerInt(Abase,Apower,ADeciDigitCountBaseOne);
+  n1:=StrMath.ToInt(Apower,False);
+  n2:=StrMath.SumSub(Apower,StrMath.MulDiv(n1,'-1',ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
+
+  n1:=self.xPowerInt(Abase,n1,ADeciDigitCountBaseOne);
+  n2:=StrMath.ePower(StrMath.MulDiv(n2,StrMath.ln(Abase,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
+
+  Result:=StrMath.MulDiv(n1,n2,ADeciDigitCountBaseOne);
 end;
 
 function StringMath.xModX(num1, num2: String): String;
