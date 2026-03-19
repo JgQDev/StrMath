@@ -45,7 +45,7 @@ A FreePascal Unit for String Number Calculation and Accurate Results.
 - function Condition (Num1, Symbol, Num2: String): Boolean;
 - function InRange (var varNum: String; fromNum, ToNum, PaceNum: String): Boolean;
 - function InRange (var varNum: String; fromNum, ToNum: String): Boolean;
-- function isNaN (const NumV: String): Boolean;function xMod(const num1,num2:String):String;  
+- function isNaN (const NumV: String): Boolean;
 - function CutDeciCount (const NumV: String; const DeciCountBaseOne: Integer): String;
 - function isNumber (const NumV: String): Boolean;
 - function isInt (const NumV: String): boolean;
