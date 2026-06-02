@@ -4618,6 +4618,7 @@ procedure ArrMath.SetBitPos(var num: TBitPos; const ByteAtBaseZero,
   BitAtBaseZero: Integer);
 begin
   num.ByteAtBaseZero:=ByteAtBaseZero;
+  if(num.ByteAtBaseZero<0)then num.ByteAtBaseZero:=0;
   if(BitAtBaseZero<0)then num.BitAtBaseZero:=7 else
   if(BitAtBaseZero>7)then num.BitAtBaseZero:=0 else num.BitAtBaseZero:=BitAtBaseZero;
 end;
@@ -4644,6 +4645,7 @@ begin
     num.BitAtBaseZero:=7;
     num.ByteAtBaseZero:=num.ByteAtBaseZero-1;
   end;
+  if(num.ByteAtBaseZero<0)then num.ByteAtBaseZero:=0;
 end;
 
 procedure ArrMath.GetLastBit(var num: TBitPos; const numArr: IntArr);
@@ -4677,6 +4679,9 @@ begin
 
   if(num2.BitAtBaseZero<0)then num2.BitAtBaseZero:=7 else
   if(num2.BitAtBaseZero>7)then num2.BitAtBaseZero:=0;
+
+  if(num1.ByteAtBaseZero<0)then num1.ByteAtBaseZero:=0;
+  if(num2.ByteAtBaseZero<0)then num2.ByteAtBaseZero:=0;
 
   if(num1.ByteAtBaseZero<>num2.ByteAtBaseZero)or
   (num1.BitAtBaseZero<>num2.BitAtBaseZero)then Exit;
@@ -4912,14 +4917,9 @@ var
   n1Pos,n1PosF1,n2Pos,n2PosF1,n2PosF3:TBitPos;
   n1PosF2,n2PosF2:TBitPos;
   bool1,bool2,bool3:Boolean;
-  AData,CData:Byte;
-
-  Str1,Str2,Str3:String;
+  AData:Byte;
+  CData0,CData1:Integer;
 begin
-  Str1:='';
-  Str2:='';
-  Str3:='';
-
   SetLength(numResult,0);
   self.SetBitPosZero(n1PosCount);
 
@@ -4932,45 +4932,42 @@ begin
   self.GetLastBit(n2PosF2,num2);
   self.SetBitPosZero(n2PosF3);
 
-  CData:=0;
+  CData0:=0;
+  CData1:=0;
   bool2:=False;
   bool3:=False;
-
-  Str1:=IntToBitStr(num1);
-  Str2:=IntToBitStr(num2);
-  Str3:=IntToBitStr(numResult);
   While(bool3=False)do begin
     bool1:=False;
     AData:=0;
+    CData1:=0;
     repeat
       if(bool1=True)then begin self.DecBitPos(n1Pos);self.IncBitPos(n2Pos);end;
       if(self.IsBitPosSet(n1Pos,num1)=True)and
       (self.IsBitPosSet(n2Pos,num2)=True)then begin
-        AData:=AData+CData+1;
-        if(AData=1)then begin CData:=0; end else
-        if(AData=2)then begin AData:=0;CData:=1;end else
-        if(AData=3)then begin AData:=1;CData:=1;end;
+        if(CData0>0)then begin CData0:=CData0-1;AData:=AData+2;end else AData:=AData+1;
+        if(AData=2)then begin AData:=0;CData1:=CData1+1;end else
+        if(AData=3)then begin AData:=1;CData1:=CData1+1;end;
       end else
-      if(CData=1)then begin
-        AData:=AData+CData;
-        if(AData=1)then begin CData:=0; end else
-        if(AData=2)then begin AData:=0;CData:=1;end else
-        if(AData=3)then begin AData:=1;CData:=1;end;
+      if(CData0>0)then begin
+        CData0:=CData0-1;AData:=AData+1;
+        if(AData=2)then begin AData:=0;CData1:=CData1+1;end else
+        if(AData=3)then begin AData:=1;CData1:=CData1+1;end;
       end;
       if(self.IsBitPosEqual(n1Pos,n1PosF2)=True)and(bool2=False)then bool2:=True;
       if(bool1=False)then bool1:=True;
       if(self.IsBitPosEqual(n1Pos,n1PosF2)=True)and
       (self.IsBitPosEqual(n2Pos,n2PosF2)=True)then bool3:=True;
-
-      Str1:=IntToBitStr(num1);
-      Str2:=IntToBitStr(num2);
-      Str3:=IntToBitStr(numResult);
     until(self.IsBitPosEqual(n2Pos,n2PosF1)=True);
 
-    Str1:=IntToBitStr(num1);
-    Str2:=IntToBitStr(num2);
-    Str3:=IntToBitStr(numResult);
+    for i:=1 to CData0 do begin
+      if(CData0>0)then begin
+        CData0:=CData0-1;AData:=AData+1;
+        if(AData=2)then begin AData:=0;CData1:=CData1+1;end else
+        if(AData=3)then begin AData:=1;CData1:=CData1+1;end;
+      end;
+    end;
 
+    CData0:=CData0+CData1;
     if(AData=1)then self.BitPosAddSetArr(n1PosCount,numResult);
     self.IncBitPos(n1PosCount);
     if(self.IsBitPosEqual(n1PosF1,n1PosF2)=False)then self.IncBitPos(n1PosF1);
@@ -4981,16 +4978,9 @@ begin
       self.IncBitPos(n2PosF3);
       self.CopyBitPos(n2PosF3,n2Pos);
     end;
-
-    Str1:=IntToBitStr(num1);
-    Str2:=IntToBitStr(num2);
-    Str3:=IntToBitStr(numResult);
   end;
 
-  if(CData=1)then self.BitPosAddSetArr(n1PosCount,numResult);
-  Str1:=IntToBitStr(num1);
-  Str2:=IntToBitStr(num2);
-  Str3:=IntToBitStr(numResult);
+  if(CData0=1)then self.BitPosAddSetArr(n1PosCount,numResult);
 end;
 
 procedure ArrMath.DivInt(num1, num2: IntArr; var numResult: IntArr);
@@ -5033,9 +5023,7 @@ procedure ArrMath.MulDivInt(num1, num2: IntArr; var numResult: IntArr;
   const doMul: Boolean);
 var
   bool1,bool2:Boolean;
-  Str1:String;
 begin
-  Str1:='';
   SetLength(numResult,0);
   if(Length(num1)=0)then Exit;
   if(Length(num2)=0)then Exit;
@@ -5068,15 +5056,12 @@ begin
     if(doMul=True)then self.MulIntBit(num1,num2,numResult) else
     //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
     if(doMul=False)then self.DivInt(num1,num2,numResult);
-    Str1:=IntToBitStr(numResult);
     self.Shift(False,True,numResult);
   end;
-  Str1:=IntToBitStr(numResult);
   if(Length(numResult)>1)then begin
     self.CutSome(numResult,num1);
     self.SetInt(num1,numResult);
   end;
-  Str1:=IntToBitStr(numResult);
 end;
 
 procedure ArrMath.StrToIntArr(AStr: String; var numResult: IntArr);
