@@ -271,10 +271,66 @@ const
 type
 
   TNumArr = Array of Integer;
+  TParamArr = Array of Number;
+
+  TProcNor = procedure(AParamArr:TParamArr);
+  TProcObj = procedure(AParamArr:TParamArr) of object;
 
   TBitPos = Record
     ByteAtBaseZero:Integer;
     BitAtBaseZero:Integer;
+  end;
+
+  { CodeLine }
+
+  CodeLine = class(TObject)
+  private
+    TCodeArr:Number;
+    TParaArr:Array of Number;
+    TFuncDataIsNor:Byte;        // 0 = False, 1 = True, 2 =  nil
+    TFuncDataNor:TProcNor;
+    TFuncDataObj:TProcObj;
+  public
+    constructor Create;
+    constructor Create(var ACodeLine:CodeLine);
+    constructor Create(const CodeData:Number);
+    destructor Destroy; override;
+    procedure ChangeTo(var ACodeLine:CodeLine);
+    procedure Code_SetCodeData(const CodeData:Number);
+    procedure Code_AddParamData(const ParamData:Number);
+    procedure Code_SetFuncData(var FuncData:TProcNor);
+    procedure Code_SetFuncData(var FuncData:TProcObj);
+    function Code_ParamArrLength:Integer;
+    function Code_GetParamData(const AIndexBaseZero:Integer):Number;
+    function Code_RunFuncData:Boolean;
+  end;
+
+  TClnArr = Array of CodeLine;
+
+  { CodeArray }
+
+  CodeArray = class(TObject)
+  private
+    TCodeLn:TClnArr;
+    function GetLines: TClnArr;
+    procedure SetLines(AValue: TClnArr);
+  public
+    constructor Create;
+    constructor Create(var ACodeArray:CodeArray);
+    destructor Destroy; override;
+    procedure ChangeTo(var ACodeArray:CodeArray);
+    property Lines:TClnArr Read GetLines Write SetLines;
+    function Lines_ArrLength:Integer;
+  end;
+
+  { CodeBuild }
+
+  CodeBuild = class(TObject)
+  private
+    TCodeArr:CodeArray;
+  public
+    constructor Create;
+    destructor Destroy; override;
   end;
 
   { ArrMath }
@@ -326,8 +382,10 @@ type
     procedure MulIntBit(num1,num2:IntArr;var numResult:IntArr);
     procedure DivInt(num1,num2:IntArr;var numResult:IntArr);
     procedure MulDivInt(num1,num2:IntArr;var numResult:IntArr;const doMul:Boolean);
+    procedure xPowerIntArr(Base,Power:IntArr;var numResult:IntArr);
     procedure StrToIntArr(AStr:String;var numResult:IntArr);
     procedure IntArrToStr(num:IntArr;var AStr:String);
+    procedure IntArrToStr_Old1(num:IntArr;var AStr:String);
     procedure IntArrMod(num1,num2:IntArr;var numResult:IntArr);
   end;
 
@@ -698,9 +756,12 @@ begin
 end;
 
 function xPowerInt(const Base, Power: IntArr): IntArr;
-var
-  n1,n2,n3:RealArr;
+{var
+  n1,n2,n3:RealArr;}
 begin
+  Result:=nil;
+  AArrMath.xPowerIntArr(Base,Power,Result);
+  {
   n1:=nil;
   n2:=nil;
   n3:=nil;
@@ -708,12 +769,15 @@ begin
   n2:=IntReal(Power);
   n3:=ARealMath.RealXPowerInt(n1,n2,3);
   Result:=StrMath.RoundRealR(n3);
+  }
 end;
 
 procedure xPowerInt(const Base, Power: IntArr; var AAnswer: IntArr);
-var
-  n1,n2,n3:RealArr;
+{var
+  n1,n2,n3:RealArr;}
 begin
+  AArrMath.xPowerIntArr(Base,Power,AAnswer);
+  {
   n1:=nil;
   n2:=nil;
   n3:=nil;
@@ -721,6 +785,7 @@ begin
   n2:=IntReal(Power);
   n3:=ARealMath.RealXPowerInt(n1,n2,3);
   AAnswer:=StrMath.RoundRealR(n3);
+  }
 end;
 
 function InitInt(const num: String): IntArr;
@@ -2830,6 +2895,179 @@ end;
 function xMod(const num1, num2: String): String;
 begin
   Result:=AStrMath.xModX(num1,num2);
+end;
+
+{ CodeBuild }
+
+constructor CodeBuild.Create;
+begin
+
+end;
+
+destructor CodeBuild.Destroy;
+begin
+  inherited Destroy;
+end;
+
+{ CodeArray }
+
+procedure CodeArray.SetLines(AValue: TClnArr);
+var
+  i:Integer;
+begin
+  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
+  SetLength(self.TCodeLn,Length(AValue));
+  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i]:=CodeLine.Create(AValue[i]);
+end;
+
+function CodeArray.GetLines: TClnArr;
+var
+  i:Integer;
+begin
+  Result:=nil;
+  SetLength(Result,Length(self.TCodeLn));
+  for i:=0 to (Length(Result)-1)do Result[i]:=CodeLine.Create(self.TCodeLn[i]);
+end;
+
+constructor CodeArray.Create;
+begin
+  self.TCodeLn:=nil;
+end;
+
+constructor CodeArray.Create(var ACodeArray: CodeArray);
+begin
+  self.TCodeLn:=nil;
+  self.ChangeTo(ACodeArray);
+end;
+
+destructor CodeArray.Destroy;
+var
+  i:Integer;
+begin
+  inherited Destroy;
+  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
+  SetLength(self.TCodeLn,0);
+end;
+
+procedure CodeArray.ChangeTo(var ACodeArray: CodeArray);
+var
+  i:Integer;
+begin
+  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
+  SetLength(self.TCodeLn,Length(ACodeArray.TCodeLn));
+  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i]:=CodeLine.Create(ACodeArray.TCodeLn[i]);
+end;
+
+function CodeArray.Lines_ArrLength: Integer;
+begin
+  Result:=Length(self.TCodeLn);
+end;
+
+{ CodeLine }
+
+constructor CodeLine.Create;
+begin
+  self.TCodeArr:=nil;
+  self.TParaArr:=nil;
+  self.TFuncDataIsNor:=2;
+  self.TFuncDataNor:=nil;
+  self.TFuncDataObj:=nil;
+end;
+
+constructor CodeLine.Create(var ACodeLine: CodeLine);
+begin
+  self.TCodeArr:=nil;
+  self.TParaArr:=nil;
+  self.TFuncDataIsNor:=2;
+  self.TFuncDataNor:=nil;
+  self.TFuncDataObj:=nil;
+  self.ChangeTo(ACodeLine);
+end;
+
+constructor CodeLine.Create(const CodeData: Number);
+begin
+  self.TCodeArr:=StrMath.AssignNum(CodeData);
+  self.TParaArr:=nil;
+  self.TFuncDataIsNor:=2;
+  self.TFuncDataNor:=nil;
+  self.TFuncDataObj:=nil;
+end;
+
+destructor CodeLine.Destroy;
+var
+  i:Integer;
+begin
+  inherited Destroy;
+  SetLength(self.TCodeArr,0);
+  for i:=0 to (Length(self.TParaArr)-1)do SetLength(self.TParaArr[i],0);
+  SetLength(self.TParaArr,0);
+  self.TFuncDataIsNor:=2;
+  self.TFuncDataNor:=nil;
+  self.TFuncDataObj:=nil;
+end;
+
+procedure CodeLine.ChangeTo(var ACodeLine: CodeLine);
+var
+  i:Integer;
+begin
+  self.TCodeArr:=StrMath.AssignNum(ACodeLine.TCodeArr);
+
+  for i:=0 to (Length(self.TParaArr)-1)do SetLength(self.TParaArr[i],0);
+  SetLength(self.TParaArr,Length(ACodeLine.TParaArr));
+  for i:=0 to (Length(self.TParaArr)-1)do
+    self.TParaArr[i]:=StrMath.AssignNum(ACodeLine.TParaArr[i]);
+
+  self.TFuncDataIsNor:=ACodeLine.TFuncDataIsNor;
+  self.TFuncDataNor:=ACodeLine.TFuncDataNor;
+  self.TFuncDataObj:=ACodeLine.TFuncDataObj;
+end;
+
+procedure CodeLine.Code_SetCodeData(const CodeData: Number);
+begin
+  self.TCodeArr:=StrMath.AssignNum(CodeData);
+end;
+
+procedure CodeLine.Code_AddParamData(const ParamData: Number);
+begin
+  SetLength(self.TParaArr,Length(self.TParaArr)+1);
+  self.TParaArr[Length(self.TParaArr)-1]:=StrMath.AssignNum(ParamData);
+end;
+
+procedure CodeLine.Code_SetFuncData(var FuncData: TProcNor);
+begin
+  self.TFuncDataIsNor:=1;
+  self.TFuncDataNor:=@FuncData;
+end;
+
+procedure CodeLine.Code_SetFuncData(var FuncData: TProcObj);
+begin
+  self.TFuncDataIsNor:=0;
+  self.TFuncDataObj:=@FuncData;
+end;
+
+function CodeLine.Code_ParamArrLength: Integer;
+begin
+  Result:=Length(self.TParaArr);
+end;
+
+function CodeLine.Code_GetParamData(const AIndexBaseZero: Integer): Number;
+begin
+  Result:=nil;
+  if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
+  Result:=AssignNum(self.TParaArr[AIndexBaseZero]);
+end;
+
+function CodeLine.Code_RunFuncData: Boolean;
+begin
+  Result:=False;
+  if(self.TFuncDataIsNor=0)then begin
+    self.TFuncDataObj(self.TParaArr);
+    Result:=True;
+  end else
+  if(self.TFuncDataIsNor=1)then begin
+    self.TFuncDataNor(self.TParaArr);
+    Result:=True;
+  end;
 end;
 
 { RealMath }
@@ -5064,6 +5302,40 @@ begin
   end;
 end;
 
+procedure ArrMath.xPowerIntArr(Base, Power: IntArr; var numResult: IntArr);
+var
+  TArr1,TArr2:IntArr;
+  ByteA:Byte;
+begin
+  SetLength(numResult,0);
+  numResult:=InitInt('1');
+
+  ByteA:=0;
+  if(StrMath.ConditionInt(Power,'=',InitInt('0'))=True)then Exit;
+  if(StrMath.ConditionInt(Power,'<',InitInt('0'))=True)then ByteA:=1;
+  TArr1:=nil;
+  TArr2:=nil;
+
+  if(ByteA=0)then begin
+    TArr1:=InitInt('1');
+    While(StrMath.ConditionInt(TArr1,'<=',Power)=True)do begin
+      numResult:=StrMath.MulDivInt(numResult,Base);
+      TArr1:=StrMath.SumSubInt(TArr1,InitInt('1'));
+    end;
+  end else begin
+    TArr1:=InitInt('-1');
+    TArr2:=AssignNum(Base);
+    While(StrMath.ConditionInt(TArr1,'>=',Power)=True)do begin
+      TArr2:=StrMath.MulDivInt(TArr2,Base);
+      TArr1:=StrMath.SumSubInt(TArr1,InitInt('-1'));
+    end;
+    numResult:=StrMath.MulDivInt(Base,TArr2,False);
+  end;
+
+  SetLength(TArr1,0);
+  SetLength(TArr2,0);
+end;
+
 procedure ArrMath.StrToIntArr(AStr: String; var numResult: IntArr);
 var
   bool1:Boolean;
@@ -5127,6 +5399,40 @@ begin
 end;
 
 procedure ArrMath.IntArrToStr(num: IntArr; var AStr: String);
+var
+  n1Str,n2Str:String;
+  n1Pos,n1PosF1:TBitPos;
+  ByteA:Byte;
+begin
+  AStr:='nil';
+  if(Length(num)=0)then Exit;
+  ByteA:=isPositiveIntAdvance(num);  // 0 = False, 1 = True, 2 = Zero, 3 = Error
+  if(ByteA=3)then Exit;
+  self.Shift(True,False,num);
+
+  AStr:='0.0';
+  n1Str:='1';
+  n2Str:='0';
+
+  self.SetBitPosZero(n1Pos);
+  self.GetLastBit(n1PosF1,num);
+
+  While(self.IsBitPosEqual(n1Pos,n1PosF1)=False)do begin
+    n1Str:=AStrMath.SumSub(n1Str,n2Str);
+    if(self.IsBitPosSet(n1Pos,num)=True)then AStr:=AStrMath.SumSub(AStr,n1Str);
+    n2Str:=n1Str;
+    self.IncBitPos(n1Pos);
+  end;
+  if(self.IsBitPosSet(n1Pos,num)=True)then begin
+    n1Str:=AStrMath.SumSub(n1Str,n2Str);
+    AStr:=AStrMath.SumSub(AStr,n1Str);
+  end;
+
+  AStr:=AStrMath.RR(AStr,False);
+  if(ByteA=0)then AStr:='-'+AStr;
+end;
+
+procedure ArrMath.IntArrToStr_Old1(num: IntArr; var AStr: String);
 var
   TArr1,TArr2,TArr3,TArr4,TArr5:IntArr;
   TArr6,TArr7,TArr8:IntArr;
