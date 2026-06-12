@@ -270,6 +270,7 @@ const
 
 type
 
+  TPtrNumber = ^Number;
   TNumArr = Array of Integer;
   TParamArr = Array of Number;
 
@@ -279,6 +280,53 @@ type
   TBitPos = Record
     ByteAtBaseZero:Integer;
     BitAtBaseZero:Integer;
+  end;
+
+  { CodePoint }
+
+  CodePoint = class(TObject)
+  private
+    TPointArr:Array of Integer;
+  public
+    constructor Create;
+    constructor Create(const APoint:Integer);
+    constructor Create(var ACodePoint:CodePoint);
+    destructor Destroy; override;
+    procedure ChangeTo(var ACodePoint:CodePoint);
+    procedure Point_SetPoint(const APoint:Integer);
+    procedure Point_AddLast;
+    procedure Point_AddLast(const APoint:Integer);
+    procedure Point_DeleteLast;
+    function Point_GetPoint:Integer;
+  end;
+
+  { CodeVariable }
+
+  CodeVariable = class(TObject)
+  private
+    TVarArr:Array of Number;
+    TVarName:Array of String;
+    function isVarNameExist(const AVarName:String;out AIndex:Integer):Boolean;
+  public
+    constructor Create;
+    constructor Create(var ACodeVariable:CodeVariable);
+    destructor Destroy; override;
+    procedure changeTo(var ACodeVariable:CodeVariable);
+    function Var_AddVariable(const AVarName:String):Boolean;
+    function Var_AddVariable(const AVarName:String;const AValue:Number):Boolean;
+    function Var_AddVariableInt(const AVarName:String;AValue:Integer):Boolean;
+    function Var_ArrLength:Integer;
+    procedure Var_SetValue(const AVarName:String;const AValue:Number);
+    procedure Var_SetValueInt(const AVarName:String;AValue:Integer);
+    procedure Var_SetValue(const AIndex:Integer;const AValue:Number);
+    procedure Var_SetValueInt(const AIndex:Integer;AValue:Integer);
+    function Var_GetVar(const AVarName:String):TPtrNumber;
+    function Var_GetVar(const AIndex:Integer):TPtrNumber;
+    function Var_GetValue(const AVarName:String):Number;
+    function Var_GetValueInt(const AVarName:String):Integer;
+    function Var_GetValue(const AIndex:Integer):Number;
+    function Var_GetValueInt(const AIndex:Integer):Integer;
+    function Var_GetValueInt_Index(const AVarName:String):Integer;
   end;
 
   { CodeLine }
@@ -298,10 +346,12 @@ type
     procedure ChangeTo(var ACodeLine:CodeLine);
     procedure Code_SetCodeData(const CodeData:Number);
     procedure Code_AddParamData(const ParamData:Number);
-    procedure Code_SetFuncData(var FuncData:TProcNor);
-    procedure Code_SetFuncData(var FuncData:TProcObj);
+    procedure Code_AddParamDataInt(const ParamData:Integer);
+    procedure Code_SetFuncData(const FuncData:TProcNor);
+    procedure Code_SetFuncData(const FuncData:TProcObj);
     function Code_ParamArrLength:Integer;
     function Code_GetParamData(const AIndexBaseZero:Integer):Number;
+    function Code_GetParamDataInt(const AIndexBaseZero:Integer):Integer;
     function Code_RunFuncData:Boolean;
   end;
 
@@ -312,15 +362,92 @@ type
   CodeArray = class(TObject)
   private
     TCodeLn:TClnArr;
+    function GetCLine: CodeLine;
     function GetLines: TClnArr;
+    procedure SetCLine(AValue: CodeLine);
     procedure SetLines(AValue: TClnArr);
   public
     constructor Create;
     constructor Create(var ACodeArray:CodeArray);
     destructor Destroy; override;
     procedure ChangeTo(var ACodeArray:CodeArray);
+    procedure Lines_CreateLast;
     property Lines:TClnArr Read GetLines Write SetLines;
+    property Lines_AtLast:CodeLine Read GetCLine Write SetCLine;
     function Lines_ArrLength:Integer;
+  end;
+
+  { CodeProperties }
+
+  CodeProperties = class(TObject)
+  private
+    TCPoint:CodePoint;
+    TVarArr:CodeVariable;
+    TCodeArr:CodeArray;
+    function GetCodeArr: CodeArray;
+    function GetCPoint: CodePoint;
+    function GetVarArr: CodeVariable;
+    procedure SetCodeArr(AValue: CodeArray);
+    procedure SetCPoint(AValue: CodePoint);
+    procedure SetVarArr(AValue: CodeVariable);
+  public
+    constructor Create;
+    constructor Create(var ACodeProperties:CodeProperties);
+    destructor Destroy; override;
+    procedure ChangeTo(var ACodeProperties:CodeProperties);
+    property Property_CodePoint:CodePoint Read GetCPoint Write SetCPoint;
+    property Property_CodeVariable:CodeVariable Read GetVarArr Write SetVarArr;
+    property Property_CodeArray:CodeArray Read GetCodeArr Write SetCodeArr;
+  end;
+
+  CodePropertiesArr = Array of CodeProperties;
+
+  { CodeCores }
+
+  CodeCores = class(TObject)
+  private
+    TCoreIndex:Integer;
+    TCPropertyArr:CodePropertiesArr;
+    procedure AddProperty(var ACodeProperties:CodeProperties);
+  public
+    constructor Create;
+    constructor Create(var ACodeCores:CodeCores);
+    destructor Destroy; override;
+    procedure ChangeTo(var ACodeCores:CodeCores);
+    procedure Cores_AddProperty(var ACodeProperties:CodeProperties;ATimes:Integer);
+    procedure Cores_AddProperty(var ACodeProperties:CodeProperties);
+    procedure Cores_ResetIndex;
+    procedure Cores_Continue;
+    function Cores_RunProperty:Boolean;
+    function Cores_isPropertyDone:Boolean;
+    function Cores_ArrLength:Integer;
+  end;
+
+  PtrCodeProperties = ^CodeProperties;
+
+  { CodeComponentBasic }
+
+  CodeComponentBasic = class(TObject)
+  private
+    TCProperty:PtrCodeProperties;
+
+    //procedure(AParamArr:TParamArr);
+    procedure SumSubInteger_Proc(AParamArr:TParamArr);
+    procedure MulDivInteger_Proc(AParamArr:TParamArr);
+    procedure SetLength_Proc(AParamArr:TParamArr);
+    procedure Length_Proc(AParamArr:TParamArr);
+  public
+    constructor Create;
+    constructor Create(const APtrCodeProperties:PtrCodeProperties);
+    destructor Destroy; override;
+    procedure Component_SetProperty(const APtrCodeProperties:PtrCodeProperties);
+    function Component_Variable_ResultData(const ResultVarName:String):Integer;
+    function Component_SumSubInteger(const num1VarName,num2VarName,
+      ResultVarName:String):Integer;
+    function Component_MulDivInteger(const num1VarName,num2VarName,
+      ResultVarName,isMulVarName:String):Integer;
+    function Component_SetLength(const ArrayVarName,ArrayLengthVarName:String):Integer;
+    function Component_Length(const ArrayVarName,ResultVarName:String):Integer;
   end;
 
   { CodeBuild }
@@ -339,6 +466,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    function IntToNumber(const Int1:Integer):Number;
+    function NumberToInt(const num:Number):Integer;
     function RR(const x:Real):Integer;
     function unNum(const x:Integer):Integer;
     function unNum(const x:Real):Real;
@@ -2897,6 +3026,595 @@ begin
   Result:=AStrMath.xModX(num1,num2);
 end;
 
+{ CodeComponentBasic }
+
+procedure CodeComponentBasic.SumSubInteger_Proc(AParamArr: TParamArr);
+var
+  num1Point,num2Point,ResultPoint:Integer;
+  num1V,num2V,ResultV:Integer;
+begin
+  num1Point:=AArrMath.NumberToInt(AParamArr[0]);
+  num2Point:=AArrMath.NumberToInt(AParamArr[1]);
+  ResultPoint:=AArrMath.NumberToInt(AParamArr[2]);
+
+  num1V:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt(num1Point);
+  num2V:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt(num2Point);
+  self.TCProperty^.Property_CodeVariable.Var_SetValueInt(ResultPoint,num1V+num2V);
+end;
+
+procedure CodeComponentBasic.MulDivInteger_Proc(AParamArr: TParamArr);
+var
+  num1Point,num2Point,ResultPoint,isMulPoint:Integer;
+  num1V,num2V,ResultV,isMulV:Integer;
+begin
+  num1Point:=AArrMath.NumberToInt(AParamArr[0]);
+  num2Point:=AArrMath.NumberToInt(AParamArr[1]);
+  ResultPoint:=AArrMath.NumberToInt(AParamArr[2]);
+  isMulPoint:=AArrMath.NumberToInt(AParamArr[3]);
+
+  num1V:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt(num1Point);
+  num2V:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt(num2Point);
+  isMulV:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt(isMulPoint);
+
+  if(isMulV=1)then self.TCProperty^.Property_CodeVariable.Var_SetValueInt(ResultPoint,num1V*num2V)
+  else self.TCProperty^.Property_CodeVariable.Var_SetValueInt(ResultPoint,num1V div num2V)
+end;
+
+procedure CodeComponentBasic.SetLength_Proc(AParamArr: TParamArr);
+var
+  ArrayVarPoint,ArrayLengthVarPoint:Integer;
+  ArrayLengthVarV:Integer;
+  PtrNum:TPtrNumber;
+begin
+  PtrNum:=nil;
+
+  ArrayVarPoint:=AArrMath.NumberToInt(AParamArr[0]);
+  ArrayLengthVarPoint:=AArrMath.NumberToInt(AParamArr[1]);
+
+  ArrayLengthVarV:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt(ArrayLengthVarPoint);
+
+  PtrNum:=self.TCProperty^.Property_CodeVariable.Var_GetVar(ArrayVarPoint);
+  SetLength(PtrNum^,ArrayLengthVarV);
+  PtrNum:=nil;
+end;
+
+procedure CodeComponentBasic.Length_Proc(AParamArr: TParamArr);
+var
+  ArrayVarPoint,ResultPoint:Integer;
+  ResultV:Integer;
+  PtrNum:TPtrNumber;
+begin
+  PtrNum:=nil;
+
+  ArrayVarPoint:=AArrMath.NumberToInt(AParamArr[0]);
+  ResultPoint:=AArrMath.NumberToInt(AParamArr[1]);
+
+  PtrNum:=self.TCProperty^.Property_CodeVariable.Var_GetVar(ArrayVarPoint);
+  ResultV:=Length(PtrNum^);
+
+  self.TCProperty^.Property_CodeVariable.Var_SetValueInt(ResultPoint,ResultV);
+  PtrNum:=nil;
+end;
+
+constructor CodeComponentBasic.Create;
+begin
+  self.TCProperty:=nil;
+end;
+
+constructor CodeComponentBasic.Create(
+  const APtrCodeProperties: PtrCodeProperties);
+begin
+  self.TCProperty:=APtrCodeProperties;
+end;
+
+destructor CodeComponentBasic.Destroy;
+begin
+  inherited Destroy;
+  self.TCProperty:=nil;
+end;
+
+procedure CodeComponentBasic.Component_SetProperty(
+  const APtrCodeProperties: PtrCodeProperties);
+begin
+  self.TCProperty:=APtrCodeProperties;
+end;
+
+function CodeComponentBasic.Component_Variable_ResultData(
+  const ResultVarName: String): Integer;
+begin
+  self.TCProperty^.Property_CodeVariable.Var_AddVariable(ResultVarName);
+  Result:=self.TCProperty^.Property_CodeVariable.Var_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_SumSubInteger(const num1VarName,
+  num2VarName, ResultVarName: String): Integer;
+var
+  num1Count,num2Count,ResultCount:Integer;
+begin
+  num1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num1VarName);
+  num2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num2VarName);
+  ResultCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(20));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(num1Count);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(num2Count);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ResultCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SumSubInteger_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MulDivInteger(const num1VarName,
+  num2VarName, ResultVarName, isMulVarName: String): Integer;
+var
+  num1Count,num2Count,ResultCount,isMulCount:Integer;
+begin
+  num1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num1VarName);
+  num2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num2VarName);
+  ResultCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
+  isMulCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(isMulVarName);
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(11));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(num1Count);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(num2Count);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ResultCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(isMulCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.MulDivInteger_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_SetLength(const ArrayVarName,
+  ArrayLengthVarName: String): Integer;
+var
+  ArrayVarCount,ArrayLengthVarCount:Integer;
+begin
+  ArrayVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayVarName);
+  ArrayLengthVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayLengthVarName);
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(17));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ArrayVarCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ArrayLengthVarCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SetLength_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_Length(const ArrayVarName,
+  ResultVarName: String): Integer;
+var
+  ArrayVarCount,ResultVarCount:Integer;
+begin
+  ArrayVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayVarName);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(1));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ArrayVarCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ResultVarCount);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.Length_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+{ CodeCores }
+
+procedure CodeCores.AddProperty(var ACodeProperties: CodeProperties);
+begin
+  SetLength(self.TCPropertyArr,Length(self.TCPropertyArr)+1);
+  self.TCPropertyArr[Length(self.TCPropertyArr)-1]:=CodeProperties.Create(ACodeProperties);
+end;
+
+constructor CodeCores.Create;
+begin
+  self.TCoreIndex:=-1;
+  self.TCPropertyArr:=nil;
+end;
+
+constructor CodeCores.Create(var ACodeCores: CodeCores);
+begin
+  self.TCoreIndex:=-1;
+  self.TCPropertyArr:=nil;
+  self.ChangeTo(ACodeCores);
+end;
+
+destructor CodeCores.Destroy;
+var
+  i:Integer;
+begin
+  inherited Destroy;
+  self.TCoreIndex:=-1;
+  for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i].Free;
+  SetLength(self.TCPropertyArr,0);
+end;
+
+procedure CodeCores.ChangeTo(var ACodeCores: CodeCores);
+var
+  i:Integer;
+begin
+  self.TCoreIndex:=ACodeCores.TCoreIndex;
+  for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i].Free;
+  SetLength(self.TCPropertyArr,Length(ACodeCores.TCPropertyArr));
+  for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i]:=CodeProperties.Create(ACodeCores.TCPropertyArr[i]);
+end;
+
+procedure CodeCores.Cores_AddProperty(var ACodeProperties: CodeProperties;
+  ATimes: Integer);
+var
+  i:Integer;
+begin
+  if(ATimes<0)then ATimes:=0;
+  for i:=1 to ATimes do self.AddProperty(ACodeProperties);
+end;
+
+procedure CodeCores.Cores_AddProperty(var ACodeProperties: CodeProperties);
+begin
+  self.AddProperty(ACodeProperties);
+end;
+
+procedure CodeCores.Cores_ResetIndex;
+begin
+  self.TCoreIndex:=-1;
+end;
+
+procedure CodeCores.Cores_Continue;
+begin
+  self.TCoreIndex:=self.TCoreIndex+1;
+  if(self.TCoreIndex>(Length(self.TCPropertyArr)-1))then self.TCoreIndex:=0;
+end;
+
+function CodeCores.Cores_RunProperty: Boolean;
+var
+  AIndex:Integer;
+begin
+  AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint.Point_GetPoint;
+  Result:=self.TCPropertyArr[self.TCoreIndex].Property_CodeArray.Lines[AIndex].Code_RunFuncData;
+  AIndex:=AIndex+1;
+  if(AIndex>self.TCPropertyArr[self.TCoreIndex].Property_CodeArray.Lines_ArrLength)then AIndex:=AIndex-1;
+  self.TCPropertyArr[self.TCoreIndex].Property_CodePoint.Point_SetPoint(AIndex);
+end;
+
+function CodeCores.Cores_isPropertyDone: Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint.Point_GetPoint;
+  if(AIndex=self.TCPropertyArr[self.TCoreIndex].Property_CodeArray.Lines_ArrLength)then Result:=True;
+end;
+
+function CodeCores.Cores_ArrLength: Integer;
+begin
+  Result:=Length(self.TCPropertyArr);
+end;
+
+{ CodePoint }
+
+constructor CodePoint.Create;
+begin
+  self.TPointArr:=nil;
+end;
+
+constructor CodePoint.Create(const APoint: Integer);
+begin
+  self.TPointArr:=nil;
+  self.Point_SetPoint(APoint);
+end;
+
+constructor CodePoint.Create(var ACodePoint: CodePoint);
+begin
+  self.TPointArr:=nil;
+  self.ChangeTo(ACodePoint);
+end;
+
+destructor CodePoint.Destroy;
+begin
+  inherited Destroy;
+  SetLength(self.TPointArr,0);
+end;
+
+procedure CodePoint.ChangeTo(var ACodePoint: CodePoint);
+var
+  i:Integer;
+begin
+  SetLength(self.TPointArr,Length(ACodePoint.TPointArr));
+  for i:=0 to (Length(self.TPointArr)-1)do self.TPointArr[i]:=ACodePoint.TPointArr[i];
+end;
+
+procedure CodePoint.Point_SetPoint(const APoint: Integer);
+begin
+  if(Length(self.TPointArr)>0)then self.TPointArr[Length(self.TPointArr)-1]:=APoint
+  else begin
+    SetLength(self.TPointArr,Length(self.TPointArr)+1);
+    self.TPointArr[Length(self.TPointArr)-1]:=APoint;
+  end;
+end;
+
+procedure CodePoint.Point_AddLast;
+begin
+  SetLength(self.TPointArr,Length(self.TPointArr)+1);
+  self.TPointArr[Length(self.TPointArr)-1]:=0;
+end;
+
+procedure CodePoint.Point_AddLast(const APoint: Integer);
+begin
+  SetLength(self.TPointArr,Length(self.TPointArr)+1);
+  self.TPointArr[Length(self.TPointArr)-1]:=APoint;
+end;
+
+procedure CodePoint.Point_DeleteLast;
+begin
+  SetLength(self.TPointArr,Length(self.TPointArr)-1);
+end;
+
+function CodePoint.Point_GetPoint: Integer;
+begin
+  Result:=self.TPointArr[Length(self.TPointArr)-1];
+end;
+
+{ CodeVariable }
+
+function CodeVariable.isVarNameExist(const AVarName: String; out AIndex: Integer
+  ): Boolean;
+var
+  i:Integer;
+begin
+  Result:=False;
+  AIndex:=-1;
+  for i:=0 to (Length(self.TVarName)-1)do
+    if(self.TVarName[i]=AVarName)then begin
+      AIndex:=i;
+      Result:=True;
+      Exit;
+    end;
+end;
+
+constructor CodeVariable.Create;
+begin
+  self.TVarArr:=nil;
+  self.TVarName:=nil;
+end;
+
+constructor CodeVariable.Create(var ACodeVariable: CodeVariable);
+begin
+  self.TVarArr:=nil;
+  self.TVarName:=nil;
+  self.changeTo(ACodeVariable);
+end;
+
+destructor CodeVariable.Destroy;
+var
+  i:Integer;
+begin
+  inherited Destroy;
+  for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
+  SetLength(self.TVarArr,0);
+  SetLength(self.TVarName,0);
+end;
+
+procedure CodeVariable.changeTo(var ACodeVariable: CodeVariable);
+var
+  i:Integer;
+begin
+  for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
+  SetLength(self.TVarArr,Length(ACodeVariable.TVarArr));
+  for i:=0 to (Length(self.TVarArr)-1)do self.TVarArr[i]:=ACodeVariable.TVarArr[i];
+
+  SetLength(self.TVarName,Length(ACodeVariable.TVarName));
+  for i:=0 to (Length(self.TVarName)-1)do self.TVarName[i]:=ACodeVariable.TVarName[i];
+end;
+
+function CodeVariable.Var_AddVariable(const AVarName: String): Boolean;
+var
+  AIndex:Integer;
+begin
+  AIndex:=-1;
+  Result:=self.isVarNameExist(AVarName,AIndex);
+  if(Result=False)and(AIndex=-1)then begin
+    SetLength(self.TVarArr,Length(self.TVarArr)+1);
+    self.TVarArr[Length(self.TVarArr)-1]:=nil;
+
+    SetLength(self.TVarName,Length(self.TVarName)+1);
+    self.TVarName[Length(self.TVarName)+1]:=AVarName;
+
+    Result:=True;
+  end else Result:=False;
+end;
+
+function CodeVariable.Var_AddVariable(const AVarName: String;
+  const AValue: Number): Boolean;
+var
+  AIndex:Integer;
+begin
+  AIndex:=-1;
+  Result:=self.isVarNameExist(AVarName,AIndex);
+  if(Result=False)and(AIndex=-1)then begin
+    SetLength(self.TVarArr,Length(self.TVarArr)+1);
+    self.TVarArr[Length(self.TVarArr)-1]:=StrMath.AssignNum(AValue);
+
+    SetLength(self.TVarName,Length(self.TVarName)+1);
+    self.TVarName[Length(self.TVarName)+1]:=AVarName;
+
+    Result:=True;
+  end else Result:=False;
+end;
+
+function CodeVariable.Var_AddVariableInt(const AVarName: String; AValue: Integer
+  ): Boolean;
+var
+  AIndex:Integer;
+begin
+  AIndex:=-1;
+  Result:=self.isVarNameExist(AVarName,AIndex);
+  if(Result=False)and(AIndex=-1)then begin
+    SetLength(self.TVarArr,Length(self.TVarArr)+1);
+    self.TVarArr[Length(self.TVarArr)-1]:=AArrMath.IntToNumber(AValue);
+
+    SetLength(self.TVarName,Length(self.TVarName)+1);
+    self.TVarName[Length(self.TVarName)+1]:=AVarName;
+
+    Result:=True;
+  end else Result:=False;
+end;
+
+function CodeVariable.Var_ArrLength: Integer;
+begin
+  Result:=Length(self.TVarName);
+end;
+
+procedure CodeVariable.Var_SetValue(const AVarName: String; const AValue: Number
+  );
+var
+  AIndex:Integer;
+begin
+  AIndex:=-1;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
+    self.TVarArr[AIndex]:=StrMath.AssignNum(AValue);
+end;
+
+procedure CodeVariable.Var_SetValueInt(const AVarName: String; AValue: Integer);
+var
+  AIndex:Integer;
+begin
+  AIndex:=-1;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
+    self.TVarArr[AIndex]:=AArrMath.IntToNumber(AValue);
+end;
+
+procedure CodeVariable.Var_SetValue(const AIndex: Integer; const AValue: Number
+  );
+begin
+  if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
+  self.TVarArr[AIndex]:=StrMath.AssignNum(AValue);
+end;
+
+procedure CodeVariable.Var_SetValueInt(const AIndex: Integer; AValue: Integer);
+begin
+  if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
+  self.TVarArr[AIndex]:=AArrMath.IntToNumber(AValue);
+end;
+
+function CodeVariable.Var_GetVar(const AVarName: String): TPtrNumber;
+var
+  AIndex:Integer;
+begin
+  Result:=nil;
+  AIndex:=-1;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
+    Result:=@self.TVarArr[AIndex];
+end;
+
+function CodeVariable.Var_GetVar(const AIndex: Integer): TPtrNumber;
+begin
+  Result:=nil;
+  if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
+  Result:=@self.TVarArr[AIndex];
+end;
+
+function CodeVariable.Var_GetValue(const AVarName: String): Number;
+var
+  AIndex:Integer;
+begin
+  Result:=nil;
+  AIndex:=-1;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
+    Result:=StrMath.AssignNum(self.TVarArr[AIndex]);
+end;
+
+function CodeVariable.Var_GetValueInt(const AVarName: String): Integer;
+var
+  AIndex:Integer;
+begin
+  Result:=0;
+  AIndex:=-1;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
+    Result:=AArrMath.NumberToInt(self.TVarArr[AIndex]);
+end;
+
+function CodeVariable.Var_GetValue(const AIndex: Integer): Number;
+begin
+  Result:=nil;
+  if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
+  Result:=StrMath.AssignNum(self.TVarArr[AIndex]);
+end;
+
+function CodeVariable.Var_GetValueInt(const AIndex: Integer): Integer;
+begin
+  Result:=0;
+  if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
+  Result:=AArrMath.NumberToInt(self.TVarArr[AIndex]);
+end;
+
+function CodeVariable.Var_GetValueInt_Index(const AVarName: String): Integer;
+var
+  AIndex:Integer;
+begin
+  Result:=-1;
+  AIndex:=-1;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then Result:=AIndex;
+end;
+
+{ CodeProperties }
+
+function CodeProperties.GetCodeArr: CodeArray;
+begin
+  Result:=CodeArray.Create(self.TCodeArr);
+end;
+
+function CodeProperties.GetCPoint: CodePoint;
+begin
+  Result:=CodePoint.Create(self.TCPoint);
+end;
+
+function CodeProperties.GetVarArr: CodeVariable;
+begin
+  Result:=CodeVariable.Create(self.TVarArr);
+end;
+
+procedure CodeProperties.SetCodeArr(AValue: CodeArray);
+begin
+  self.TCodeArr.ChangeTo(AValue);
+end;
+
+procedure CodeProperties.SetCPoint(AValue: CodePoint);
+begin
+  self.TCPoint.ChangeTo(AValue);
+end;
+
+procedure CodeProperties.SetVarArr(AValue: CodeVariable);
+begin
+  self.TVarArr.changeTo(AValue);
+end;
+
+constructor CodeProperties.Create;
+begin
+  self.TCPoint:=CodePoint.Create;
+  self.TVarArr:=CodeVariable.Create;
+  self.TCodeArr:=CodeArray.Create;
+end;
+
+constructor CodeProperties.Create(var ACodeProperties: CodeProperties);
+begin
+  self.TCPoint:=CodePoint.Create;
+  self.TVarArr:=CodeVariable.Create;
+  self.TCodeArr:=CodeArray.Create;
+  self.ChangeTo(ACodeProperties);
+end;
+
+destructor CodeProperties.Destroy;
+begin
+  inherited Destroy;
+  self.TCPoint.Free;
+  self.TVarArr.Free;
+  self.TCodeArr.Free;
+end;
+
+procedure CodeProperties.ChangeTo(var ACodeProperties: CodeProperties);
+begin
+  self.TCPoint.ChangeTo(ACodeProperties.TCPoint);
+  self.TVarArr.ChangeTo(ACodeProperties.TVarArr);
+  self.TCodeArr.ChangeTo(ACodeProperties.TCodeArr);
+end;
+
 { CodeBuild }
 
 constructor CodeBuild.Create;
@@ -2929,6 +3647,16 @@ begin
   for i:=0 to (Length(Result)-1)do Result[i]:=CodeLine.Create(self.TCodeLn[i]);
 end;
 
+function CodeArray.GetCLine: CodeLine;
+begin
+  Result:=CodeLine.Create(self.TCodeLn[Length(self.TCodeLn)-1]);
+end;
+
+procedure CodeArray.SetCLine(AValue: CodeLine);
+begin
+  self.TCodeLn[Length(self.TCodeLn)-1].ChangeTo(AValue);
+end;
+
 constructor CodeArray.Create;
 begin
   self.TCodeLn:=nil;
@@ -2956,6 +3684,12 @@ begin
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
   SetLength(self.TCodeLn,Length(ACodeArray.TCodeLn));
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i]:=CodeLine.Create(ACodeArray.TCodeLn[i]);
+end;
+
+procedure CodeArray.Lines_CreateLast;
+begin
+  SetLength(self.TCodeLn,Length(self.TCodeLn)+1);
+  self.TCodeLn[Length(self.TCodeLn)-1]:=CodeLine.Create;
 end;
 
 function CodeArray.Lines_ArrLength: Integer;
@@ -3033,13 +3767,19 @@ begin
   self.TParaArr[Length(self.TParaArr)-1]:=StrMath.AssignNum(ParamData);
 end;
 
-procedure CodeLine.Code_SetFuncData(var FuncData: TProcNor);
+procedure CodeLine.Code_AddParamDataInt(const ParamData: Integer);
+begin
+  SetLength(self.TParaArr,Length(self.TParaArr)+1);
+  self.TParaArr[Length(self.TParaArr)-1]:=AArrMath.IntToNumber(ParamData);
+end;
+
+procedure CodeLine.Code_SetFuncData(const FuncData: TProcNor);
 begin
   self.TFuncDataIsNor:=1;
   self.TFuncDataNor:=@FuncData;
 end;
 
-procedure CodeLine.Code_SetFuncData(var FuncData: TProcObj);
+procedure CodeLine.Code_SetFuncData(const FuncData: TProcObj);
 begin
   self.TFuncDataIsNor:=0;
   self.TFuncDataObj:=@FuncData;
@@ -3055,6 +3795,13 @@ begin
   Result:=nil;
   if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
   Result:=AssignNum(self.TParaArr[AIndexBaseZero]);
+end;
+
+function CodeLine.Code_GetParamDataInt(const AIndexBaseZero: Integer): Integer;
+begin
+  Result:=nil;
+  if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
+  Result:=AArrMath.NumberToInt(self.TParaArr[AIndexBaseZero]);
 end;
 
 function CodeLine.Code_RunFuncData: Boolean;
@@ -4488,6 +5235,20 @@ end;
 destructor ArrMath.Destroy;
 begin
   inherited Destroy;
+end;
+
+function ArrMath.IntToNumber(const Int1: Integer): Number;
+begin
+  Result:=nil;
+  SetLength(Result,SizeOf(Int1));
+  Move(Int1,Result,SizeOf(Int1));
+end;
+
+function ArrMath.NumberToInt(const num: Number): Integer;
+begin
+  Result:=0;
+  if(Length(num)<SizeOf(Integer))then SetLength(num,SizeOf(Integer));
+  Move(num,Result,Length(num));
 end;
 
 function ArrMath.RR(const x: Real): Integer;
