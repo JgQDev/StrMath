@@ -438,6 +438,8 @@ type
   CodeComponentBasic = class(TObject)
   private
     TCVarCapStr:String;
+    TCMemCapNum:Integer;
+    TCMemCapStr:String;
     TCProperty:PtrCodeProperties;
     function isVarNameValid(const VarName:String):Boolean;
 
@@ -478,6 +480,8 @@ type
     procedure AllocateMem_Integer_Proc(AParamArr:TParamArr);
     procedure AllocateMem_String_Proc(AParamArr:TParamArr);
     procedure BinStr_Proc(AParamArr:TParamArr);
+    procedure StartMem_Proc(AParamArr:TParamArr);
+    procedure EndMem_Proc(AParamArr:TParamArr);
   public
     constructor Create;
     constructor Create(const APtrCodeProperties:PtrCodeProperties);
@@ -485,7 +489,7 @@ type
     procedure UnComponent_SetProperty(const APtrCodeProperties:PtrCodeProperties);
     procedure UnComponent_VariableClass(const VarClassName:String);
     procedure UnComponent_VariableClassReset;
-    function UnComponent_VarClass(const VarName:String):String;
+    function UnComponent_VarClass:String;
     function UnComponent_CodeLength:Integer;
     function UnComponent_AppendVariable(const VarName:String):Integer;
     function UnComponent_AppendVariable(const VarName:String;const AValue:Number):Integer;
@@ -533,6 +537,10 @@ type
     function Component_AllocateMem(const VarName:String;const AValue:Integer):Integer;
     function Component_AllocateMem(const VarName:String;const AValue:String):Integer;
     function Component_BinStr(const VarName,CountVarName,ResultStrVarName:String):Integer;
+    function Component_StartMem:Integer;
+    function Component_StartMem(out StartStr:String):Integer;
+    function Component_EndMem:Integer;
+    function Component_EndMem(out EndStr:String):Integer;
   end;
 
   PtrCodeComponentBasic = ^CodeComponentBasic;
@@ -558,6 +566,9 @@ type
     function Component_ReverseInt(const numVarName,numResultVarName:String):Integer;
     function Component_isIntZero(const numVarName,boolResultVarName:String):Integer;
     function Component_MatchLength(const isLeftBoolVarName,numVarName,numResultVarName:String):Integer;
+    function Component_Shift(const isLeftBoolVarName,isSetBoolVarName,numVarName:String):Integer;
+    function Component_ShiftPace(const isLeftBoolVarName,PaceBaseOneIntVarName,numVarName:String):Integer;
+    function Component_isPositiveAd(const numVarName,numResultByteVarName:String):Integer;
   end;
 
   { CodeBuild }
@@ -3167,6 +3178,8 @@ end;
 
 function CodeComponent.Component_unNumInteger(const numVarName,
   ResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3174,7 +3187,9 @@ begin
   if(x<0)then Result:=Result*(-1);
   }
 
-  Result:=self.TPtrCComponent^.Component_MoveV2ToV1(ResultVarName,numVarName);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(ResultVarName,numVarName);
 
   self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
   self.TPtrCComponent^.Component_AllocateMem('isMulV',1);
@@ -3182,83 +3197,112 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('GotoMul1',self.TPtrCComponent^.UnComponent_CodeLength+3);
   self.TPtrCComponent^.Component_AllocateMem('GotoMul2',self.TPtrCComponent^.UnComponent_CodeLength+3);
 
-  self.TPtrCComponent^.Component_JumpTo('JumpMul1');
-  self.TPtrCComponent^.Component_MulDivInteger(ResultVarName,'NumNegOne',ResultVarName,'isMulV');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpMul1');
+  self.TPtrCComponent^.Component_MulDivInteger(ResultVarName,AMem1+'NumNegOne',ResultVarName,AMem1+'isMulV');
   self.TPtrCComponent^.Component_Exit;
 
   self.TPtrCComponent^.Component_AllocateMem('ConditionA',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
 
-  self.TPtrCComponent^.Component_V1LTV2(numVarName,'NumZero','ConditionA');
-  self.TPtrCComponent^.Component_IfV1_Goto('ConditionA','GotoMul1','GotoMul2');
+  self.TPtrCComponent^.Component_V1LTV2(numVarName,AMem1+'NumZero',AMem1+'ConditionA');
+  self.TPtrCComponent^.Component_IfV1_Goto(AMem1+'ConditionA',AMem1+'GotoMul1',AMem1+'GotoMul2');
+
+  self.TPtrCComponent^.Component_EndMem;
+
 end;
 
 function CodeComponent.Component_SetBit(const ByteVarName, PosBaseZeroVarName,
   ResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
   B:=B or (1 shl PosBaseZero);
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
-  self.TPtrCComponent^.Component_V1SHLV2('NumOne',PosBaseZeroVarName,ResultVarName);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+
+  self.TPtrCComponent^.Component_V1SHLV2(AMem1+'NumOne',PosBaseZeroVarName,ResultVarName);
   self.TPtrCComponent^.Component_V1OrV2(ByteVarName,ResultVarName,ResultVarName);
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_ClearBit(const ByteVarName,
   PosBaseZeroVarName, ResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
   B:=B and not (1 shl PosBaseZero);
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
-  self.TPtrCComponent^.Component_V1SHLV2('NumOne',PosBaseZeroVarName,ResultVarName);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+
+  self.TPtrCComponent^.Component_V1SHLV2(AMem1+'NumOne',PosBaseZeroVarName,ResultVarName);
   self.TPtrCComponent^.Component_NotV1(ResultVarName,ResultVarName);
   self.TPtrCComponent^.Component_V1AndV2(ByteVarName,ResultVarName,ResultVarName);
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_ReverseBit(const ByteVarName,
   PosBaseZeroVarName, ResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
   B:=B xor (1 shl PosBaseZero);
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
-  self.TPtrCComponent^.Component_V1SHLV2('NumOne',PosBaseZeroVarName,ResultVarName);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+
+  self.TPtrCComponent^.Component_V1SHLV2(AMem1+'NumOne',PosBaseZeroVarName,ResultVarName);
   self.TPtrCComponent^.Component_V1XORV2(ByteVarName,ResultVarName,ResultVarName);
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_IsBitSet(const ByteVarName,
   PosBaseZeroVarName, ResultBoolVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
   Result:=(B and (1 shl PosBaseZero)) <> 0;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
-  self.TPtrCComponent^.Component_V1SHLV2('NumOne',PosBaseZeroVarName,ResultBoolVarName);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+
+  self.TPtrCComponent^.Component_V1SHLV2(AMem1+'NumOne',PosBaseZeroVarName,ResultBoolVarName);
   self.TPtrCComponent^.Component_V1AndV2(ByteVarName,ResultBoolVarName,ResultBoolVarName);
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
-  self.TPtrCComponent^.Component_V1NotEqV2(ResultBoolVarName,'NumZero',ResultBoolVarName);
+  self.TPtrCComponent^.Component_V1NotEqV2(ResultBoolVarName,AMem1+'NumZero',ResultBoolVarName);
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_BitsToStr(const numVarName,
   ResultStrBitsVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3271,13 +3315,15 @@ begin
   end;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('i',0);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem(ResultStrBitsVarName,'');
 
   self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult',0);
-  self.TPtrCComponent^.Component_Length(numVarName,'LengthResult');
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult','NumNegOne','LengthResult');
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'LengthResult');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult',AMem1+'NumNegOne',AMem1+'LengthResult');
 
   self.TPtrCComponent^.Component_AllocateMem('Str1','');
   self.TPtrCComponent^.Component_AllocateMem('Str2',' ');
@@ -3286,24 +3332,28 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('num3',1);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
 
-  self.TPtrCComponent^.Component_AllocateMem('ForEnd',self.TPtrCComponent^.UnComponent_CodeLength+9);
+  self.TPtrCComponent^.Component_AllocateMem('ForEnd',self.TPtrCComponent^.UnComponent_CodeLength+10);
   self.TPtrCComponent^.Component_AllocateMem('ForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num2');
-  self.TPtrCComponent^.Component_IfV1True('num2','ForEnd');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'LengthResult',AMem1+'num2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num2',AMem1+'ForEnd');
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,'i','ByteA');
-  self.TPtrCComponent^.Component_BinStr('ByteA','num1','Str1');
-  self.TPtrCComponent^.Component_CombineV2ToV1('Str1','Str2','Str1');
-  self.TPtrCComponent^.Component_CombineV2ToV1('Str1',ResultStrBitsVarName,ResultStrBitsVarName);
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_BinStr(AMem1+'ByteA',AMem1+'num1',AMem1+'Str1');
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'Str1',AMem1+'Str2',AMem1+'Str1');
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'Str1',ResultStrBitsVarName,ResultStrBitsVarName);
 
-  self.TPtrCComponent^.Component_SumSubInteger('i','num3','i');
-  self.TPtrCComponent^.Component_JumpTo('ForBegin');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num3',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'ForBegin');
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_BitsLength(const numVarName,
   ResultLengthVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3319,18 +3369,24 @@ begin
   end;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('num1',8);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('num1',8);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult',0);
 
-  self.TPtrCComponent^.Component_Length(numVarName,'LengthResult');
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'LengthResult');
   self.TPtrCComponent^.Component_AllocateMem('isMulV',1);
 
-  self.TPtrCComponent^.Component_MulDivInteger('num1','LengthResult',ResultLengthVarName,'isMulV');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'num1',AMem1+'LengthResult',ResultLengthVarName,AMem1+'isMulV');
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_SetInt(const numVarName,
   numResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3343,14 +3399,16 @@ begin
   end;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('i',0);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult',0);
 
-  self.TPtrCComponent^.Component_Length(numVarName,'LengthResult');
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'LengthResult');
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'LengthResult');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'LengthResult');
 
   self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult','NumNegOne','LengthResult');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult',AMem1+'NumNegOne',AMem1+'LengthResult');
 
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_AllocateMem('num2',1);
@@ -3359,19 +3417,23 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('ForEnd',self.TPtrCComponent^.UnComponent_CodeLength+8);
   self.TPtrCComponent^.Component_AllocateMem('ForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
-  self.TPtrCComponent^.Component_IfV1True('num1','ForEnd');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'LengthResult',AMem1+'num1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num1',AMem1+'ForEnd');
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,'i','ByteA');
-  self.TPtrCComponent^.Component_ArrayIndexSet(numResultVarName,'i','ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultVarName,AMem1+'i',AMem1+'ByteA');
 
-  self.TPtrCComponent^.Component_SumSubInteger('i','num2','i');
-  self.TPtrCComponent^.Component_JumpTo('ForBegin');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num2',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'ForBegin');
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_ReverseInt(const numVarName,
   numResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3386,21 +3448,23 @@ begin
   end;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('i',0);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem('j',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult',0);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult_numResult',0);
 
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'NumZero');
-  self.TPtrCComponent^.Component_Length(numVarName,'LengthResult');
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'LengthResult');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'NumZero');
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'LengthResult');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'LengthResult');
 
   self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult','NumNegOne','LengthResult');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult',AMem1+'NumNegOne',AMem1+'LengthResult');
 
-  self.TPtrCComponent^.Component_Length(numResultVarName,'LengthResult_numResult');
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult_numResult','NumNegOne','LengthResult_numResult');
+  self.TPtrCComponent^.Component_Length(numResultVarName,AMem1+'LengthResult_numResult');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult_numResult',AMem1+'NumNegOne',AMem1+'LengthResult_numResult');
 
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_AllocateMem('num2',1);
@@ -3410,11 +3474,11 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
   self.TPtrCComponent^.Component_AllocateMem('isMulV',1);
 
-  self.TPtrCComponent^.Component_AllocateMem('iForEnd',self.TPtrCComponent^.UnComponent_CodeLength+23);
+  self.TPtrCComponent^.Component_AllocateMem('iForEnd',self.TPtrCComponent^.UnComponent_CodeLength+24);
   self.TPtrCComponent^.Component_AllocateMem('iForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
-  self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'LengthResult',AMem1+'num1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num1',AMem1+'iForEnd');
 
   //============================================================================
 
@@ -3422,41 +3486,45 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('jForEnd',self.TPtrCComponent^.UnComponent_CodeLength+17);
   self.TPtrCComponent^.Component_AllocateMem('jForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1GTV2('j','num3','num1');
-  self.TPtrCComponent^.Component_IfV1True('num1','jForEnd');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'j',AMem1+'num3',AMem1+'num1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num1',AMem1+'jForEnd');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,'i','ByteA');
-  self.Component_IsBitSet('ByteA','j','num1');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'i',AMem1+'ByteA');
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'j',AMem1+'num1');
 
   self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+9);
-  self.TPtrCComponent^.Component_IfV1False('num1','JumpFalse');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse');
 
-  self.TPtrCComponent^.Component_MulDivInteger('i','NumNegOne','num4','isMulV');
-  self.TPtrCComponent^.Component_MulDivInteger('j','NumNegOne','num5','isMulV');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'i',AMem1+'NumNegOne',AMem1+'num4',AMem1+'isMulV');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'j',AMem1+'NumNegOne',AMem1+'num5',AMem1+'isMulV');
 
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult_numResult','num4','num4');
-  self.TPtrCComponent^.Component_SumSubInteger('num3','num5','num5');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult_numResult',AMem1+'num4',AMem1+'num4');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'num3',AMem1+'num5',AMem1+'num5');
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numResultVarName,'num4','ByteA');
-  self.Component_SetBit('ByteA','num5','ByteA');
-  self.TPtrCComponent^.Component_ArrayIndexSet(numResultVarName,'num4','ByteA');
-
-  //============================================================================
-
-  self.TPtrCComponent^.Component_SumSubInteger('j','num2','j');
-  self.TPtrCComponent^.Component_JumpTo('jForBegin');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultVarName,AMem1+'num4',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num5',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultVarName,AMem1+'num4',AMem1+'ByteA');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_SumSubInteger('i','num2','i');
-  self.TPtrCComponent^.Component_JumpTo('iForBegin');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'j',AMem1+'num2',AMem1+'j');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'jForBegin');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num2',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_isIntZero(const numVarName,
   boolResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3469,19 +3537,21 @@ begin
   end;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('i',0);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult',0);
 
-  self.TPtrCComponent^.Component_ArrayIndexGet('True','NumZero','True');
-  self.TPtrCComponent^.Component_ArrayIndexGet('False','NumZero','False');
-  self.TPtrCComponent^.Component_MoveV2ToV1(boolResultVarName,'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToV1(boolResultVarName,AMem1+'True');
 
-  self.TPtrCComponent^.Component_Length(numVarName,'LengthResult');
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'LengthResult');
   self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult','NumNegOne','LengthResult');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult',AMem1+'NumNegOne',AMem1+'LengthResult');
 
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_AllocateMem('num2',1);
@@ -3490,29 +3560,33 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('iForEnd',self.TPtrCComponent^.UnComponent_CodeLength+12);
   self.TPtrCComponent^.Component_AllocateMem('iForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
-  self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'LengthResult',AMem1+'num1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num1',AMem1+'iForEnd');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,'i','ByteA');
-  self.TPtrCComponent^.Component_V1NotEqV2('ByteA','False','num1');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_V1NotEqV2(AMem1+'ByteA',AMem1+'False',AMem1+'num1');
 
   self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+4);
-  self.TPtrCComponent^.Component_IfV1False('num1','JumpFalse');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(boolResultVarName,'False');
-  self.TPtrCComponent^.Component_JumpTo('iForEnd');
+  self.TPtrCComponent^.Component_MoveV2ToV1(boolResultVarName,AMem1+'False');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_SumSubInteger('i','num2','i');
-  self.TPtrCComponent^.Component_JumpTo('iForBegin');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num2',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
 function CodeComponent.Component_MatchLength(const isLeftBoolVarName,
   numVarName, numResultVarName: String): Integer;
+var
+  AMem1:String;
 begin
 
   {
@@ -3536,22 +3610,24 @@ begin
   end;
   }
 
-  Result:=self.TPtrCComponent^.Component_AllocateMem('i',0);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('LengthResult',0);
 
-  self.TPtrCComponent^.Component_ArrayIndexGet('True','NumZero','True');
-  self.TPtrCComponent^.Component_ArrayIndexGet('False','NumZero','False');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1('bool1','False');
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'NumZero');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'NumZero');
 
-  self.TPtrCComponent^.Component_Length(numVarName,'LengthResult');
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'LengthResult');
   self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
-  self.TPtrCComponent^.Component_SumSubInteger('LengthResult','NumNegOne','LengthResult');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'LengthResult',AMem1+'NumNegOne',AMem1+'LengthResult');
 
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_AllocateMem('num2',1);
@@ -3560,90 +3636,280 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('iForEnd',self.TPtrCComponent^.UnComponent_CodeLength+12);
   self.TPtrCComponent^.Component_AllocateMem('iForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
-  self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'LengthResult',AMem1+'num1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num1',AMem1+'iForEnd');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,'i','ByteA');
-  self.TPtrCComponent^.Component_V1NotEqV2('ByteA','False','num1');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_V1NotEqV2(AMem1+'ByteA',AMem1+'False',AMem1+'num1');
 
   self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+4);
-  self.TPtrCComponent^.Component_IfV1False('num1','JumpFalse');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1('bool1','True');
-  self.TPtrCComponent^.Component_JumpTo('iForEnd');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_SumSubInteger('i','num2','i');
-  self.TPtrCComponent^.Component_JumpTo('iForBegin');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num2',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
 
   self.TPtrCComponent^.Component_AllocateMem('AExit',self.TPtrCComponent^.UnComponent_CodeLength+46);
 
-  self.TPtrCComponent^.Component_V1EqV2('bool1','False','num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'num1');
   self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+4);
-  self.TPtrCComponent^.Component_IfV1False('num1','JumpFalse');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse');
 
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'num2');
-  self.TPtrCComponent^.Component_JumpTo('AExit');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'num2');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'AExit');
 
   self.TPtrCComponent^.Component_AllocateMem('num3',0);
-  self.Component_BitsLength(numVarName,'num3');
-  self.TPtrCComponent^.Component_SumSubInteger('num3','NumNegOne','num3');
-  self.TPtrCComponent^.Component_MoveV2ToV1('i','num3');
+  self.Component_BitsLength(numVarName,AMem1+'num3');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'num3',AMem1+'NumNegOne',AMem1+'num3');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'i',AMem1+'num3');
 
   self.TPtrCComponent^.Component_AllocateMem('iForEnd',self.TPtrCComponent^.UnComponent_CodeLength+36);
   self.TPtrCComponent^.Component_AllocateMem('iForBegin',self.TPtrCComponent^.UnComponent_CodeLength+1);
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','num1');
-  self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
+  self.TPtrCComponent^.Component_V1LTV2(AMem1+'i',AMem1+'NumZero',AMem1+'num1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'num1',AMem1+'iForEnd');
 
   //============================================================================
 
   self.TPtrCComponent^.Component_AllocateMem('num4',8);
   self.TPtrCComponent^.Component_AllocateMem('isMulV',0);
-  self.TPtrCComponent^.Component_MulDivInteger('i','num4','num4','isMulV');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'i',AMem1+'num4',AMem1+'num4',AMem1+'isMulV');
 
   self.TPtrCComponent^.Component_AllocateMem('num5',8);
   self.TPtrCComponent^.Component_AllocateMem('isMulV',1);
-  self.TPtrCComponent^.Component_MulDivInteger('num4','num5','num5','isMulV');
-  self.TPtrCComponent^.Component_MulDivInteger('NumNegOne','num5','num5','isMulV');
-  self.TPtrCComponent^.Component_SumSubInteger('i','num5','num5');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'num4',AMem1+'num5',AMem1+'num5',AMem1+'isMulV');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'NumNegOne',AMem1+'num5',AMem1+'num5',AMem1+'isMulV');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num5',AMem1+'num5');
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,'num4','ByteA');
-  self.Component_IsBitSet('ByteA','num5','num1');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'num4',AMem1+'ByteA');
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'num5',AMem1+'num1');
 
   self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+20);
-  self.TPtrCComponent^.Component_IfV1False('num1','JumpFalse');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse');
 
   self.TPtrCComponent^.Component_AllocateMem('num3',8);
   self.TPtrCComponent^.Component_AllocateMem('num4',1);
-  self.TPtrCComponent^.Component_SumSubInteger('num4','i','num4');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'num4',AMem1+'i',AMem1+'num4');
   self.TPtrCComponent^.Component_AllocateMem('isMulV',0);
-  self.TPtrCComponent^.Component_MulDivInteger('num4','num3','num4','isMulV');
-  self.TPtrCComponent^.Component_SumSubInteger('num4','num2','num4');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'num4',AMem1+'num3',AMem1+'num4',AMem1+'isMulV');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'num4',AMem1+'num2',AMem1+'num4');
 
   self.TPtrCComponent^.Component_AllocateMem('num5',-1);
-  self.TPtrCComponent^.Component_SumSubInteger('num5','i','num5');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'num5',AMem1+'i',AMem1+'num5');
   self.TPtrCComponent^.Component_AllocateMem('isMulV',0);
-  self.TPtrCComponent^.Component_MulDivInteger('num5','num3','num5','isMulV');
-  self.TPtrCComponent^.Component_SumSubInteger('num5','num2','num5');
+  self.TPtrCComponent^.Component_MulDivInteger(AMem1+'num5',AMem1+'num3',AMem1+'num5',AMem1+'isMulV');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'num5',AMem1+'num2',AMem1+'num5');
 
   self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+3);
   self.TPtrCComponent^.Component_AllocateMem('JumpTrue',self.TPtrCComponent^.UnComponent_CodeLength+4);
-  self.TPtrCComponent^.Component_IfV1(isLeftBoolVarName,'JumpTrue','JumpFalse');
+  self.TPtrCComponent^.Component_IfV1(isLeftBoolVarName,AMem1+'JumpTrue',AMem1+'JumpFalse');
 
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'num4');
-  self.TPtrCComponent^.Component_JumpTo('iForEnd');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'num4');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
 
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,'num5');
-  self.TPtrCComponent^.Component_JumpTo('iForEnd');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'num5');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_SumSubInteger('i','NumNegOne','i');
-  self.TPtrCComponent^.Component_JumpTo('iForBegin');
+  self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'NumNegOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_Shift(const isLeftBoolVarName,
+  isSetBoolVarName, numVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  procedure ArrMath.Shift(const isLeft, isSet: Boolean; var num: IntArr);
+  var
+    i,j:Integer;
+    TArr1:IntArr;
+    bool1:Boolean;
+  begin
+    TArr1:=nil;
+    bool1:=False;
+    if(isLeft=False)then begin
+      self.MatchLength(isLeft,num,TArr1);
+      self.AlignNums(num,TArr1);
+      for i:=0 to (Length(num)-1)do begin
+        if(bool1=True)then self.SetBit(TArr1[i],0);
+        bool1:=False;
+        for j:=0 to 7 do begin
+          if(j<7)and(self.IsBitSet(num[i],j)=True)then
+            self.SetBit(TArr1[i],j+1) else
+          if(j=7)and(self.IsBitSet(num[i],j)=True)then bool1:=True;
+        end;
+      end;
+      if(bool1=True)then begin
+        SetLength(TArr1,Length(TArr1)+1);
+        TArr1[Length(TArr1)-1]:=0;
+        if(bool1=True)then self.SetBit(TArr1[Length(TArr1)-1],0);
+      end;
+      if(isSet=True)then self.SetBit(TArr1[0],0);
+      bool1:=True;
+    end else
+    if(isLeft=True)then begin
+      self.MatchLength(isLeft,num,TArr1);
+      self.AlignNums(num,TArr1);
+      for i:=0 to (Length(num)-1)do begin
+        for j:=0 to 7 do begin
+          if(j>0)then if(self.IsBitSet(num[i],j)=True)then
+            self.SetBit(TArr1[i],j-1);
+        end;
+        if((i+1)<=(Length(num)-1))and(self.IsBitSet(num[i+1],0)=True)then
+          self.SetBit(TArr1[i],7);
+      end;
+      if(isSet=True)then self.SetBit(TArr1[Length(TArr1)-1],7);
+      bool1:=True;
+    end;
+    if(bool1=True)then begin
+      SetLength(num,Length(TArr1));
+      for i:=0 to (Length(TArr1)-1)do num[i]:=TArr1[i];
+    end;
+    SetLength(TArr1,0);
+  end;
+  }
+
+end;
+
+function CodeComponent.Component_ShiftPace(const isLeftBoolVarName,
+  PaceBaseOneIntVarName, numVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  procedure ArrMath.Shift(const isLeft: Boolean; PaceBaseOne: Integer;
+    var num: IntArr);
+  var
+    i:Integer;
+    TArr1:IntArr;
+    bool1:Boolean;
+    nCount:Integer;
+    nCountr:Real;
+  begin
+    TArr1:=nil;
+    bool1:=False;
+    nCount:=0;
+    nCountr:=0;
+    if(PaceBaseOne<0)then PaceBaseOne:=PaceBaseOne*(-1);
+    if(isLeft=True)then begin
+      for i:=0 to ((8*Length(num))-1)do begin
+        nCount:=i-PaceBaseOne;
+        if(nCount>-1)then begin
+          nCountr:=i/7;
+          if(Length(TArr1)=0)then SetLength(TArr1,Length(TArr1)+1);
+          if(nCountr=RR(nCountr))and(nCountr<>0)then bool1:=True;
+          if(self.IsBitSet(num[RR(i/8)],i-(RR(i/8)*8))=True)then
+            self.SetBit(TArr1[RR(nCount/8)],nCount-(RR(nCount/8)*8));
+        end;
+        if(bool1=True)then SetLength(TArr1,Length(TArr1)+1);
+        bool1:=False;
+      end;
+      bool1:=True;
+    end else
+    if(isLeft=False)then begin
+      for i:=0 to ((8*Length(num))-1)do begin
+        nCount:=i+PaceBaseOne;
+        nCountr:=nCount/7;
+        if(Length(TArr1)=0)then SetLength(TArr1,RR(unNum(PaceBaseOne-1)/7)+1);
+        if(nCountr=RR(nCountr))and(nCountr<>0)then bool1:=True;
+        if(bool1=True)then SetLength(TArr1,Length(TArr1)+1); bool1:=False;
+        if(self.IsBitSet(num[RR(i/8)],i-(RR(i/8)*8))=True)then
+          self.SetBit(TArr1[RR(nCount/8)],nCount-(RR(nCount/8)*8));
+      end;
+      bool1:=True;
+    end;
+    if(bool1=True)then begin
+      for i:=(Length(TArr1)-1)downto 0 do if(TArr1[i]<>0)then break;
+      SetLength(TArr1,i+1);
+
+      if(Length(TArr1)=0)then SetLength(TArr1,1);
+
+      SetLength(num,Length(TArr1));
+      for i:=0 to (Length(TArr1)-1)do num[i]:=TArr1[i];
+    end;
+    SetLength(TArr1,0);
+  end;
+  }
+
+end;
+
+function CodeComponent.Component_isPositiveAd(const numVarName,
+  numResultByteVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  function ArrMath.isPositiveAd(var num: IntArr): Byte;
+  var
+    bool1:Boolean;
+  begin
+    bool1:=False;
+    if(self.IsBitSet(num[0],0)=True)then bool1:=True;
+    self.Shift(True,False,num);
+    if(self.isIntZero(num)=True)then Result:=2 else
+    if(bool1=True)then Result:=1 else Result:=0;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('True2',2);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True2',AMem1+'NumZero',AMem1+'True2');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool2',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'NumZero',AMem1+'ByteA');
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'NumZero',AMem1+'bool2');
+
+  self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+3);
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.Component_Shift(AMem1+'True',AMem1+'False',numVarName);
+  self.Component_isIntZero(numVarName,AMem1+'bool2');
+
+  self.TPtrCComponent^.Component_AllocateMem('JumpExit',self.TPtrCComponent^.UnComponent_CodeLength+10);
+  self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+4);
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(numResultByteVarName,AMem1+'True2');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit');
+
+  self.TPtrCComponent^.Component_AllocateMem('JumpFalse',self.TPtrCComponent^.UnComponent_CodeLength+4);
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(numResultByteVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(numResultByteVarName,AMem1+'False');
+
+  self.TPtrCComponent^.Component_EndMem;
 
 end;
 
@@ -4365,6 +4631,7 @@ begin
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
+  VarNameStr:=self.TCMemCapStr+VarNameStr;
 
   AIndex:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then self.TCProperty^.Property_CodeVariable.Var_SetValue(AIndex,AValue)
@@ -4381,6 +4648,7 @@ begin
   AValue:=AArrMath.NumberToInt(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
+  VarNameStr:=self.TCMemCapStr+VarNameStr;
 
   AIndex:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then self.TCProperty^.Property_CodeVariable.Var_SetValueInt(AIndex,AValue)
@@ -4397,6 +4665,7 @@ begin
   AValue:=AArrMath.NumberToStr(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
+  VarNameStr:=self.TCMemCapStr+VarNameStr;
 
   AIndex:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then self.TCProperty^.Property_CodeVariable.Var_SetValueStr(AIndex,AValue)
@@ -4429,17 +4698,31 @@ begin
   Anum3:='';
 end;
 
+procedure CodeComponentBasic.StartMem_Proc(AParamArr: TParamArr);
+begin
+  self.TCMemCapStr:=AArrMath.NumberToStr(AParamArr[0]);
+end;
+
+procedure CodeComponentBasic.EndMem_Proc(AParamArr: TParamArr);
+begin
+  self.TCMemCapStr:=AArrMath.NumberToStr(AParamArr[0]);
+end;
+
 constructor CodeComponentBasic.Create;
 begin
   self.TCProperty:=nil;
-  self.TCVarCapStr:='@public_Class';
+  self.TCVarCapStr:='@public_Class_';
+  self.TCMemCapNum:=0;
+  self.TCMemCapStr:='#0_';
 end;
 
 constructor CodeComponentBasic.Create(
   const APtrCodeProperties: PtrCodeProperties);
 begin
   self.TCProperty:=APtrCodeProperties;
-  self.TCVarCapStr:='@public_Class';
+  self.TCVarCapStr:='@public_Class_';
+  self.TCMemCapNum:=0;
+  self.TCMemCapStr:='#0_';
 end;
 
 destructor CodeComponentBasic.Destroy;
@@ -4447,6 +4730,8 @@ begin
   inherited Destroy;
   self.TCProperty:=nil;
   self.TCVarCapStr:='';
+  self.TCMemCapNum:=0;
+  self.TCMemCapStr:='';
 end;
 
 procedure CodeComponentBasic.UnComponent_SetProperty(
@@ -4458,19 +4743,19 @@ end;
 procedure CodeComponentBasic.UnComponent_VariableClass(
   const VarClassName: String);
 begin
-  self.TCVarCapStr:='@public_Class';
+  self.TCVarCapStr:='@public_Class_';
   if(self.isVarNameValid(VarClassName)=False)then Exit;
-  self.TCVarCapStr:='@'+VarClassName;
+  self.TCVarCapStr:='@'+VarClassName+'_';
 end;
 
 procedure CodeComponentBasic.UnComponent_VariableClassReset;
 begin
-  self.TCVarCapStr:='@public_Class';
+  self.TCVarCapStr:='@public_Class_';
 end;
 
-function CodeComponentBasic.UnComponent_VarClass(const VarName: String): String;
+function CodeComponentBasic.UnComponent_VarClass: String;
 begin
-  Result:=self.TCVarCapStr+'_'+VarName;
+  Result:=self.TCVarCapStr;
 end;
 
 function CodeComponentBasic.UnComponent_CodeLength: Integer;
@@ -4561,9 +4846,9 @@ function CodeComponentBasic.Component_SumSubInteger(const num1VarName,
 var
   num1Count,num2Count,ResultCount:Integer;
 begin
-  num1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+num1VarName);
-  num2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+num2VarName);
-  ResultCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  num1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num1VarName);
+  num2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num2VarName);
+  ResultCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(20));
@@ -4579,10 +4864,10 @@ function CodeComponentBasic.Component_MulDivInteger(const num1VarName,
 var
   num1Count,num2Count,ResultCount,isMulCount:Integer;
 begin
-  num1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+num1VarName);
-  num2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+num2VarName);
-  ResultCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
-  isMulCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+isMulVarName);
+  num1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num1VarName);
+  num2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(num2VarName);
+  ResultCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
+  isMulCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(isMulVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(11));
@@ -4599,9 +4884,9 @@ function CodeComponentBasic.Component_ArrayIndexGet(const ArrayVarName,
 var
   ArrayCount,IndexCount,ResultVarCount:Integer;
 begin
-  ArrayCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ArrayVarName);
-  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+IndexVarName);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  ArrayCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayVarName);
+  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(IndexVarName);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(12));
@@ -4617,9 +4902,9 @@ function CodeComponentBasic.Component_ArrayIndexSet(const ArrayVarName,
 var
   ArrayCount,IndexCount,ValueVarCount:Integer;
 begin
-  ArrayCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ArrayVarName);
-  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+IndexVarName);
-  ValueVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ValueVarName);
+  ArrayCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayVarName);
+  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(IndexVarName);
+  ValueVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ValueVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(21));
@@ -4635,9 +4920,9 @@ function CodeComponentBasic.Component_StrIndexGet(const StrVarName,
 var
   StrCount,IndexCount,ResultVarCount:Integer;
 begin
-  StrCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+StrVarName);
-  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+IndexVarName);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  StrCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(StrVarName);
+  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(IndexVarName);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(32));
@@ -4653,9 +4938,9 @@ function CodeComponentBasic.Component_StrIndexSet(const StrVarName,
 var
   StrCount,IndexCount,ValueVarCount:Integer;
 begin
-  StrCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+StrVarName);
-  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+IndexVarName);
-  ValueVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ValueVarName);
+  StrCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(StrVarName);
+  IndexCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(IndexVarName);
+  ValueVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ValueVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(23));
@@ -4671,8 +4956,8 @@ function CodeComponentBasic.Component_SetLength(const ArrayVarName,
 var
   ArrayVarCount,ArrayLengthVarCount:Integer;
 begin
-  ArrayVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ArrayVarName);
-  ArrayLengthVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ArrayLengthVarName);
+  ArrayVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayVarName);
+  ArrayLengthVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayLengthVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(17));
@@ -4687,8 +4972,8 @@ function CodeComponentBasic.Component_Length(const ArrayVarName,
 var
   ArrayVarCount,ResultVarCount:Integer;
 begin
-  ArrayVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ArrayVarName);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  ArrayVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ArrayVarName);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(1));
@@ -4703,8 +4988,8 @@ function CodeComponentBasic.Component_StrLength(const StrVarName,
 var
   StrVarCount,ResultVarCount:Integer;
 begin
-  StrVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+StrVarName);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  StrVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(StrVarName);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(31));
@@ -4719,7 +5004,7 @@ function CodeComponentBasic.Component_JumpTo(const JumpToVarName: String
 var
   JumpToCount:Integer;
 begin
-  JumpToCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+JumpToVarName);
+  JumpToCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(JumpToVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(2));
@@ -4732,7 +5017,7 @@ function CodeComponentBasic.Component_Goto(const GotoVarName: String): Integer;
 var
   GotoCount:Integer;
 begin
-  GotoCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+GotoVarName);
+  GotoCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(GotoVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(22));
@@ -4754,8 +5039,8 @@ function CodeComponentBasic.Component_MoveV2ToV1(const VarName1,
 var
   VarName1Count,VarName2Count:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(50));
@@ -4770,9 +5055,9 @@ function CodeComponentBasic.Component_V1AndV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(55));
@@ -4788,9 +5073,9 @@ function CodeComponentBasic.Component_V1OrV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(77));
@@ -4806,8 +5091,8 @@ function CodeComponentBasic.Component_NotV1(const VarName1,
 var
   VarName1Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(24));
@@ -4822,9 +5107,9 @@ function CodeComponentBasic.Component_V1XORV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(57));
@@ -4840,9 +5125,9 @@ function CodeComponentBasic.Component_V1SHLV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(48));
@@ -4858,9 +5143,9 @@ function CodeComponentBasic.Component_V1SHRV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(84));
@@ -4876,9 +5161,9 @@ function CodeComponentBasic.Component_V1EqV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(100));
@@ -4894,9 +5179,9 @@ function CodeComponentBasic.Component_V1NotEqV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(150));
@@ -4912,9 +5197,9 @@ function CodeComponentBasic.Component_V1GTV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(177));
@@ -4930,9 +5215,9 @@ function CodeComponentBasic.Component_V1GTEqV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(170));
@@ -4948,9 +5233,9 @@ function CodeComponentBasic.Component_V1LTV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(111));
@@ -4966,9 +5251,9 @@ function CodeComponentBasic.Component_V1LTEqV2(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(110));
@@ -4984,9 +5269,9 @@ function CodeComponentBasic.Component_CombineV2ToV1(const VarName1, VarName2,
 var
   VarName1Count,VarName2Count,ResultVarCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName2);
-  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  VarName2Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName2);
+  ResultVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
@@ -5002,9 +5287,9 @@ function CodeComponentBasic.Component_IfV1(const VarName1, JumpToTrueVarName,
 var
   VarName1Count,JumpToTrueCount,JumpToFalseCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  JumpToTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+JumpToTrueVarName);
-  JumpToFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+JumpToFalseVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  JumpToTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(JumpToTrueVarName);
+  JumpToFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(JumpToFalseVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(36));
@@ -5020,8 +5305,8 @@ function CodeComponentBasic.Component_IfV1True(const VarName1,
 var
   VarName1Count,JumpToTrueCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  JumpToTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+JumpToTrueVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  JumpToTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(JumpToTrueVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(13));
@@ -5036,8 +5321,8 @@ function CodeComponentBasic.Component_IfV1False(const VarName1,
 var
   VarName1Count,JumpToFalseCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  JumpToFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+JumpToFalseVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  JumpToFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(JumpToFalseVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(60));
@@ -5052,9 +5337,9 @@ function CodeComponentBasic.Component_IfV1_Goto(const VarName1,
 var
   VarName1Count,GotoTrueCount,GotoFalseCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  GotoTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+GotoTrueVarName);
-  GotoFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+GotoFalseVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  GotoTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(GotoTrueVarName);
+  GotoFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(GotoFalseVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(96));
@@ -5070,8 +5355,8 @@ function CodeComponentBasic.Component_IfV1True_Goto(const VarName1,
 var
   VarName1Count,GotoTrueCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  GotoTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+GotoTrueVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  GotoTrueCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(GotoTrueVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(19));
@@ -5086,8 +5371,8 @@ function CodeComponentBasic.Component_IfV1False_Goto(const VarName1,
 var
   VarName1Count,GotoFalseCount:Integer;
 begin
-  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName1);
-  GotoFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+GotoFalseVarName);
+  VarName1Count:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName1);
+  GotoFalseCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(GotoFalseVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(91));
@@ -5102,7 +5387,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(self.TCVarCapStr+'_'+VarName);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamData(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_Number_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -5113,7 +5398,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(self.TCVarCapStr+'_'+VarName);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_Integer_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -5124,7 +5409,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(self.TCVarCapStr+'_'+VarName);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_String_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -5135,9 +5420,9 @@ function CodeComponentBasic.Component_BinStr(const VarName, CountVarName,
 var
   VarNameCount,CountVarCount,ResultStrCount:Integer;
 begin
-  VarNameCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+VarName);
-  CountVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+CountVarName);
-  ResultStrCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(self.TCVarCapStr+'_'+ResultStrVarName);
+  VarNameCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(VarName);
+  CountVarCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(CountVarName);
+  ResultStrCount:=self.TCProperty^.Property_CodeVariable.Var_GetValueInt_Index(ResultStrVarName);
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(30));
@@ -5145,6 +5430,60 @@ begin
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(CountVarCount);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(ResultStrCount);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.BinStr_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_StartMem: Integer;
+var
+  AStr:String;
+begin
+  self.TCMemCapNum:=self.TCMemCapNum+1;
+  AStr:='#'+IntToStr(self.TCMemCapNum)+'_';
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(18));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AStr);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.StartMem_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_StartMem(out StartStr: String): Integer;
+begin
+  self.TCMemCapNum:=self.TCMemCapNum+1;
+  StartStr:='#'+IntToStr(self.TCMemCapNum)+'_';
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(18));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(StartStr);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.StartMem_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_EndMem: Integer;
+var
+  AStr:String;
+begin
+  self.TCMemCapNum:=self.TCMemCapNum-1;
+  if(self.TCMemCapNum<0)then self.TCMemCapNum:=0;
+  AStr:='#'+IntToStr(self.TCMemCapNum)+'_';
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(81));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AStr);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.EndMem_Proc);
+  Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_EndMem(out EndStr: String): Integer;
+begin
+  self.TCMemCapNum:=self.TCMemCapNum-1;
+  if(self.TCMemCapNum<0)then self.TCMemCapNum:=0;
+  EndStr:='#'+IntToStr(self.TCMemCapNum)+'_';
+
+  self.TCProperty^.Property_CodeArray.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(81));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(EndStr);
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.EndMem_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
 end;
 
