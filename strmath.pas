@@ -759,18 +759,12 @@ type
     procedure DivReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
     procedure MulDivReal(num1,num2:RealArr;var numResult:RealArr;const doMul:Boolean;ADeciDigitCountBaseOne:Integer);
     procedure RealArrMod(num1,num2:RealArr;var numResult:RealArr);
-    function RealXPowerInt(Abase,Apower:RealArr;
-      const ADeciDigitCountBaseOne:Integer):RealArr;
-    function RealXPowerIntStr(Abase,Apower:RealArr;
-      const ADeciDigitCountBaseOne:Integer):RealArr;
-    procedure lynReal(num:RealArr;var numResult:RealArr;
-      const ADeciDigitCountBaseOne:Integer);
-    procedure lynRealR(num:RealArr;var numResult:RealArr;
-      const ADeciDigitCountBaseOne:Integer);
-    procedure logaReal(num,base:RealArr;var numResult:RealArr;
-      const ADeciDigitCountBaseOne:Integer);
-    procedure Root2Real(num:RealArr;var numResult:RealArr;
-      const ADeciDigitCountBaseOne:Integer);
+    function RealXPowerInt(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    function RealXPowerIntStr(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    procedure lynReal(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    procedure lynRealR(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    procedure logaReal(num,base:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    procedure Root2Real(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
     function SinReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
     function CosReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
     function TanReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
@@ -5987,20 +5981,64 @@ procedure CodeComponentBasic.V1GTV2_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
+  VarName1AIndex,VarName2AIndex,ResultVarAIndex:Integer;
   Anum1,Anum2,Anum3:Number;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
   Anum1:=nil;
   Anum2:=nil;
   Anum3:=nil;
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
   VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
   VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
   ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
 
-  Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
-  Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
-  Anum3:=(Anum1 > Anum2);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarStr,Anum3);
+  VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
+  VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
+  ResultVarAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end;
+  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
@@ -6012,20 +6050,64 @@ procedure CodeComponentBasic.V1GTEqV2_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
+  VarName1AIndex,VarName2AIndex,ResultVarAIndex:Integer;
   Anum1,Anum2,Anum3:Number;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
   Anum1:=nil;
   Anum2:=nil;
   Anum3:=nil;
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
   VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
   VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
   ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
 
-  Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
-  Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
-  Anum3:=(Anum1 >= Anum2);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarStr,Anum3);
+  VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
+  VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
+  ResultVarAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end;
+  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
@@ -6037,20 +6119,64 @@ procedure CodeComponentBasic.V1LTV2_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
+  VarName1AIndex,VarName2AIndex,ResultVarAIndex:Integer;
   Anum1,Anum2,Anum3:Number;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
   Anum1:=nil;
   Anum2:=nil;
   Anum3:=nil;
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
   VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
   VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
   ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
 
-  Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
-  Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
-  Anum3:=(Anum1 < Anum2);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarStr,Anum3);
+  VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
+  VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
+  ResultVarAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThan(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThan(AReal1,AReal2);
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetLessThan(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetLessThan(AReal1,AReal2);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThan(AReal1,AReal2);
+  end;
+  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
@@ -6062,20 +6188,64 @@ procedure CodeComponentBasic.V1LTEqV2_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
+  VarName1AIndex,VarName2AIndex,ResultVarAIndex:Integer;
   Anum1,Anum2,Anum3:Number;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
   Anum1:=nil;
   Anum2:=nil;
   Anum3:=nil;
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
   VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
   VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
   ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
 
-  Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
-  Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
-  Anum3:=(Anum1 <= Anum2);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarStr,Anum3);
+  VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
+  VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
+  ResultVarAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end;
+  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
