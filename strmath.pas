@@ -474,7 +474,9 @@ type
     function GetNot(const num1:Number):Number;
     function GetXOR(const num1,num2:Number):Number;
     function GetEqual(const num1,num2:Number):Number;
+    function GetEqual(const num1,num2:Real):Number;
     function GetNotEqual(const num1,num2:Number):Number;
+    function GetNotEqual(const num1,num2:Real):Number;
     function GetIf(const num1:Number):Number;
     function GetGreaterThan(const num1,num2:Real):Number;
     function GetGreaterThanOrEqualTo(const num1,num2:Real):Number;
@@ -640,6 +642,7 @@ type
     function Component_SetLengthToLength(const ArrayVarName,ArrayLengthVarName:String):Integer;
     function Component_RR(const RealVarName,ResultIntVarName:String):Integer;
     function Component_unNumInteger(const numVarName,ResultVarName:String):Integer;
+    function Component_unNumReal(const numVarName,ResultVarName:String):Integer;
     function Component_SetBit(const ByteVarName,PosBaseZeroVarName,ResultVarName:String):Integer;
     function Component_ClearBit(const ByteVarName,PosBaseZeroVarName,ResultVarName:String):Integer;
     function Component_ReverseBit(const ByteVarName,PosBaseZeroVarName,ResultVarName:String):Integer;
@@ -688,121 +691,116 @@ type
 
   ArrMath = class(TObject)
   public
-    constructor Create;
-    destructor Destroy; override;
-    function StrToNumber(const AStr:String):Number;
-    function NumberToStr(const Anum:Number):String;
-    function BoolToNumber(const bool1:Boolean):Number;
-    function NumberToBool(const num:Number):Boolean;
-    function IntToNumber(const Int1:Integer):Number;
-    function NumberToInt(const num:Number):Integer;
-    function RealToNumber(const Real1:Real):Number;
-    function NumberToReal(const num:Number):Real;
-    function RR(const x:Real):Integer;
-    function unNum(const x:Integer):Integer;
-    function unNum(const x:Real):Real;
-    procedure SetBit(var B:Byte;const PosBaseZero:Byte);
-    procedure ClearBit(var B:Byte;const PosBaseZero:Byte);
-    procedure ReverseBit(var B:Byte;const PosBaseZero:Byte);
-    function IsBitSet(B:Byte;const PosBaseZero:Byte):Boolean;
-    procedure BitsToStr(const num:IntArr;var AStrBits:String);
-    function BitsLength(const num:IntArr):Integer;
-    procedure SetInt(const num:IntArr;var numResult:IntArr);
-    procedure ReverseInt(const num:IntArr;var numResult:IntArr);
-    function isIntZero(const num:IntArr):Boolean;
-    procedure MatchLength(const isLeft:Boolean;const num:IntArr;var numResult:IntArr);
-    procedure Shift(const isLeft,isSet:Boolean;var num:IntArr);
-    procedure Shift(const isLeft:Boolean;PaceBaseOne:Integer;var num:IntArr);
-    function isPositiveAd(var num:IntArr):Byte;
-    function isPositive(var num:IntArr):Boolean;
-    function isNum1Bigger(var num1,num2:IntArr):Byte;
-    function isNum1BiggerAlign(num1,num2:IntArr):Byte;
-    function isIntNumber(const Digit:String):Boolean;
-    function GetIntDigit(const Digit:Byte):String;
-    procedure InitZeroToNine(const isNeg:Boolean;const Digit:Byte;var num:IntArr);
-    procedure AlignNums(var num1,num2:IntArr);
-    procedure AssignIntNum(num:IntArr;var numResult:IntArr);
-    procedure CutSome(num:IntArr;var numResult:IntArr);
-    procedure SetBitPosZero(var num:TBitPos);
-    procedure CopyBitPos(const CopyNum:TBitPos;var ToNum:TBitPos);
-    procedure SetBitPos(var num:TBitPos;const ByteAtBaseZero,BitAtBaseZero:Integer);
-    procedure IncBitPos(var num:TBitPos);
-    procedure DecBitPos(var num:TBitPos);
-    procedure GetLastBit(var num:TBitPos;const numArr:IntArr);
-    function IsBitPosEqual(num1,num2:TBitPos):Boolean;
-    function IsBitPosSet(const num:TBitPos;const numArr:IntArr):Boolean;
-    procedure BitPosSetArr(const num:TBitPos;var numArr:IntArr);
-    procedure BitPosAddSetArr(const num:TBitPos;var numArr:IntArr);
-    procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
-    procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
-    procedure SumSubInt(num1,num2:IntArr;var numResult:IntArr);
-    procedure MulInt(num1,num2:IntArr;var numResult:IntArr);
-    procedure MulIntSum(num1,num2:IntArr;var numResult:IntArr);
-    procedure MulIntBit(num1,num2:IntArr;var numResult:IntArr);
-    procedure DivInt(num1,num2:IntArr;var numResult:IntArr);
-    procedure MulDivInt(num1,num2:IntArr;var numResult:IntArr;const doMul:Boolean);
-    procedure xPowerIntArr(Base,Power:IntArr;var numResult:IntArr);
-    procedure StrToIntArr(AStr:String;var numResult:IntArr);
-    procedure IntArrToStr(num:IntArr;var AStr:String);
-    procedure IntArrToStr_Old1(num:IntArr;var AStr:String);
-    procedure IntArrMod(num1,num2:IntArr;var numResult:IntArr);
+    class function StrToNumber(const AStr:String):Number;
+    class function NumberToStr(const Anum:Number):String;
+    class function BoolToNumber(const bool1:Boolean):Number;
+    class function NumberToBool(const num:Number):Boolean;
+    class function IntToNumber(const Int1:Integer):Number;
+    class function NumberToInt(const num:Number):Integer;
+    class function RealToNumber(const Real1:Real):Number;
+    class function NumberToReal(const num:Number):Real;
+    class function RR(const x:Real):Integer;
+    class function unNum(const x:Integer):Integer;
+    class function unNum(const x:Real):Real;
+    class procedure SetBit(var B:Byte;const PosBaseZero:Byte);
+    class procedure ClearBit(var B:Byte;const PosBaseZero:Byte);
+    class procedure ReverseBit(var B:Byte;const PosBaseZero:Byte);
+    class function IsBitSet(B:Byte;const PosBaseZero:Byte):Boolean;
+    class procedure BitsToStr(const num:IntArr;var AStrBits:String);
+    class function BitsLength(const num:IntArr):Integer;
+    class procedure SetInt(const num:IntArr;var numResult:IntArr);
+    class procedure ReverseInt(const num:IntArr;var numResult:IntArr);
+    class function isIntZero(const num:IntArr):Boolean;
+    class procedure MatchLength(const isLeft:Boolean;const num:IntArr;var numResult:IntArr);
+    class procedure Shift(const isLeft,isSet:Boolean;var num:IntArr);
+    class procedure Shift(const isLeft:Boolean;PaceBaseOne:Integer;var num:IntArr);
+    class function isPositiveAd(var num:IntArr):Byte;
+    class function isPositive(var num:IntArr):Boolean;
+    class function isNum1Bigger(var num1,num2:IntArr):Byte;
+    class function isNum1BiggerAlign(num1,num2:IntArr):Byte;
+    class function isIntNumber(const Digit:String):Boolean;
+    class function GetIntDigit(const Digit:Byte):String;
+    class procedure InitZeroToNine(const isNeg:Boolean;const Digit:Byte;var num:IntArr);
+    class procedure AlignNums(var num1,num2:IntArr);
+    class procedure AssignIntNum(num:IntArr;var numResult:IntArr);
+    class procedure CutSome(num:IntArr;var numResult:IntArr);
+    class procedure SetBitPosZero(var num:TBitPos);
+    class procedure CopyBitPos(const CopyNum:TBitPos;var ToNum:TBitPos);
+    class procedure SetBitPos(var num:TBitPos;const ByteAtBaseZero,BitAtBaseZero:Integer);
+    class procedure IncBitPos(var num:TBitPos);
+    class procedure DecBitPos(var num:TBitPos);
+    class procedure GetLastBit(var num:TBitPos;const numArr:IntArr);
+    class function IsBitPosEqual(num1,num2:TBitPos):Boolean;
+    class function IsBitPosSet(const num:TBitPos;const numArr:IntArr):Boolean;
+    class procedure BitPosSetArr(const num:TBitPos;var numArr:IntArr);
+    class procedure BitPosAddSetArr(const num:TBitPos;var numArr:IntArr);
+    class procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
+    class procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
+    class procedure SumSubInt(num1,num2:IntArr;var numResult:IntArr);
+    class procedure MulInt(num1,num2:IntArr;var numResult:IntArr);
+    class procedure MulIntSum(num1,num2:IntArr;var numResult:IntArr);
+    class procedure MulIntBit(num1,num2:IntArr;var numResult:IntArr);
+    class procedure DivInt(num1,num2:IntArr;var numResult:IntArr);
+    class procedure MulDivInt(num1,num2:IntArr;var numResult:IntArr;const doMul:Boolean);
+    class procedure xPowerIntArr(Base,Power:IntArr;var numResult:IntArr);
+    class procedure StrToIntArr(AStr:String;var numResult:IntArr);
+    class procedure IntArrToStr(num:IntArr;var AStr:String);
+    class procedure IntArrToStr_Old1(num:IntArr;var AStr:String);
+    class procedure IntArrMod(num1,num2:IntArr;var numResult:IntArr);
   end;
 
   { RealMath }
 
   RealMath = class(TObject)
   public
-    TTL:ArrMath;
-    constructor Create;
-    destructor Destroy; override;
-    function CheckIntegrity(num:RealArr):Boolean;
-    function DigitStr(const AStr:String):Boolean;
-    procedure CombineArr(FromNum1,FromNum2:IntArr;var ToNum:RealArr;var NumAt:IntArr);
-    function SplitArr(var FromNum1,FromNum2:IntArr;const ToNum:RealArr;const NumAt:IntArr):Boolean;
-    procedure CombineIntToArr(FromNum:IntArr;var ToNum:RealArr);
-    procedure SplitIntToArr(var FromNum:IntArr;var ToNum:RealArr);
-    procedure StrToRealArr(AStr:String;var numResult:RealArr);
-    procedure RealArrToStr(num:RealArr;var AStr:String);
-    procedure IntArrToRealArrEqual(num:IntArr;var numResult:RealArr);
-    procedure RealArrToIntArrRound(num:RealArr;var numResult:IntArr);
-    procedure RRR(num:RealArr;var numResult:IntArr);
-    procedure RealArrRound(var num:RealArr;const ADeciDigitCountBaseOne:Integer);
-    function GetDeciCountBaseOne(num:RealArr):Integer;
-    procedure RealCutDeciCountBaseOne(var num:RealArr;CutAt:Integer);
-    procedure RealCutDeciCountBaseOneR(var num:RealArr;CutAt:Integer);
-    procedure AlignStr(var AStr1,AStr2:String;const APlace:String);
-    procedure AlignStrLeft(var AStr1,AStr2:String;const APlace:String);
-    procedure CutSomeR(var num:IntArr);
-    procedure CutSomeStr(var AStr:String);
-    function CutSomeStrLeft(AStr:String):String;
-    function ReverseStr(const AStr:String):String;
-    function isPositiveAd(num:RealArr):Byte;
-    function isPositive(num:RealArr):Boolean;
-    procedure SumReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
-    procedure SubReal(num1,num2:RealArr;var numResult:RealArr;out NumBiggerMode:Byte;ADeciDigitCountBaseOne:Integer);
-    procedure SumSubReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
-    procedure MulReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
-    procedure DivReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
-    procedure MulDivReal(num1,num2:RealArr;var numResult:RealArr;const doMul:Boolean;ADeciDigitCountBaseOne:Integer);
-    procedure RealArrMod(num1,num2:RealArr;var numResult:RealArr);
-    function RealXPowerInt(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function RealXPowerIntStr(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    procedure lynReal(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
-    procedure lynRealR(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
-    procedure logaReal(num,base:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
-    procedure Root2Real(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
-    function SinReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function CosReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function TanReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function InSinReal(SinX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function InCosReal(CosX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function InTanReal(TanX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function RealFactorialIntStr(num:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function ePower(num:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
-    function ePowerX(num:RealArr;ADeciDigitCountBaseOne:Integer):RealArr;
-    function xPower(Abase,Apower:RealArr;ADeciDigitCountBaseOne:Integer):RealArr;
-    procedure xPowerDiv2(var Abase,Apower:RealArr;ADeciDigitCountBaseOne:Integer);
-    function xPowerX(Abase,Apower:RealArr;ADeciDigitCountBaseOne:Integer):RealArr;
+    class function CheckIntegrity(num:RealArr):Boolean;
+    class function DigitStr(const AStr:String):Boolean;
+    class procedure CombineArr(FromNum1,FromNum2:IntArr;var ToNum:RealArr;var NumAt:IntArr);
+    class function SplitArr(var FromNum1,FromNum2:IntArr;const ToNum:RealArr;const NumAt:IntArr):Boolean;
+    class procedure CombineIntToArr(FromNum:IntArr;var ToNum:RealArr);
+    class procedure SplitIntToArr(var FromNum:IntArr;var ToNum:RealArr);
+    class procedure StrToRealArr(AStr:String;var numResult:RealArr);
+    class procedure RealArrToStr(num:RealArr;var AStr:String);
+    class procedure IntArrToRealArrEqual(num:IntArr;var numResult:RealArr);
+    class procedure RealArrToIntArrRound(num:RealArr;var numResult:IntArr);
+    class procedure RRR(num:RealArr;var numResult:IntArr);
+    class procedure RealArrRound(var num:RealArr;const ADeciDigitCountBaseOne:Integer);
+    class function GetDeciCountBaseOne(num:RealArr):Integer;
+    class procedure RealCutDeciCountBaseOne(var num:RealArr;CutAt:Integer);
+    class procedure RealCutDeciCountBaseOneR(var num:RealArr;CutAt:Integer);
+    class procedure AlignStr(var AStr1,AStr2:String;const APlace:String);
+    class procedure AlignStrLeft(var AStr1,AStr2:String;const APlace:String);
+    class procedure CutSomeR(var num:IntArr);
+    class procedure CutSomeStr(var AStr:String);
+    class function CutSomeStrLeft(AStr:String):String;
+    class function ReverseStr(const AStr:String):String;
+    class function isPositiveAd(num:RealArr):Byte;
+    class function isPositive(num:RealArr):Boolean;
+    class procedure SumReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
+    class procedure SubReal(num1,num2:RealArr;var numResult:RealArr;out NumBiggerMode:Byte;ADeciDigitCountBaseOne:Integer);
+    class procedure SumSubReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
+    class procedure MulReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
+    class procedure DivReal(num1,num2:RealArr;var numResult:RealArr;ADeciDigitCountBaseOne:Integer);
+    class procedure MulDivReal(num1,num2:RealArr;var numResult:RealArr;const doMul:Boolean;ADeciDigitCountBaseOne:Integer);
+    class procedure RealArrMod(num1,num2:RealArr;var numResult:RealArr);
+    class function RealXPowerInt(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function RealXPowerIntStr(Abase,Apower:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class procedure lynReal(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    class procedure lynRealR(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    class procedure logaReal(num,base:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    class procedure Root2Real(num:RealArr;var numResult:RealArr;const ADeciDigitCountBaseOne:Integer);
+    class function SinReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function CosReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function TanReal(Degrees:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function InSinReal(SinX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function InCosReal(CosX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function InTanReal(TanX:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function RealFactorialIntStr(num:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function ePower(num:RealArr;const ADeciDigitCountBaseOne:Integer):RealArr;
+    class function ePowerX(num:RealArr;ADeciDigitCountBaseOne:Integer):RealArr;
+    class function xPower(Abase,Apower:RealArr;ADeciDigitCountBaseOne:Integer):RealArr;
+    class procedure xPowerDiv2(var Abase,Apower:RealArr;ADeciDigitCountBaseOne:Integer);
+    class function xPowerX(Abase,Apower:RealArr;ADeciDigitCountBaseOne:Integer):RealArr;
   end;
 
   { StringMath }
@@ -811,53 +809,48 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function RR(const x:Real):Integer;
-    function unNum(const x:Integer):Integer;
-    procedure MoveDeciDiv(var Num1,Num2:String);
-    procedure getWholeDeci(const NumV:String;out AWhole,ADeci:String);
-    function isPositiveAd(const NumV:String):Byte;
-    function isPositive(const NumV:String):Boolean;
-    function CleanNum(const NumV:String):String;
-    procedure GetAlign(var num1,num2:String;const StrPlace:String;
-      const isRight:Boolean);
-    function isNum1Bigger(const num1,num2:String):Byte;
-    procedure Carrying(const num1,num2:String;var TArr1,TArr2:TNumArr);
-    function Reverse(const Num1:String):String;
-    function RR(x:String;const WithDeci:Boolean = True):String;
-    function RD(x:String;const WithDeci:Boolean = True):String;
-    function RX(x:String;const WithDeci:Boolean = True):String;
-    function GetDeciCountBaseOne(num:String):Integer;
-    procedure RealCutDeciCountBaseOne(var num:String;CutAt:Integer);
-    procedure RealCutDeciCountBaseOneR(var num:String;CutAt:Integer);
-    function Sum(const num1,num2:String):String;
-    function Sub(const num1,num2:String):String;
-    function SumSub(const num1,num2:String):String;
-    function Mul(const num1,num2:String):String;
-    function DivA(const num1,num2:String;const DeciDigitCountBaseOne:Integer):String;
-    function MulDiv(const num1,num2:String;const ADeciDigitCountBaseOne:Integer;const doMul:Boolean = True):String;
-    function xPowerInt(Abase,Apower:String;const ADeciDigitCountBaseOne:Integer):String;
-    function lyn(x:String;const ADeciDigitCountBaseOne:Integer):String;
-    function lnx(x:String;ADeciDigitCountBaseOne:Integer):String;
-    function log(num,base:String;ADeciDigitCountBaseOne:Integer):String;
-    function SqrRoot(x:String;const ADeciDigitCountBaseOne:Integer):String;
-    function Sine(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
-    function Cosine(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
-    function Tangent(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
-    function InSine(SineX:String;const ADeciDigitCountBaseOne:Integer):String;
-    function InCosine(CosineX:String;const ADeciDigitCountBaseOne:Integer):String;
-    function InTangent(TangentX:String;const ADeciDigitCountBaseOne:Integer):String;
-    function FactorialInt(x:String;const ADeciDigitCountBaseOne:Integer):String;
-    function ePower(x:String;ADeciDigitCountBaseOne:Integer):String;
-    function ePowerX(x:String;ADeciDigitCountBaseOne:Integer):String;
-    function xPower(Abase,Apower:String;ADeciDigitCountBaseOne:Integer):String;
-    procedure xPowerDiv2(var Abase,Apower:String;ADeciDigitCountBaseOne:Integer);
-    function xPowerX(Abase,Apower:String;ADeciDigitCountBaseOne:Integer):String;
-    function xModX(num1,num2:String):String;
+    class function RR(const x:Real):Integer;
+    class function unNum(const x:Integer):Integer;
+    class procedure MoveDeciDiv(var Num1,Num2:String);
+    class procedure getWholeDeci(const NumV:String;out AWhole,ADeci:String);
+    class function isPositiveAd(const NumV:String):Byte;
+    class function isPositive(const NumV:String):Boolean;
+    class function CleanNum(const NumV:String):String;
+    class procedure GetAlign(var num1,num2:String;const StrPlace:String;const isRight:Boolean);
+    class function isNum1Bigger(const num1,num2:String):Byte;
+    class procedure Carrying(const num1,num2:String;var TArr1,TArr2:TNumArr);
+    class function Reverse(const Num1:String):String;
+    class function RR(x:String;const WithDeci:Boolean = True):String;
+    class function RD(x:String;const WithDeci:Boolean = True):String;
+    class function RX(x:String;const WithDeci:Boolean = True):String;
+    class function GetDeciCountBaseOne(num:String):Integer;
+    class procedure RealCutDeciCountBaseOne(var num:String;CutAt:Integer);
+    class procedure RealCutDeciCountBaseOneR(var num:String;CutAt:Integer);
+    class function Sum(const num1,num2:String):String;
+    class function Sub(const num1,num2:String):String;
+    class function SumSub(const num1,num2:String):String;
+    class function Mul(const num1,num2:String):String;
+    class function DivA(const num1,num2:String;const DeciDigitCountBaseOne:Integer):String;
+    class function MulDiv(const num1,num2:String;const ADeciDigitCountBaseOne:Integer;const doMul:Boolean = True):String;
+    class function xPowerInt(Abase,Apower:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function lyn(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function lnx(x:String;ADeciDigitCountBaseOne:Integer):String;
+    class function log(num,base:String;ADeciDigitCountBaseOne:Integer):String;
+    class function SqrRoot(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function Sine(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function Cosine(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function Tangent(Degrees:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function InSine(SineX:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function InCosine(CosineX:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function InTangent(TangentX:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function FactorialInt(x:String;const ADeciDigitCountBaseOne:Integer):String;
+    class function ePower(x:String;ADeciDigitCountBaseOne:Integer):String;
+    class function ePowerX(x:String;ADeciDigitCountBaseOne:Integer):String;
+    class function xPower(Abase,Apower:String;ADeciDigitCountBaseOne:Integer):String;
+    class procedure xPowerDiv2(var Abase,Apower:String;ADeciDigitCountBaseOne:Integer);
+    class function xPowerX(Abase,Apower:String;ADeciDigitCountBaseOne:Integer):String;
+    class function xModX(num1,num2:String):String;
   end;
-
-var AArrMath:ArrMath;
-var ARealMath:RealMath;
-var AStrMath:StringMath;
 
 { Extra-Math }
 
@@ -874,7 +867,7 @@ begin
   if(isLeft=True)then isLeft:=False else isLeft:=True;
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(isLeft,isSet,num);
+  ArrMath.Shift(isLeft,isSet,num);
   if(isLeft=False)then SetLength(num,i);
 end;
 
@@ -885,7 +878,7 @@ begin
   if(isLeft=True)then isLeft:=False else isLeft:=True;
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(isLeft,False,num);
+  ArrMath.Shift(isLeft,False,num);
   if(isLeft=False)then SetLength(num,i);
 end;
 
@@ -897,7 +890,7 @@ begin
   if(isLeft=True)then isLeft:=False else isLeft:=True;
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(isLeft,PaceBaseOne,num);
+  ArrMath.Shift(isLeft,PaceBaseOne,num);
   if(isLeft=False)then SetLength(num,i);
 end;
 
@@ -907,7 +900,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(False,False,num);
+  ArrMath.Shift(False,False,num);
   SetLength(num,i);
 end;
 
@@ -917,7 +910,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(True,False,num);
+  ArrMath.Shift(True,False,num);
   SetLength(num,i);
 end;
 
@@ -927,7 +920,7 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(False,PaceBaseOne,num);
+  ArrMath.Shift(False,PaceBaseOne,num);
   SetLength(num,i);
 end;
 
@@ -937,14 +930,14 @@ var
 begin
   if(Length(num)=0)then Exit;
   i:=Length(num);
-  AArrMath.Shift(True,PaceBaseOne,num);
+  ArrMath.Shift(True,PaceBaseOne,num);
   SetLength(num,i);
 end;
 
 function AssignNum(const num: Number): Number;
 begin
   Result:=nil;
-  AArrMath.AssignIntNum(num,Result);
+  ArrMath.AssignIntNum(num,Result);
 end;
 
 { Arr-Math }
@@ -1026,7 +1019,7 @@ function IntToBitStr(const num: IntArr): String;
 begin
   Result:='';
   if(Length(num)=0)then Exit;
-  AArrMath.BitsToStr(num,Result);
+  ArrMath.BitsToStr(num,Result);
 end;
 
 function isIntZero(const num: IntArr): Boolean;
@@ -1036,9 +1029,9 @@ begin
   Result:=False;
   TArr1:=nil;
   if(Length(num)=0)then Exit;
-  AArrMath.SetInt(num,TArr1);
-  AArrMath.Shift(True,False,TArr1);
-  Result:=AArrMath.isIntZero(TArr1);
+  ArrMath.SetInt(num,TArr1);
+  ArrMath.Shift(True,False,TArr1);
+  Result:=ArrMath.isIntZero(TArr1);
   SetLength(TArr1,0);
 end;
 
@@ -1049,8 +1042,8 @@ begin
   Result:=3;
   TArr1:=nil;
   if(Length(num)=0)then Exit;
-  AArrMath.SetInt(num,TArr1);
-  Result:=AArrMath.isPositiveAd(TArr1);
+  ArrMath.SetInt(num,TArr1);
+  Result:=ArrMath.isPositiveAd(TArr1);
   SetLength(TArr1,0);
 end;
 
@@ -1061,8 +1054,8 @@ begin
   Result:=False;
   TArr1:=nil;
   if(Length(num)=0)then Exit;
-  AArrMath.SetInt(num,TArr1);
-  Result:=AArrMath.isPositive(TArr1);
+  ArrMath.SetInt(num,TArr1);
+  Result:=ArrMath.isPositive(TArr1);
   SetLength(TArr1,0);
 end;
 
@@ -1074,24 +1067,24 @@ end;
 function SumSubInt(const num1, num2: IntArr): IntArr;
 begin
   Result:=nil;
-  AArrMath.SumSubInt(num1,num2,Result);
+  ArrMath.SumSubInt(num1,num2,Result);
 end;
 
 procedure SumSubInt(const num1, num2: IntArr; var AAnswer: IntArr);
 begin
-  AArrMath.SumSubInt(num1,num2,AAnswer);
+  ArrMath.SumSubInt(num1,num2,AAnswer);
 end;
 
 function MulDivInt(const num1, num2: IntArr; const doMul: Boolean): IntArr;
 begin
   Result:=nil;
-  AArrMath.MulDivInt(num1,num2,Result,doMul);
+  ArrMath.MulDivInt(num1,num2,Result,doMul);
 end;
 
 procedure MulDivInt(const num1, num2: IntArr; var AAnswer: IntArr;
   const doMul: Boolean);
 begin
-  AArrMath.MulDivInt(num1,num2,AAnswer,doMul);
+  ArrMath.MulDivInt(num1,num2,AAnswer,doMul);
 end;
 
 function unNumInt(const num: IntArr): IntArr;
@@ -1113,14 +1106,14 @@ function xPowerInt(const Base, Power: IntArr): IntArr;
   n1,n2,n3:RealArr;}
 begin
   Result:=nil;
-  AArrMath.xPowerIntArr(Base,Power,Result);
+  ArrMath.xPowerIntArr(Base,Power,Result);
   {
   n1:=nil;
   n2:=nil;
   n3:=nil;
   n1:=IntReal(Base);
   n2:=IntReal(Power);
-  n3:=ARealMath.RealXPowerInt(n1,n2,3);
+  n3:=RealMath.RealXPowerInt(n1,n2,3);
   Result:=StrMath.RoundRealR(n3);
   }
 end;
@@ -1129,14 +1122,14 @@ procedure xPowerInt(const Base, Power: IntArr; var AAnswer: IntArr);
 {var
   n1,n2,n3:RealArr;}
 begin
-  AArrMath.xPowerIntArr(Base,Power,AAnswer);
+  ArrMath.xPowerIntArr(Base,Power,AAnswer);
   {
   n1:=nil;
   n2:=nil;
   n3:=nil;
   n1:=IntReal(Base);
   n2:=IntReal(Power);
-  n3:=ARealMath.RealXPowerInt(n1,n2,3);
+  n3:=RealMath.RealXPowerInt(n1,n2,3);
   AAnswer:=StrMath.RoundRealR(n3);
   }
 end;
@@ -1144,19 +1137,19 @@ end;
 function InitInt(const num: String): IntArr;
 begin
   Result:=nil;
-  AArrMath.StrToIntArr(num,Result);
+  ArrMath.StrToIntArr(num,Result);
 end;
 
 function IntStr(const num: IntArr): String;
 begin
   Result:='';
-  AArrMath.IntArrToStr(num,Result);
+  ArrMath.IntArrToStr(num,Result);
 end;
 
 function IntMod(const num1, num2: IntArr): IntArr;
 begin
   Result:=nil;
-  AArrMath.IntArrMod(num1,num2,Result);
+  ArrMath.IntArrMod(num1,num2,Result);
 end;
 
 { RealArr-Math }
@@ -1309,38 +1302,38 @@ end;
 function IntReal(const num: IntArr): RealArr;
 begin
   Result:=nil;
-  ARealMath.IntArrToRealArrEqual(num,Result);
+  RealMath.IntArrToRealArrEqual(num,Result);
 end;
 
 function RoundReal(const num: RealArr): IntArr;
 begin
   Result:=nil;
-  ARealMath.RealArrToIntArrRound(num,Result);
+  RealMath.RealArrToIntArrRound(num,Result);
 end;
 
 function RoundRealR(const num: RealArr): IntArr;
 begin
   Result:=nil;
-  ARealMath.RRR(num,Result);
+  RealMath.RRR(num,Result);
 end;
 
 function RealDeciCountBaseOne(const num: RealArr): Integer;
 begin
-  Result:=ARealMath.GetDeciCountBaseOne(num);
+  Result:=RealMath.GetDeciCountBaseOne(num);
 end;
 
 function CutRealDeciCountBaseOne(const num: RealArr; const CutAt: Integer
   ): RealArr;
 begin
   Result:=AssignNum(num);
-  ARealMath.RealCutDeciCountBaseOne(Result,CutAt);
+  RealMath.RealCutDeciCountBaseOne(Result,CutAt);
 end;
 
 function CutRealDeciCountBaseOneR(const num: RealArr; const CutAt: Integer
   ): RealArr;
 begin
   Result:=AssignNum(num);
-  ARealMath.RealCutDeciCountBaseOneR(Result,CutAt);
+  RealMath.RealCutDeciCountBaseOneR(Result,CutAt);
 end;
 
 function isPositiveRealAdvance(const num: RealArr): Byte;
@@ -1350,8 +1343,8 @@ begin
   Result:=3;
   TArr1:=nil;
   if(Length(num)=0)then Exit;
-  AArrMath.SetInt(num,TArr1);
-  Result:=ARealMath.isPositiveAd(TArr1);
+  ArrMath.SetInt(num,TArr1);
+  Result:=RealMath.isPositiveAd(TArr1);
   SetLength(TArr1,0);
 end;
 
@@ -1362,8 +1355,8 @@ begin
   Result:=False;
   TArr1:=nil;
   if(Length(num)=0)then Exit;
-  AArrMath.SetInt(num,TArr1);
-  Result:=ARealMath.isPositive(TArr1);
+  ArrMath.SetInt(num,TArr1);
+  Result:=RealMath.isPositive(TArr1);
   SetLength(TArr1,0);
 end;
 
@@ -1372,35 +1365,35 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
-  ARealMath.SumSubReal(num1,num2,Result,Int3);
+  RealMath.SumSubReal(num1,num2,Result,Int3);
 end;
 
 procedure SumSubRealO(const num1, num2: RealArr; var AAnswer: RealArr);
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
-  ARealMath.SumSubReal(num1,num2,AAnswer,Int3);
+  RealMath.SumSubReal(num1,num2,AAnswer,Int3);
 end;
 
 function SumSubRealO(const num1, num2: RealArr; DeciCountBaseOne: Integer
   ): RealArr;
 begin
   Result:=nil;
-  ARealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne);
+  RealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne);
 end;
 
 procedure SumSubRealO(const num1, num2: RealArr; var AAnswer: RealArr;
   DeciCountBaseOne: Integer);
 begin
-  ARealMath.SumSubReal(num1,num2,AAnswer,DeciCountBaseOne);
+  RealMath.SumSubReal(num1,num2,AAnswer,DeciCountBaseOne);
 end;
 
 function MulDivRealO(const num1, num2: RealArr; const doMul: Boolean): RealArr;
@@ -1408,11 +1401,11 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
-  ARealMath.MulDivReal(num1,num2,Result,doMul,Int3);
+  RealMath.MulDivReal(num1,num2,Result,doMul,Int3);
 end;
 
 procedure MulDivRealO(const num1, num2: RealArr; var AAnswer: RealArr;
@@ -1420,24 +1413,24 @@ procedure MulDivRealO(const num1, num2: RealArr; var AAnswer: RealArr;
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
-  ARealMath.MulDivReal(num1,num2,AAnswer,doMul,Int3);
+  RealMath.MulDivReal(num1,num2,AAnswer,doMul,Int3);
 end;
 
 function MulDivRealO(const num1, num2: RealArr; DeciCountBaseOne: Integer;
   const doMul: Boolean): RealArr;
 begin
   Result:=nil;
-  ARealMath.MulDivReal(num1,num2,Result,doMul,DeciCountBaseOne);
+  RealMath.MulDivReal(num1,num2,Result,doMul,DeciCountBaseOne);
 end;
 
 procedure MulDivRealO(const num1, num2: RealArr; var AAnswer: RealArr;
   DeciCountBaseOne: Integer; const doMul: Boolean);
 begin
-  ARealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne);
+  RealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne);
 end;
 
 function SumSubReal(const num1, num2: RealArr): RealArr;
@@ -1445,26 +1438,26 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  ARealMath.SumSubReal(num1,num2,Result,Int3+1);
-  ARealMath.RealCutDeciCountBaseOneR(Result,Int3);
+  RealMath.SumSubReal(num1,num2,Result,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 procedure SumSubReal(const num1, num2: RealArr; var AAnswer: RealArr);
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  ARealMath.SumSubReal(num1,num2,AAnswer,Int3+1);
-  ARealMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  RealMath.SumSubReal(num1,num2,AAnswer,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
 end;
 
 function SumSubReal(const num1, num2: RealArr; DeciCountBaseOne: Integer
@@ -1472,16 +1465,16 @@ function SumSubReal(const num1, num2: RealArr; DeciCountBaseOne: Integer
 begin
   Result:=nil;
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  ARealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne+1);
-  ARealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+  RealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
 end;
 
 procedure SumSubReal(const num1, num2: RealArr; var AAnswer: RealArr;
   DeciCountBaseOne: Integer);
 begin
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  ARealMath.SumSubReal(num1,num2,AAnswer,DeciCountBaseOne+1);
-  ARealMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
+  RealMath.SumSubReal(num1,num2,AAnswer,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
 end;
 
 function MulDivReal(const num1, num2: RealArr; const doMul: Boolean): RealArr;
@@ -1489,13 +1482,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  ARealMath.MulDivReal(num1,num2,Result,doMul,Int3+1);
-  ARealMath.RealCutDeciCountBaseOneR(Result,Int3);
+  RealMath.MulDivReal(num1,num2,Result,doMul,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
@@ -1503,13 +1496,13 @@ procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num1);
-  Int2:=ARealMath.GetDeciCountBaseOne(num2);
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  ARealMath.MulDivReal(num1,num2,AAnswer,doMul,Int3+1);
-  ARealMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  RealMath.MulDivReal(num1,num2,AAnswer,doMul,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
 end;
 
 function MulDivReal(const num1, num2: RealArr; DeciCountBaseOne: Integer;
@@ -1517,16 +1510,16 @@ function MulDivReal(const num1, num2: RealArr; DeciCountBaseOne: Integer;
 begin
   Result:=nil;
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  ARealMath.MulDivReal(num1,num2,Result,doMul,DeciCountBaseOne+1);
-  ARealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+  RealMath.MulDivReal(num1,num2,Result,doMul,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
 end;
 
 procedure MulDivReal(const num1, num2: RealArr; var AAnswer: RealArr;
   DeciCountBaseOne: Integer; const doMul: Boolean);
 begin
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  ARealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne+1);
-  ARealMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
+  RealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
 end;
 
 function unNumReal(const num: RealArr): RealArr;
@@ -1548,11 +1541,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
   Int1:=Int1+5;
-  ARealMath.lynRealR(num,Result,Int1);
+  RealMath.lynRealR(num,Result,Int1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1-5);
 end;
 
@@ -1560,11 +1553,11 @@ procedure lnReal(const num: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
   Int1:=Int1+5;
-  ARealMath.lynRealR(num,AAnswer,Int1);
+  RealMath.lynRealR(num,AAnswer,Int1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1-5);
 end;
 
@@ -1573,12 +1566,12 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
   Int1:=Int1+5;
-  ARealMath.lynRealR(num,Result,Int1);
+  RealMath.lynRealR(num,Result,Int1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1-5);
 end;
 
@@ -1587,12 +1580,12 @@ procedure lnReal(const num: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
   Int1:=Int1+5;
-  ARealMath.lynRealR(num,AAnswer,Int1);
+  RealMath.lynRealR(num,AAnswer,Int1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1-5);
 end;
 
@@ -1601,10 +1594,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  ARealMath.logaReal(num,InitReal('10.0'),Result,Int1+1);
+  RealMath.logaReal(num,InitReal('10.0'),Result,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1612,10 +1605,10 @@ procedure logReal(const num: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  ARealMath.logaReal(num,InitReal('10.0'),AAnswer,Int1+1);
+  RealMath.logaReal(num,InitReal('10.0'),AAnswer,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1624,11 +1617,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  ARealMath.logaReal(num,InitReal('10.0'),Result,Int1+1);
+  RealMath.logaReal(num,InitReal('10.0'),Result,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1637,11 +1630,11 @@ procedure logReal(const num: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  ARealMath.logaReal(num,InitReal('10.0'),AAnswer,Int1+1);
+  RealMath.logaReal(num,InitReal('10.0'),AAnswer,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1650,12 +1643,12 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
-  Int2:=ARealMath.GetDeciCountBaseOne(base);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
+  Int2:=RealMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  ARealMath.logaReal(num,base,Result,Int3+1);
+  RealMath.logaReal(num,base,Result,Int3+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -1663,12 +1656,12 @@ procedure logReal(const num, base: RealArr; var AAnswer: RealArr);
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
-  Int2:=ARealMath.GetDeciCountBaseOne(base);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
+  Int2:=RealMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  ARealMath.logaReal(num,base,AAnswer,Int3+1);
+  RealMath.logaReal(num,base,AAnswer,Int3+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int3);
 end;
 
@@ -1677,13 +1670,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
-  Int2:=ARealMath.GetDeciCountBaseOne(base);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
+  Int2:=RealMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  ARealMath.logaReal(num,base,Result,Int3+1);
+  RealMath.logaReal(num,base,Result,Int3+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -1692,13 +1685,13 @@ procedure logReal(const num, base: RealArr; var AAnswer: RealArr;
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
-  Int2:=ARealMath.GetDeciCountBaseOne(base);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
+  Int2:=RealMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  ARealMath.logaReal(num,base,AAnswer,Int3+1);
+  RealMath.logaReal(num,base,AAnswer,Int3+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int3);
 end;
 
@@ -1707,10 +1700,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,Result,Int1+2);
+  RealMath.Root2Real(num,Result,Int1+2);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1718,10 +1711,10 @@ procedure SqrRootReal(const num: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,AAnswer,Int1+2);
+  RealMath.Root2Real(num,AAnswer,Int1+2);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1730,11 +1723,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,Result,Int1+2);
+  RealMath.Root2Real(num,Result,Int1+2);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1743,11 +1736,11 @@ procedure SqrRootReal(const num: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(num);
+  Int1:=RealMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  ARealMath.Root2Real(num,AAnswer,Int1+2);
+  RealMath.Root2Real(num,AAnswer,Int1+2);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1756,10 +1749,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.SinReal(Degrees,Int1+1);
+  Result:=RealMath.SinReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1767,10 +1760,10 @@ procedure SineReal(const Degrees: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.SinReal(Degrees,Int1+1);
+  AAnswer:=RealMath.SinReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1779,11 +1772,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.SinReal(Degrees,Int1+1);
+  Result:=RealMath.SinReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1792,11 +1785,11 @@ procedure SineReal(const Degrees: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.SinReal(Degrees,Int1+1);
+  AAnswer:=RealMath.SinReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1805,10 +1798,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.CosReal(Degrees,Int1+1);
+  Result:=RealMath.CosReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1816,10 +1809,10 @@ procedure CosineReal(const Degrees: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.CosReal(Degrees,Int1+1);
+  AAnswer:=RealMath.CosReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1828,11 +1821,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.CosReal(Degrees,Int1+1);
+  Result:=RealMath.CosReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1841,11 +1834,11 @@ procedure CosineReal(const Degrees: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.CosReal(Degrees,Int1+1);
+  AAnswer:=RealMath.CosReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1854,10 +1847,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.TanReal(Degrees,Int1+1);
+  Result:=RealMath.TanReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1865,10 +1858,10 @@ procedure TangentReal(const Degrees: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.TanReal(Degrees,Int1+1);
+  AAnswer:=RealMath.TanReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1878,11 +1871,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.TanReal(Degrees,Int1+1);
+  Result:=RealMath.TanReal(Degrees,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1891,11 +1884,11 @@ procedure TangentReal(const Degrees: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Degrees);
+  Int1:=RealMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.TanReal(Degrees,Int1+1);
+  AAnswer:=RealMath.TanReal(Degrees,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1904,10 +1897,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(SineX);
+  Int1:=RealMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.InSinReal(SineX,Int1+1);
+  Result:=RealMath.InSinReal(SineX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1915,10 +1908,10 @@ procedure InSineReal(const SineX: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(SineX);
+  Int1:=RealMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.InSinReal(SineX,Int1+1);
+  AAnswer:=RealMath.InSinReal(SineX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1927,11 +1920,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(SineX);
+  Int1:=RealMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.InSinReal(SineX,Int1+1);
+  Result:=RealMath.InSinReal(SineX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1940,11 +1933,11 @@ procedure InSineReal(const SineX: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(SineX);
+  Int1:=RealMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.InSinReal(SineX,Int1+1);
+  AAnswer:=RealMath.InSinReal(SineX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1953,10 +1946,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(CosineX);
+  Int1:=RealMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.InCosReal(CosineX,Int1+1);
+  Result:=RealMath.InCosReal(CosineX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1964,10 +1957,10 @@ procedure InCosineReal(const CosineX: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(CosineX);
+  Int1:=RealMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.InCosReal(CosineX,Int1+1);
+  AAnswer:=RealMath.InCosReal(CosineX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -1977,11 +1970,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(CosineX);
+  Int1:=RealMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.InCosReal(CosineX,Int1+1);
+  Result:=RealMath.InCosReal(CosineX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -1990,11 +1983,11 @@ procedure InCosineReal(const CosineX: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(CosineX);
+  Int1:=RealMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.InCosReal(CosineX,Int1+1);
+  AAnswer:=RealMath.InCosReal(CosineX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2003,10 +1996,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(TangentX);
+  Int1:=RealMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.InTanReal(TangentX,Int1+1);
+  Result:=RealMath.InTanReal(TangentX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2014,10 +2007,10 @@ procedure InTangentReal(const TangentX: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(TangentX);
+  Int1:=RealMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.InTanReal(TangentX,Int1+1);
+  AAnswer:=RealMath.InTanReal(TangentX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2027,11 +2020,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(TangentX);
+  Int1:=RealMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.InTanReal(TangentX,Int1+1);
+  Result:=RealMath.InTanReal(TangentX,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2040,11 +2033,11 @@ procedure InTangentReal(const TangentX: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(TangentX);
+  Int1:=RealMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.InTanReal(TangentX,Int1+1);
+  AAnswer:=RealMath.InTanReal(TangentX,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2053,10 +2046,10 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=ARealMath.ePowerX(Power,Int1+1);
+  Result:=RealMath.ePowerX(Power,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2064,10 +2057,10 @@ procedure ePowerReal(const Power: RealArr; var AAnswer: RealArr);
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.ePowerX(Power,Int1+1);
+  AAnswer:=RealMath.ePowerX(Power,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2076,11 +2069,11 @@ var
   Int1:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=ARealMath.ePowerX(Power,Int1+1);
+  Result:=RealMath.ePowerX(Power,Int1+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int1);
 end;
 
@@ -2089,11 +2082,11 @@ procedure ePowerReal(const Power: RealArr; var AAnswer: RealArr;
 var
   Int1:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=ARealMath.ePowerX(Power,Int1+1);
+  AAnswer:=RealMath.ePowerX(Power,Int1+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int1);
 end;
 
@@ -2102,12 +2095,12 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Base);
-  Int2:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Base);
+  Int2:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=ARealMath.xPowerX(base,power,Int3+1);
+  Result:=RealMath.xPowerX(base,power,Int3+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -2115,12 +2108,12 @@ procedure xPowerReal(const Base, Power: RealArr; var AAnswer: RealArr);
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Base);
-  Int2:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Base);
+  Int2:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=ARealMath.xPowerX(base,power,Int3+1);
+  AAnswer:=RealMath.xPowerX(base,power,Int3+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int3);
 end;
 
@@ -2130,13 +2123,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:=nil;
-  Int1:=ARealMath.GetDeciCountBaseOne(Base);
-  Int2:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Base);
+  Int2:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  Result:=ARealMath.xPowerX(base,power,Int3+1);
+  Result:=RealMath.xPowerX(base,power,Int3+1);
   Result:=CutRealDeciCountBaseOneR(Result,Int3);
 end;
 
@@ -2145,32 +2138,32 @@ procedure xPowerReal(const Base, Power: RealArr; var AAnswer: RealArr;
 var
   Int1,Int2,Int3:Integer;
 begin
-  Int1:=ARealMath.GetDeciCountBaseOne(Base);
-  Int2:=ARealMath.GetDeciCountBaseOne(Power);
+  Int1:=RealMath.GetDeciCountBaseOne(Base);
+  Int2:=RealMath.GetDeciCountBaseOne(Power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  AAnswer:=ARealMath.xPowerX(base,power,Int3+1);
+  AAnswer:=RealMath.xPowerX(base,power,Int3+1);
   AAnswer:=CutRealDeciCountBaseOneR(AAnswer,Int3);
 end;
 
 function InitReal(const num: String): RealArr;
 begin
   Result:=nil;
-  ARealMath.StrToRealArr(num,Result);
+  RealMath.StrToRealArr(num,Result);
 end;
 
 function RealStr(const num: RealArr): String;
 begin
   Result:='';
-  ARealMath.RealArrToStr(num,Result);
+  RealMath.RealArrToStr(num,Result);
 end;
 
 function RealMod(const num1, num2: RealArr): RealArr;
 begin
   Result:=nil;
-  ARealMath.RealArrMod(num1,num2,Result);
+  RealMath.RealArrMod(num1,num2,Result);
 end;
 
 { String-Math }
@@ -2183,8 +2176,8 @@ var
   AMode:Byte;
 begin
   Result:=False;
-  Num1:=AStrMath.CleanNum(Num1);
-  Num2:=AStrMath.CleanNum(Num2);
+  Num1:=StringMath.CleanNum(Num1);
+  Num2:=StringMath.CleanNum(Num2);
   if(Num1='nan')and(Num2='nan')then begin
     Result:=True;
     Exit;
@@ -2210,7 +2203,7 @@ begin
     end;
 
   Cal:=SumSub(Num1,MulDiv('-1',Num2));
-  AMode:=AStrMath.isPositiveAd(Cal);
+  AMode:=StringMath.isPositiveAd(Cal);
   if((Symbol='=')or(Symbol='=='))and(AMode=2)then Result:=True else
   if((Symbol='<>')or(Symbol='!=')or(Symbol='=!'))and((AMode=0)or(AMode=1))then Result:=True else
   if(Symbol='>')and(AMode=1)then Result:=True else
@@ -2292,7 +2285,7 @@ function isNaN(const NumV: String): Boolean;
 var
   NV:String;
 begin
-  NV:=AStrMath.CleanNum(NumV);
+  NV:=StringMath.CleanNum(NumV);
   if(NV='nan')then Result:=True
   else Result:=False;
 end;
@@ -2303,25 +2296,25 @@ var
   N1:String;
   AWhole,ADeci:String;
 begin
-  N1:=AStrMath.CleanNum(NumV);
+  N1:=StringMath.CleanNum(NumV);
   if(N1='nan')then begin
     Result:='nan';
     Exit;
   end;
-  AStrMath.getWholeDeci(N1,AWhole,ADeci);
+  StringMath.getWholeDeci(N1,AWhole,ADeci);
   if(Length(ADeci)>DeciCountBaseOne)then begin
     Result:=AWhole+'.'+Copy(ADeci,1,DeciCountBaseOne);
   end else begin
     Result:=AWhole+'.'+ADeci;
   end;
-  Result:=AStrMath.CleanNum(Result);
+  Result:=StringMath.CleanNum(Result);
 end;
 
 function isNumber(const NumV: String): Boolean;
 var
   Cal:String;
 begin
-  Cal:=AStrMath.CleanNum(NumV);
+  Cal:=StringMath.CleanNum(NumV);
   if(Cal='nan')then Result:=False else Result:=True;
 end;
 
@@ -2330,50 +2323,50 @@ var
   Cal,AWhole,ADeci:String;
 begin
   Result:=False;
-  Cal:=AStrMath.CleanNum(NumV);
+  Cal:=StringMath.CleanNum(NumV);
   if(Cal='nan')then Exit;
-  AStrMath.getWholeDeci(Cal,AWhole,ADeci);
+  StringMath.getWholeDeci(Cal,AWhole,ADeci);
   if(ADeci='0')then Result:=True;
 end;
 
 function CleanNum(const NumV: String): String;
 begin
-  Result:=AStrMath.CleanNum(NumV);
+  Result:=StringMath.CleanNum(NumV);
 end;
 
 function ToRound(const NumV: String; const WithDeci: Boolean): String;
 begin
-  Result:=AStrMath.RX(NumV,WithDeci);
+  Result:=StringMath.RX(NumV,WithDeci);
 end;
 
 function ToRound(const NumV: String; out AAnswer: String;
   const WithDeci: Boolean): Boolean;
 begin
-  AAnswer:=AStrMath.RX(NumV,WithDeci);
+  AAnswer:=StringMath.RX(NumV,WithDeci);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function ToInt(const NumV: String; const WithDeci: Boolean): String;
 begin
-  Result:=AStrMath.RR(NumV,WithDeci);
+  Result:=StringMath.RR(NumV,WithDeci);
 end;
 
 function ToInt(const NumV: String; out AAnswer: String; const WithDeci: Boolean
   ): Boolean;
 begin
-  AAnswer:=AStrMath.RR(NumV,WithDeci);
+  AAnswer:=StringMath.RR(NumV,WithDeci);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function ToDeci(const NumV: String; const WithDeci: Boolean): String;
 begin
-  Result:=AStrMath.RD(NumV,WithDeci);
+  Result:=StringMath.RD(NumV,WithDeci);
 end;
 
 function ToDeci(const NumV: String; out AAnswer: String; const WithDeci: Boolean
   ): Boolean;
 begin
-  AAnswer:=AStrMath.RD(NumV,WithDeci);
+  AAnswer:=StringMath.RD(NumV,WithDeci);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2382,9 +2375,9 @@ var
   NV:String;
 begin
   Result:=3;
-  NV:=AStrMath.CleanNum(NumV);
+  NV:=StringMath.CleanNum(NumV);
   if(NV='nan')then Exit;
-  Result:=AStrMath.isPositiveAd(NV);
+  Result:=StringMath.isPositiveAd(NV);
 end;
 
 function isPositive(const NumV: String): Boolean;
@@ -2392,9 +2385,9 @@ var
   NV:String;
 begin
   Result:=False;
-  NV:=AStrMath.CleanNum(NumV);
+  NV:=StringMath.CleanNum(NumV);
   if(NV='nan')then Exit;
-  Result:=AStrMath.isPositive(NV);
+  Result:=StringMath.isPositive(NV);
 end;
 
 function Num1Bigger(const Num1, Num2: String): Byte;
@@ -2403,14 +2396,14 @@ var
   Cal:String;
 begin
   Result:=3;
-  N1:=AStrMath.CleanNum(Num1);
-  N2:=AStrMath.CleanNum(Num2);
+  N1:=StringMath.CleanNum(Num1);
+  N2:=StringMath.CleanNum(Num2);
   if(N1='nan')then Exit;
   if(N2='nan')then Exit;
   Cal:=SumSub(N1,MulDiv('-1',N2));
-  if(AStrMath.isPositiveAd(Cal)=1)then Result:=1 else
-  if(AStrMath.isPositiveAd(Cal)=0)then Result:=0 else
-  if(AStrMath.isPositiveAd(Cal)=2)then Result:=2;
+  if(StringMath.isPositiveAd(Cal)=1)then Result:=1 else
+  if(StringMath.isPositiveAd(Cal)=0)then Result:=0 else
+  if(StringMath.isPositiveAd(Cal)=2)then Result:=2;
 end;
 
 function SumSub(const Num1, Num2: String): String;
@@ -2418,13 +2411,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num1);
-  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=AStrMath.SumSub(Num1,Num2);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
+  Result:=StringMath.SumSub(Num1,Num2);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function MulDiv(const Num1, Num2: String; const doMul: Boolean): String;
@@ -2432,13 +2425,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num1);
-  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=AStrMath.MulDiv(Num1,Num2,Int3+1,doMul);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
+  Result:=StringMath.MulDiv(Num1,Num2,Int3+1,doMul);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function SumSub(const Num1, Num2: String; out AAnswer: String): Boolean;
@@ -2446,13 +2439,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num1);
-  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.SumSub(Num1,Num2);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  AAnswer:=StringMath.SumSub(Num1,Num2);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2462,13 +2455,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num1);
-  Int2:=AStrMath.GetDeciCountBaseOne(num2);
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.MulDiv(Num1,Num2,Int3+1,doMul);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  AAnswer:=StringMath.MulDiv(Num1,Num2,Int3+1,doMul);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2476,8 +2469,8 @@ function SumSub(const Num1, Num2: String; DeciCountBaseOne: Integer): String;
 begin
   Result:='';
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  Result:=AStrMath.SumSub(Num1,Num2);
-  AStrMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+  Result:=StringMath.SumSub(Num1,Num2);
+  StringMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
 end;
 
 function MulDiv(const Num1, Num2: String; DeciCountBaseOne: Integer;
@@ -2485,8 +2478,8 @@ function MulDiv(const Num1, Num2: String; DeciCountBaseOne: Integer;
 begin
   Result:='';
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  Result:=AStrMath.MulDiv(Num1,Num2,DeciCountBaseOne+1,doMul);
-  AStrMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+  Result:=StringMath.MulDiv(Num1,Num2,DeciCountBaseOne+1,doMul);
+  StringMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
 end;
 
 function SumSub(const Num1, Num2: String; out AAnswer: String;
@@ -2494,8 +2487,8 @@ function SumSub(const Num1, Num2: String; out AAnswer: String;
 begin
   AAnswer:='';
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  AAnswer:=AStrMath.SumSub(Num1,Num2);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
+  AAnswer:=StringMath.SumSub(Num1,Num2);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2504,8 +2497,8 @@ function MulDiv(const Num1, Num2: String; out AAnswer: String;
 begin
   AAnswer:='';
   DeciCountBaseOne:=DeciCountBaseOne+1;
-  AAnswer:=AStrMath.MulDiv(Num1,Num2,DeciCountBaseOne+1,doMul);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
+  AAnswer:=StringMath.MulDiv(Num1,Num2,DeciCountBaseOne+1,doMul);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,DeciCountBaseOne);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2515,10 +2508,10 @@ var
   NV:String;
 begin
   Result:=False;
-  NV:=AStrMath.CleanNum(Num);
+  NV:=StringMath.CleanNum(Num);
   if(NV='nan')then Exit;
   for i:=1 to Length(Num)do if(((Num[i]='0')or(Num[i]='1'))=False)then Exit;
-  if(AStrMath.RR(Length(Num)/8)<>(Length(Num)/8))then Exit;
+  if(StringMath.RR(Length(Num)/8)<>(Length(Num)/8))then Exit;
   Result:=True;
 end;
 
@@ -2535,7 +2528,7 @@ begin
     if(IsInt(BigN)=False)then Result:='1'+Result else Result:='0'+Result;
     BigN:=ToInt(BigN);
   end;
-  While(AStrMath.RR(Length(Result)/8)<>(Length(Result)/8))do Result:='0'+Result;
+  While(StringMath.RR(Length(Result)/8)<>(Length(Result)/8))do Result:='0'+Result;
 end;
 
 function IntToBinary(const Num: String; out AAnswer: String): Boolean;
@@ -2552,7 +2545,7 @@ begin
     if(IsInt(BigN)=False)then AAnswer:='1'+AAnswer else AAnswer:='0'+AAnswer;
     BigN:=ToInt(BigN);
   end;
-  While(AStrMath.RR(Length(AAnswer)/8)<>(Length(AAnswer)/8))do AAnswer:='0'+AAnswer;
+  While(StringMath.RR(Length(AAnswer)/8)<>(Length(AAnswer)/8))do AAnswer:='0'+AAnswer;
   Result:=True;
 end;
 
@@ -2598,11 +2591,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.lnx(x,Int1+5);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.lnx(x,Int1+5);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function ln(const x: String; out AAnswer: String): Boolean;
@@ -2610,11 +2603,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.lnx(x,Int1+5);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.lnx(x,Int1+5);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2623,12 +2616,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.lnx(x,Int1+5);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.lnx(x,Int1+5);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function ln(const x: String; out AAnswer: String; DeciCountBaseOne: Integer
@@ -2637,12 +2630,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.lnx(x,Int1+5);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.lnx(x,Int1+5);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2651,11 +2644,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.log(num,'10',Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.log(num,'10',Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function log(const num: String; out AAnswer: String): Boolean;
@@ -2663,11 +2656,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.log(num,'10',Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.log(num,'10',Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2676,12 +2669,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.log(num,'10',Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.log(num,'10',Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function log(const num: String; out AAnswer: String; DeciCountBaseOne: Integer
@@ -2690,12 +2683,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.log(num,'10',Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.log(num,'10',Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2704,13 +2697,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
-  Int2:=AStrMath.GetDeciCountBaseOne(base);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
+  Int2:=StringMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=AStrMath.log(num,base,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
+  Result:=StringMath.log(num,base,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function log(const num, Base: String; out AAnswer: String): Boolean;
@@ -2718,13 +2711,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
-  Int2:=AStrMath.GetDeciCountBaseOne(base);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
+  Int2:=StringMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.log(num,Base,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  AAnswer:=StringMath.log(num,Base,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2733,14 +2726,14 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
-  Int2:=AStrMath.GetDeciCountBaseOne(base);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
+  Int2:=StringMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  Result:=AStrMath.log(num,base,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
+  Result:=StringMath.log(num,base,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function log(const num, Base: String; out AAnswer: String;
@@ -2749,14 +2742,14 @@ var
   Int1,Int2,Int3:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(num);
-  Int2:=AStrMath.GetDeciCountBaseOne(base);
+  Int1:=StringMath.GetDeciCountBaseOne(num);
+  Int2:=StringMath.GetDeciCountBaseOne(base);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.log(num,Base,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  AAnswer:=StringMath.log(num,Base,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2765,11 +2758,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.SqrRoot(x,Int1+2);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.SqrRoot(x,Int1+2);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function SqrRoot(const x: String; out AAnswer: String): Boolean;
@@ -2777,11 +2770,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.SqrRoot(x,Int1+2);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.SqrRoot(x,Int1+2);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2790,12 +2783,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.SqrRoot(x,Int1+2);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.SqrRoot(x,Int1+2);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function SqrRoot(const x: String; out AAnswer: String; DeciCountBaseOne: Integer
@@ -2804,12 +2797,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(x);
+  Int1:=StringMath.GetDeciCountBaseOne(x);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.SqrRoot(x,Int1+2);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.SqrRoot(x,Int1+2);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2818,11 +2811,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.Sine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.Sine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function Sine(const Degrees: String; out AAnswer: String): Boolean;
@@ -2830,11 +2823,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.Sine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.Sine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2843,12 +2836,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.Sine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.Sine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function Sine(const Degrees: String; out AAnswer: String;
@@ -2857,12 +2850,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.Sine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.Sine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2871,11 +2864,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.Cosine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.Cosine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function Cosine(const Degrees: String; out AAnswer: String): Boolean;
@@ -2883,11 +2876,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.Cosine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.Cosine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2896,12 +2889,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.Cosine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.Cosine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function Cosine(const Degrees: String; out AAnswer: String;
@@ -2910,12 +2903,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.Cosine(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.Cosine(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2924,11 +2917,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.Tangent(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.Tangent(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function Tangent(const Degrees: String; out AAnswer: String): Boolean;
@@ -2936,11 +2929,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.Tangent(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.Tangent(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2949,12 +2942,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.Tangent(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.Tangent(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function Tangent(const Degrees: String; out AAnswer: String;
@@ -2963,12 +2956,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Degrees);
+  Int1:=StringMath.GetDeciCountBaseOne(Degrees);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.Tangent(Degrees,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.Tangent(Degrees,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -2977,11 +2970,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(SineX);
+  Int1:=StringMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.InSine(SineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.InSine(SineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function InSine(const SineX: String; out AAnswer: String): Boolean;
@@ -2989,11 +2982,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(SineX);
+  Int1:=StringMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.InSine(SineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.InSine(SineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3002,12 +2995,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(SineX);
+  Int1:=StringMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.InSine(SineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.InSine(SineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function InSine(const SineX: String; out AAnswer: String;
@@ -3016,12 +3009,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(SineX);
+  Int1:=StringMath.GetDeciCountBaseOne(SineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.InSine(SineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.InSine(SineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3030,11 +3023,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(CosineX);
+  Int1:=StringMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.InCosine(CosineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.InCosine(CosineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function InCosine(const CosineX: String; out AAnswer: String): Boolean;
@@ -3042,11 +3035,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(CosineX);
+  Int1:=StringMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.InCosine(CosineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.InCosine(CosineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3055,12 +3048,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(CosineX);
+  Int1:=StringMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.InCosine(CosineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.InCosine(CosineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function InCosine(const CosineX: String; out AAnswer: String;
@@ -3069,12 +3062,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(CosineX);
+  Int1:=StringMath.GetDeciCountBaseOne(CosineX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.InCosine(CosineX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.InCosine(CosineX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3083,11 +3076,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(TangentX);
+  Int1:=StringMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.InTangent(TangentX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.InTangent(TangentX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function InTangent(const TangentX: String; out AAnswer: String): Boolean;
@@ -3095,11 +3088,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(TangentX);
+  Int1:=StringMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.InTangent(TangentX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.InTangent(TangentX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3108,12 +3101,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(TangentX);
+  Int1:=StringMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.InTangent(TangentX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.InTangent(TangentX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function InTangent(const TangentX: String; out AAnswer: String;
@@ -3122,12 +3115,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(TangentX);
+  Int1:=StringMath.GetDeciCountBaseOne(TangentX);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.InTangent(TangentX,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.InTangent(TangentX,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3136,11 +3129,11 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Power);
+  Int1:=StringMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  Result:=AStrMath.ePowerX(Power,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.ePowerX(Power,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function ePower(const Power: String; out AAnswer: String): Boolean;
@@ -3148,11 +3141,11 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Power);
+  Int1:=StringMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.ePowerX(Power,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.ePowerX(Power,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3161,12 +3154,12 @@ var
   Int1:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Power);
+  Int1:=StringMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  Result:=AStrMath.ePowerX(Power,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int1);
+  Result:=StringMath.ePowerX(Power,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int1);
 end;
 
 function ePower(const Power: String; out AAnswer: String;
@@ -3175,12 +3168,12 @@ var
   Int1:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(Power);
+  Int1:=StringMath.GetDeciCountBaseOne(Power);
   if(Int1<RealDeciLength)then Int1:=RealDeciLength;
   if(Int1<DeciCountBaseOne)then Int1:=DeciCountBaseOne;
   Int1:=Int1+1;
-  AAnswer:=AStrMath.ePowerX(Power,Int1+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
+  AAnswer:=StringMath.ePowerX(Power,Int1+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int1);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3189,13 +3182,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(base);
-  Int2:=AStrMath.GetDeciCountBaseOne(power);
+  Int1:=StringMath.GetDeciCountBaseOne(base);
+  Int2:=StringMath.GetDeciCountBaseOne(power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  Result:=AStrMath.xPowerX(Base,Power,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
+  Result:=StringMath.xPowerX(Base,Power,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function xPower(const Base, Power: String; out AAnswer: String): Boolean;
@@ -3203,13 +3196,13 @@ var
   Int1,Int2,Int3:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(base);
-  Int2:=AStrMath.GetDeciCountBaseOne(power);
+  Int1:=StringMath.GetDeciCountBaseOne(base);
+  Int2:=StringMath.GetDeciCountBaseOne(power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.xPowerX(Base,Power,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  AAnswer:=StringMath.xPowerX(Base,Power,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
@@ -3218,14 +3211,14 @@ var
   Int1,Int2,Int3:Integer;
 begin
   Result:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(base);
-  Int2:=AStrMath.GetDeciCountBaseOne(power);
+  Int1:=StringMath.GetDeciCountBaseOne(base);
+  Int2:=StringMath.GetDeciCountBaseOne(power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  Result:=AStrMath.xPowerX(Base,Power,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(Result,Int3);
+  Result:=StringMath.xPowerX(Base,Power,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function xPower(const Base, Power: String; out AAnswer: String;
@@ -3234,20 +3227,20 @@ var
   Int1,Int2,Int3:Integer;
 begin
   AAnswer:='';
-  Int1:=AStrMath.GetDeciCountBaseOne(base);
-  Int2:=AStrMath.GetDeciCountBaseOne(power);
+  Int1:=StringMath.GetDeciCountBaseOne(base);
+  Int2:=StringMath.GetDeciCountBaseOne(power);
   if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
   if(Int3<RealDeciLength)then Int3:=RealDeciLength;
   if(Int3<DeciCountBaseOne)then Int3:=DeciCountBaseOne;
   Int3:=Int3+1;
-  AAnswer:=AStrMath.xPowerX(Base,Power,Int3+1);
-  AStrMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
+  AAnswer:=StringMath.xPowerX(Base,Power,Int3+1);
+  StringMath.RealCutDeciCountBaseOneR(AAnswer,Int3);
   if(AAnswer='nan')then Result:=False else Result:=True;
 end;
 
 function xMod(const num1, num2: String): String;
 begin
-  Result:=AStrMath.xModX(num1,num2);
+  Result:=StringMath.xModX(num1,num2);
 end;
 
 { CodeComponent }
@@ -3386,6 +3379,41 @@ begin
 
   self.TPtrCComponent^.Component_Port('GotoMul1');
   self.TPtrCComponent^.Component_MulDivInteger(ResultVarName,AMem1+'NumNegOne',ResultVarName,AMem1+'isMulV');
+  self.TPtrCComponent^.Component_Exit;
+
+  self.TPtrCComponent^.Component_Port('JumpMul1');
+  self.TPtrCComponent^.Component_AllocateMem('ConditionA',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+
+  self.TPtrCComponent^.Component_V1LTV2(numVarName,AMem1+'NumZero',AMem1+'ConditionA');
+  self.TPtrCComponent^.Component_IfV1True_Goto(AMem1+'ConditionA',AMem1+'GotoMul1');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_unNumReal(const numVarName,
+  ResultVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  Result:=x;
+  if(x<0)then Result:=Result*(-1);
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(ResultVarName,numVarName);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumNegOne',-1);
+  self.TPtrCComponent^.Component_AllocateMem('isMulV',1);
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpMul1');
+
+  self.TPtrCComponent^.Component_Port('GotoMul1');
+  self.TPtrCComponent^.Component_MulDivReal(ResultVarName,AMem1+'NumNegOne',ResultVarName,AMem1+'isMulV');
   self.TPtrCComponent^.Component_Exit;
 
   self.TPtrCComponent^.Component_Port('JumpMul1');
@@ -4299,6 +4327,9 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('NegOne',-1);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
 
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
@@ -4308,6 +4339,232 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
   self.TPtrCComponent^.Component_AllocateMem('nCount',0);
+  self.TPtrCComponent^.Component_AllocateMem('nCountr',0.0);
+
+  self.TPtrCComponent^.Component_AllocateMem('bool2',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength',0);
+  self.TPtrCComponent^.Component_AllocateMem('TArrLength',0);
+  self.TPtrCComponent^.Component_AllocateMem('nCountrInt',0);
+  self.TPtrCComponent^.Component_AllocateMem('Andbool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('Andbool2',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'numLength');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'numLength',AMem1+'Num8',AMem1+'numLength');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'numLength',AMem1+'NumOne',AMem1+'numLength');
+
+  self.TPtrCComponent^.Component_V1LTV2(PaceBaseOneIntVarName,AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MulInteger(PaceBaseOneIntVarName,AMem1+'NegOne',PaceBaseOneIntVarName);
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_V1EqV2(isLeftBoolVarName,AMem1+'True',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'LeftIsNotTrue');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',PaceBaseOneIntVarName,AMem1+'nCount');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'nCount',AMem1+'NegOne',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_DivReal(AMem1+'i',AMem1+'Num7',AMem1+'nCountr');
+
+  self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'TArrLength');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'TArrLength',AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse3');
+
+  self.Component_SetLengthInc(AMem1+'TArr1',AMem1+'False');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  self.Component_RR(AMem1+'nCountr',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'nCountrInt',AMem1+'nCountr',AMem1+'Andbool1');
+  self.TPtrCComponent^.Component_V1NotEqV2(AMem1+'NumZero',AMem1+'nCountr',AMem1+'Andbool2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'Andbool1',AMem1+'Andbool2',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse4');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'i',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'nCountrInt',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'nCountrInt',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'nCountrInt',AMem1+'nCountrInt');
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'nCountrInt',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'nCount',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'TArr1',AMem1+'nCountrInt',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'nCountrInt',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'nCount',AMem1+'nCountrInt',AMem1+'nCountrInt');
+
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'nCountrInt',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'nCount',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_ArrayIndexSet(AMem1+'TArr1',AMem1+'nCountrInt',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse5');
+
+  self.Component_SetLengthInc(AMem1+'TArr1',AMem1+'False');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse5');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'LeftIsNotFalse');
+
+  self.TPtrCComponent^.Component_Port('LeftIsNotTrue');
+
+  self.TPtrCComponent^.Component_V1EqV2(isLeftBoolVarName,AMem1+'False',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'LeftIsNotFalse');
+
+  self.TPtrCComponent^.Component_Port('jForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'jForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',PaceBaseOneIntVarName,AMem1+'nCount');
+  self.TPtrCComponent^.Component_DivReal(AMem1+'nCount',AMem1+'Num7',AMem1+'nCountr');
+
+  self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'TArrLength');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'TArrLength',AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse6');
+
+  self.TPtrCComponent^.Component_SubInteger(PaceBaseOneIntVarName,AMem1+'NumOne',AMem1+'nCountrInt');
+  self.Component_unNumInteger(AMem1+'nCountrInt',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'nCountrInt',AMem1+'Num7',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'nCountrInt',AMem1+'NumOne',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'TArr1',AMem1+'nCountrInt');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse6');
+
+  self.Component_RR(AMem1+'nCountr',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'nCountrInt',AMem1+'nCountr',AMem1+'Andbool1');
+  self.TPtrCComponent^.Component_V1NotEqV2(AMem1+'NumZero',AMem1+'nCountr',AMem1+'Andbool2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'Andbool1',AMem1+'Andbool2',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse7');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse8');
+
+  self.Component_SetLengthInc(AMem1+'TArr1',AMem1+'False');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse8');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'i',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'nCountrInt',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'nCountrInt',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'nCountrInt',AMem1+'nCountrInt');
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'nCountrInt',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse9');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'nCount',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'TArr1',AMem1+'nCountrInt',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'nCountrInt',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'nCount',AMem1+'nCountrInt',AMem1+'nCountrInt');
+
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'nCountrInt',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'nCount',AMem1+'Num8',AMem1+'nCountrInt');
+  self.TPtrCComponent^.Component_ArrayIndexSet(AMem1+'TArr1',AMem1+'nCountrInt',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse9');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'jForBegin');
+
+  self.TPtrCComponent^.Component_Port('jForEnd');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('LeftIsNotFalse');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'lForEnd');
+
+  self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'i');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+
+  self.TPtrCComponent^.Component_Port('kForBegin');
+
+  self.TPtrCComponent^.Component_V1LTV2(AMem1+'i',AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'kForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'TArr1',AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_V1NotEqV2(AMem1+'ByteA',AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'kForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'kForBegin');
+
+  self.TPtrCComponent^.Component_Port('kForEnd');
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'TArr1',AMem1+'i');
+
+  self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'TArrLength');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'TArrLength',AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse10');
+
+  self.TPtrCComponent^.Component_SetLength(AMem1+'TArr1',AMem1+'NumOne');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse10');
+
+  self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'TArrLength');
+  self.TPtrCComponent^.Component_SetLength(numVarName,AMem1+'TArrLength');
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'TArrLength');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'TArrLength',AMem1+'NumOne',AMem1+'TArrLength');
+
+  self.TPtrCComponent^.Component_Port('lForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'TArrLength',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'lForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'TArr1',AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numVarName,AMem1+'i',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'lForBegin');
+
+  self.TPtrCComponent^.Component_Port('lForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
 
@@ -5306,18 +5563,18 @@ begin
 
   bool1:=False;
   bool2:=False;
-  AArrMath.SetBitPosZero(TBPosMin);
-  AArrMath.SetBitPosZero(TBPosMax);
-  AArrMath.GetLastBit(TBPosMax,Result);
-  while(AArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
-    bool1:=AArrMath.IsBitPosSet(TBPosMin,num1);
-    bool2:=AArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)and(bool2=True)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-    AArrMath.IncBitPos(TBPosMin);
+  ArrMath.SetBitPosZero(TBPosMin);
+  ArrMath.SetBitPosZero(TBPosMax);
+  ArrMath.GetLastBit(TBPosMax,Result);
+  while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
+    bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
+    bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
+    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    ArrMath.IncBitPos(TBPosMin);
   end;
-  bool1:=AArrMath.IsBitPosSet(TBPosMin,num1);
-  bool2:=AArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)and(bool2=True)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
+  bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
+  bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
+  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
 end;
 
 function CodeComponentBasic.GetOr(const num1, num2: Number): Number;
@@ -5334,22 +5591,22 @@ begin
 
   bool1:=False;
   bool2:=False;
-  AArrMath.SetBitPosZero(TBPosMin);
-  AArrMath.SetBitPosZero(TBPosMax);
-  AArrMath.GetLastBit(TBPosMax,Result);
-  while(AArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
-    bool1:=AArrMath.IsBitPosSet(TBPosMin,num1);
-    bool2:=AArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)and(bool2=True)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-    if(bool1=False)and(bool2=True)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-    if(bool1=True)and(bool2=False)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-    AArrMath.IncBitPos(TBPosMin);
+  ArrMath.SetBitPosZero(TBPosMin);
+  ArrMath.SetBitPosZero(TBPosMax);
+  ArrMath.GetLastBit(TBPosMax,Result);
+  while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
+    bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
+    bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
+    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    if(bool1=False)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    if(bool1=True)and(bool2=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    ArrMath.IncBitPos(TBPosMin);
   end;
-  bool1:=AArrMath.IsBitPosSet(TBPosMin,num1);
-  bool2:=AArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)and(bool2=True)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-  if(bool1=False)and(bool2=True)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-  if(bool1=True)and(bool2=False)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
+  bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
+  bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
+  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+  if(bool1=False)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+  if(bool1=True)and(bool2=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
 end;
 
 function CodeComponentBasic.GetNot(const num1: Number): Number;
@@ -5363,16 +5620,16 @@ begin
   SetLength(Result,Length(num1));
 
   bool1:=False;
-  AArrMath.SetBitPosZero(TBPosMin);
-  AArrMath.SetBitPosZero(TBPosMax);
-  AArrMath.GetLastBit(TBPosMax,Result);
-  while(AArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
-    bool1:=AArrMath.IsBitPosSet(TBPosMin,num1);
-    if(bool1=False)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
-    AArrMath.IncBitPos(TBPosMin);
+  ArrMath.SetBitPosZero(TBPosMin);
+  ArrMath.SetBitPosZero(TBPosMax);
+  ArrMath.GetLastBit(TBPosMax,Result);
+  while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
+    bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
+    if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    ArrMath.IncBitPos(TBPosMin);
   end;
-  bool1:=AArrMath.IsBitPosSet(TBPosMin,num1);
-  if(bool1=False)then AArrMath.BitPosAddSetArr(TBPosMin,Result);
+  bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
+  if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
 end;
 
 function CodeComponentBasic.GetXOR(const num1, num2: Number): Number;
@@ -5394,10 +5651,24 @@ begin
   Result[Length(Result)-1]:=1;
 end;
 
+function CodeComponentBasic.GetEqual(const num1, num2: Real): Number;
+begin
+  Result:=nil;
+  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
+  if(num1=num2)then Result[Length(Result)-1]:=1;
+end;
+
 function CodeComponentBasic.GetNotEqual(const num1, num2: Number): Number;
 begin
   Result:=self.GetEqual(num1,num2);
   if(Result[0]=1)then Result[0]:=0 else Result[0]:=1;
+end;
+
+function CodeComponentBasic.GetNotEqual(const num1, num2: Real): Number;
+begin
+  Result:=nil;
+  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
+  if(num1<>num2)then Result[Length(Result)-1]:=1;
 end;
 
 function CodeComponentBasic.GetIf(const num1: Number): Number;
@@ -5459,9 +5730,9 @@ var
   num1Str,num2Str,ResultStr:String;
   num1V,num2V:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1Str);
   num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2Str);
@@ -5475,17 +5746,17 @@ var
   num1Str,num2Str,ResultStr,isMulStr:String;
   num1V,num2V,isMulV:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
-  isMulStr:=AArrMath.NumberToStr(AParamArr[3]);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+  isMulStr:=ArrMath.NumberToStr(AParamArr[3]);
 
   num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1Str);
   num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2Str);
   isMulV:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(isMulStr);
 
   if(isMulV>0)then TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(ResultStr,num1V*num2V)
-  else TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(ResultStr,AArrMath.RR(num1V/num2V));
+  else TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(ResultStr,ArrMath.RR(num1V/num2V));
 end;
 
 procedure CodeComponentBasic.SumInteger_Proc(AParamArr: TParamArr;
@@ -5495,9 +5766,9 @@ var
   num1Str,num2Str,ResultStr:String;
   num1V,num2V:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1Str);
   num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2Str);
@@ -5511,9 +5782,9 @@ var
   num1Str,num2Str,ResultStr:String;
   num1V,num2V:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1Str);
   num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2Str);
@@ -5527,9 +5798,9 @@ var
   num1Str,num2Str,ResultStr:String;
   num1V,num2V:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1Str);
   num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2Str);
@@ -5543,13 +5814,13 @@ var
   num1Str,num2Str,ResultStr:String;
   num1V,num2V:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1Str);
   num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2Str);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(ResultStr,AArrMath.RR(num1V/num2V));
+  TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(ResultStr,ArrMath.RR(num1V/num2V));
 end;
 
 procedure CodeComponentBasic.SumSubReal_Proc(AParamArr: TParamArr;
@@ -5557,15 +5828,56 @@ procedure CodeComponentBasic.SumSubReal_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
-  num1V,num2V:Real;
+  num1AIndex,num2AIndex,ResultAIndex:Integer;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1Str);
-  num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2Str);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V+num2V);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+
+  num1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num1Str);
+  num2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num2Str);
+  ResultAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+    AReal1:=AInt1+0.0;
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end;
+
+  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1+AReal2);
 end;
 
 procedure CodeComponentBasic.MulDivReal_Proc(AParamArr: TParamArr;
@@ -5573,20 +5885,62 @@ procedure CodeComponentBasic.MulDivReal_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr,isMulStr:String;
-  num1V,num2V:Real;
+  num1AIndex,num2AIndex,ResultAIndex,isMulAIndex:Integer;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
   isMulV:Integer;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
-  isMulStr:=AArrMath.NumberToStr(AParamArr[3]);
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1Str);
-  num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2Str);
-  isMulV:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(isMulStr);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+  isMulStr:=ArrMath.NumberToStr(AParamArr[3]);
 
-  if(isMulV>0)then TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V*num2V)
-  else TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V/num2V);
+  num1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num1Str);
+  num2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num2Str);
+  ResultAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultStr);
+  isMulAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(isMulStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+    AReal1:=AInt1+0.0;
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end;
+
+  isMulV:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(isMulAIndex);
+
+  if(isMulV>0)then TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1*AReal2)
+  else TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1/AReal2);
 end;
 
 procedure CodeComponentBasic.SumReal_Proc(AParamArr: TParamArr;
@@ -5594,15 +5948,56 @@ procedure CodeComponentBasic.SumReal_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
-  num1V,num2V:Real;
+  num1AIndex,num2AIndex,ResultAIndex:Integer;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1Str);
-  num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2Str);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V+num2V);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+
+  num1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num1Str);
+  num2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num2Str);
+  ResultAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+    AReal1:=AInt1+0.0;
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end;
+
+  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1+AReal2);
 end;
 
 procedure CodeComponentBasic.SubReal_Proc(AParamArr: TParamArr;
@@ -5610,15 +6005,56 @@ procedure CodeComponentBasic.SubReal_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
-  num1V,num2V:Real;
+  num1AIndex,num2AIndex,ResultAIndex:Integer;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1Str);
-  num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2Str);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V-num2V);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+
+  num1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num1Str);
+  num2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num2Str);
+  ResultAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+    AReal1:=AInt1+0.0;
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end;
+
+  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1-AReal2);
 end;
 
 procedure CodeComponentBasic.MulReal_Proc(AParamArr: TParamArr;
@@ -5626,15 +6062,56 @@ procedure CodeComponentBasic.MulReal_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
-  num1V,num2V:Real;
+  num1AIndex,num2AIndex,ResultAIndex:Integer;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1Str);
-  num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2Str);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V*num2V);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+
+  num1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num1Str);
+  num2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num2Str);
+  ResultAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+    AReal1:=AInt1+0.0;
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end;
+
+  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1*AReal2);
 end;
 
 procedure CodeComponentBasic.DivReal_Proc(AParamArr: TParamArr;
@@ -5642,15 +6119,56 @@ procedure CodeComponentBasic.DivReal_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
-  num1V,num2V:Real;
+  num1AIndex,num2AIndex,ResultAIndex:Integer;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
-  num1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  num2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[2]);
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  num1V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1Str);
-  num2V:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2Str);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultStr,num1V/num2V);
+  num1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  num2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[2]);
+
+  num1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num1Str);
+  num2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(num2Str);
+  ResultAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(num2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal2:=AInt2+0.0;
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+    AReal1:=AInt1+0.0;
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(num2AIndex);
+  end else begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(num2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+  end;
+
+  TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(ResultAIndex,AReal1/AReal2);
 end;
 
 procedure CodeComponentBasic.ArrayIndexGet_Proc(AParamArr: TParamArr;
@@ -5665,9 +6183,9 @@ begin
   Anum2:=0;
   Anum3:=nil;
 
-  ArrayStr:=AArrMath.NumberToStr(AParamArr[0]);
-  IndexStr:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  ArrayStr:=ArrMath.NumberToStr(AParamArr[0]);
+  IndexStr:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(ArrayStr);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(IndexStr);
@@ -5694,9 +6212,9 @@ begin
   Anum2:=0;
   Anum3:=nil;
 
-  ArrayStr:=AArrMath.NumberToStr(AParamArr[0]);
-  IndexStr:=AArrMath.NumberToStr(AParamArr[1]);
-  ValueVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  ArrayStr:=ArrMath.NumberToStr(AParamArr[0]);
+  IndexStr:=ArrMath.NumberToStr(AParamArr[1]);
+  ValueVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetVar(ArrayStr);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(IndexStr);
@@ -5722,9 +6240,9 @@ begin
   Anum2:=0;
   Anum3:=nil;
 
-  StrStr:=AArrMath.NumberToStr(AParamArr[0]);
-  IndexStr:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  StrStr:=ArrMath.NumberToStr(AParamArr[0]);
+  IndexStr:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueStr(StrStr);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(IndexStr);
@@ -5750,9 +6268,9 @@ begin
   Anum2:=0;
   Anum3:=nil;
 
-  StrStr:=AArrMath.NumberToStr(AParamArr[0]);
-  IndexStr:=AArrMath.NumberToStr(AParamArr[1]);
-  ValueVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  StrStr:=ArrMath.NumberToStr(AParamArr[0]);
+  IndexStr:=ArrMath.NumberToStr(AParamArr[1]);
+  ValueVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueStr(StrStr);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(IndexStr);
@@ -5776,8 +6294,8 @@ var
 begin
   PtrNum:=nil;
 
-  ArrayVarStr:=AArrMath.NumberToStr(AParamArr[0]);
-  ArrayLengthVarStr:=AArrMath.NumberToStr(AParamArr[1]);
+  ArrayVarStr:=ArrMath.NumberToStr(AParamArr[0]);
+  ArrayLengthVarStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   ArrayLengthVarV:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(ArrayLengthVarStr);
 
@@ -5796,8 +6314,8 @@ var
 begin
   PtrNum:=nil;
 
-  ArrayVarStr:=AArrMath.NumberToStr(AParamArr[0]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[1]);
+  ArrayVarStr:=ArrMath.NumberToStr(AParamArr[0]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   PtrNum:=TCCodeProperties^.Property_CodeVariable.Var_GetVar(ArrayVarStr);
   ResultV:=Length(PtrNum^);
@@ -5816,8 +6334,8 @@ var
 begin
   StrA:='';
 
-  StrVarStr:=AArrMath.NumberToStr(AParamArr[0]);
-  ResultStr:=AArrMath.NumberToStr(AParamArr[1]);
+  StrVarStr:=ArrMath.NumberToStr(AParamArr[0]);
+  ResultStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   StrA:=TCCodeProperties^.Property_CodeVariable.Var_GetValueStr(StrVarStr);
   ResultV:=Length(StrA);
@@ -5833,7 +6351,7 @@ var
   JumpToStr:String;
   JumpToV:Integer;
 begin
-  JumpToStr:=AArrMath.NumberToStr(AParamArr[0]);
+  JumpToStr:=ArrMath.NumberToStr(AParamArr[0]);
 
   JumpToV:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(JumpToStr);
 
@@ -5847,7 +6365,7 @@ var
   GotoStr:String;
   GotoV:Integer;
 begin
-  GotoStr:=AArrMath.NumberToStr(AParamArr[0]);
+  GotoStr:=ArrMath.NumberToStr(AParamArr[0]);
 
   GotoV:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(GotoStr);
 
@@ -5879,8 +6397,8 @@ begin
   AReal:=0.0;
   AMode:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
 
   VarName2Index:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
   AMode:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2Index);
@@ -5910,7 +6428,7 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
@@ -5925,8 +6443,8 @@ var
   AValue:Integer;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToInt(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToInt(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(AIndex,AValue);
@@ -5940,8 +6458,8 @@ var
   AValue:Real;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToReal(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToReal(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(AIndex,AValue);
@@ -5955,8 +6473,8 @@ var
   AValue:String;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToStr(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToStr(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then TCCodeProperties^.Property_CodeVariable.Var_SetValueStr(AIndex,AValue);
@@ -5973,9 +6491,9 @@ begin
   Anum2:=nil;
   Anum3:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
@@ -5998,9 +6516,9 @@ begin
   Anum2:=nil;
   Anum3:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
@@ -6022,8 +6540,8 @@ begin
   Anum1:=nil;
   Anum3:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[1]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   Anum3:=self.GetNot(Anum1);
@@ -6044,9 +6562,9 @@ begin
   Anum2:=nil;
   Anum3:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
@@ -6069,9 +6587,9 @@ begin
   Anum2:=0;
   Anum3:=0;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1Str);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2Str);
@@ -6090,9 +6608,9 @@ begin
   Anum2:=0;
   Anum3:=0;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1Str);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2Str);
@@ -6106,19 +6624,64 @@ procedure CodeComponentBasic.V1EqV2_Proc(AParamArr: TParamArr;
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
   Anum1,Anum2,Anum3:Number;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
   Anum1:=nil;
   Anum2:=nil;
   Anum3:=nil;
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
-  Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
-  Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
-  Anum3:=self.GetEqual(Anum1,Anum2);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarStr,Anum3);
+  VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
+  VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
+  ResultVarAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else begin
+    Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1AIndex);
+    Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2AIndex);
+    Anum3:=self.GetEqual(Anum1,Anum2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end;
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
@@ -6130,20 +6693,66 @@ procedure CodeComponentBasic.V1NotEqV2_Proc(AParamArr: TParamArr;
   var TCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
+  VarName1AIndex,VarName2AIndex,ResultVarAIndex:Integer;
   Anum1,Anum2,Anum3:Number;
+  AInt1,AInt2:Integer;
+  AReal1,AReal2:Real;
+  AMode1,AMode2:String;
 begin
   Anum1:=nil;
   Anum2:=nil;
   Anum3:=nil;
+  AInt1:=0;
+  AInt2:=0;
+  AReal1:=0.0;
+  AReal2:=0.0;
+  AMode1:='';
+  AMode2:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
-  Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
-  Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
-  Anum3:=self.GetNotEqual(Anum1,Anum2);
-  TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarStr,Anum3);
+  VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
+  VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
+  ResultVarAIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(ResultVarStr);
+
+  AMode1:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName1AIndex);
+  AMode2:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(VarName2AIndex);
+
+  if(AMode1='integer')and(AMode2='integer')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='real')and(AMode2='integer')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AInt2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='integer')and(AMode2='real')then begin
+    AInt1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='real')and(AMode2='real')then begin
+    AReal1:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName1AIndex);
+    AReal2:=TCCodeProperties^.Property_CodeVariable.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end else begin
+    Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1AIndex);
+    Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2AIndex);
+    Anum3:=self.GetNotEqual(Anum1,Anum2);
+    TCCodeProperties^.Property_CodeVariable.Var_SetValue(ResultVarAIndex,Anum3);
+  end;
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
@@ -6171,9 +6780,9 @@ begin
   AMode1:='';
   AMode2:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
   VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
@@ -6240,9 +6849,9 @@ begin
   AMode1:='';
   AMode2:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
   VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
@@ -6309,9 +6918,9 @@ begin
   AMode1:='';
   AMode2:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
   VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
@@ -6378,9 +6987,9 @@ begin
   AMode1:='';
   AMode2:='';
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   VarName1AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName1Str);
   VarName2AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarName2Str);
@@ -6438,9 +7047,9 @@ begin
   Anum2:=nil;
   Anum3:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  VarName2Str:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultVarStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultVarStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName2Str);
@@ -6472,9 +7081,9 @@ var
 begin
   Anum1:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  JumpToTrueStr:=AArrMath.NumberToStr(AParamArr[1]);
-  JumpToFalseStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  JumpToTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
+  JumpToFalseStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   JumpToTrueNum:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(JumpToTrueStr);
@@ -6496,8 +7105,8 @@ var
 begin
   Anum1:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  JumpToTrueStr:=AArrMath.NumberToStr(AParamArr[1]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  JumpToTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   JumpToTrueNum:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(JumpToTrueStr);
@@ -6517,8 +7126,8 @@ var
 begin
   Anum1:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  JumpToFalseStr:=AArrMath.NumberToStr(AParamArr[1]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  JumpToFalseStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   JumpToFalseNum:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(JumpToFalseStr);
@@ -6538,9 +7147,9 @@ var
 begin
   Anum1:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  GotoTrueStr:=AArrMath.NumberToStr(AParamArr[1]);
-  GotoFalseStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  GotoTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
+  GotoFalseStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   GotoTrueNum:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(GotoTrueStr);
@@ -6562,8 +7171,8 @@ var
 begin
   Anum1:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  GotoTrueStr:=AArrMath.NumberToStr(AParamArr[1]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  GotoTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   GotoTrueNum:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(GotoTrueStr);
@@ -6583,8 +7192,8 @@ var
 begin
   Anum1:=nil;
 
-  VarName1Str:=AArrMath.NumberToStr(AParamArr[0]);
-  GotoFalseStr:=AArrMath.NumberToStr(AParamArr[1]);
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  GotoFalseStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarName1Str);
   GotoFalseNum:=TCCodeProperties^.Property_CodePorts.Var_GetValueInt(GotoFalseStr);
@@ -6602,7 +7211,7 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
@@ -6621,8 +7230,8 @@ var
   AValue:Integer;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToInt(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToInt(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
   VarNameStr:=TCMemCapStr^+VarNameStr;
@@ -6640,8 +7249,8 @@ var
   AValue:Real;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToReal(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToReal(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
   VarNameStr:=TCMemCapStr^+VarNameStr;
@@ -6659,8 +7268,8 @@ var
   AValue:String;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToStr(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToStr(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then Exit;
   VarNameStr:=TCMemCapStr^+VarNameStr;
@@ -6683,9 +7292,9 @@ begin
   Anum2:=nil;
   Anum3:='';
 
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  CountVarStr:=AArrMath.NumberToStr(AParamArr[1]);
-  ResultStrStr:=AArrMath.NumberToStr(AParamArr[2]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  CountVarStr:=ArrMath.NumberToStr(AParamArr[1]);
+  ResultStrStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   Anum1:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(VarNameStr);
   Anum2:=TCCodeProperties^.Property_CodeVariable.Var_GetValue(CountVarStr);
@@ -6702,7 +7311,7 @@ procedure CodeComponentBasic.StartMem_Proc(AParamArr: TParamArr;
   var TCMemCapNum: TPtrInteger; var TCMemCapStr: TPtrString;
   var TCCodeProperties: PtrCodeProperties);
 begin
-  TCMemCapStr^:=AArrMath.NumberToStr(AParamArr[0]);
+  TCMemCapStr^:=ArrMath.NumberToStr(AParamArr[0]);
 end;
 
 procedure CodeComponentBasic.EndMem_Proc(AParamArr: TParamArr;
@@ -6716,7 +7325,7 @@ begin
   TCCodeProperties^.Property_CodeVariable.Var_GetVarNameParts(TCMemCapStr^,TArr1);
   TCCodeProperties^.Property_CodeVariable.Var_DeleteVarNames(TArr1);
 
-  TCMemCapStr^:=AArrMath.NumberToStr(AParamArr[0]);
+  TCMemCapStr^:=ArrMath.NumberToStr(AParamArr[0]);
   SetLength(TArr1,0);
 end;
 
@@ -6735,7 +7344,7 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
@@ -6750,8 +7359,8 @@ var
   AValue:Integer;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToInt(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToInt(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then TCCodeProperties^.Property_CodeVariable.Var_SetValueInt(AIndex,AValue);
@@ -6765,8 +7374,8 @@ var
   AValue:Real;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToReal(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToReal(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then TCCodeProperties^.Property_CodeVariable.Var_SetValueReal(AIndex,AValue);
@@ -6780,8 +7389,8 @@ var
   AValue:String;
   AIndex:Integer;
 begin
-  VarNameStr:=AArrMath.NumberToStr(AParamArr[0]);
-  AValue:=AArrMath.NumberToStr(AParamArr[1]);
+  VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
+  AValue:=ArrMath.NumberToStr(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameStr);
   if(AIndex<>-1)then TCCodeProperties^.Property_CodeVariable.Var_SetValueStr(AIndex,AValue);
@@ -6797,8 +7406,8 @@ var
   AIndex:Integer;
   AMode:String;
 begin
-  VarNameRealStr:=AArrMath.NumberToStr(AParamArr[0]);
-  ResultIntVarNameStr:=AArrMath.NumberToStr(AParamArr[1]);
+  VarNameRealStr:=ArrMath.NumberToStr(AParamArr[0]);
+  ResultIntVarNameStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   AIndex:=TCCodeProperties^.Property_CodeVariable.Var_GetValueInt_Index(VarNameRealStr);
   AMode:=TCCodeProperties^.Property_CodeVariable.Var_GetVarDataType(AIndex);
@@ -6953,7 +7562,7 @@ function CodeComponentBasic.Component_SumSubInteger(const num1VarName,
   num2VarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(20));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(20));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -6965,7 +7574,7 @@ function CodeComponentBasic.Component_MulDivInteger(const num1VarName,
   num2VarName, ResultVarName, isMulVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(11));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(11));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -6978,7 +7587,7 @@ function CodeComponentBasic.Component_SumInteger(const num1VarName,
   num2VarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(202));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(202));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -6990,7 +7599,7 @@ function CodeComponentBasic.Component_SubInteger(const num1VarName,
   num2VarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(200));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(200));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7002,7 +7611,7 @@ function CodeComponentBasic.Component_MulInteger(const num1VarName,
   num2VarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(118));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(118));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7014,7 +7623,7 @@ function CodeComponentBasic.Component_DivInteger(const num1VarName,
   num2VarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(112));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(112));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7026,7 +7635,7 @@ function CodeComponentBasic.Component_SumSubReal(const num1VarName,
   num2VarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(20));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(20));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7038,7 +7647,7 @@ function CodeComponentBasic.Component_MulDivReal(const num1VarName,
   num2VarName, ResultVarName, isMulVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(11));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(11));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7051,7 +7660,7 @@ function CodeComponentBasic.Component_SumReal(const num1VarName, num2VarName,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(202));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(202));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7063,7 +7672,7 @@ function CodeComponentBasic.Component_SubReal(const num1VarName, num2VarName,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(200));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(200));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7075,7 +7684,7 @@ function CodeComponentBasic.Component_MulReal(const num1VarName, num2VarName,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(118));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(118));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7087,7 +7696,7 @@ function CodeComponentBasic.Component_DivReal(const num1VarName, num2VarName,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(112));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(112));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num1VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(num2VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7099,7 +7708,7 @@ function CodeComponentBasic.Component_ArrayIndexGet(const ArrayVarName,
   IndexVarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(12));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(12));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ArrayVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(IndexVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7111,7 +7720,7 @@ function CodeComponentBasic.Component_ArrayIndexSet(const ArrayVarName,
   IndexVarName, ValueVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(21));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(21));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ArrayVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(IndexVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ValueVarName);
@@ -7123,7 +7732,7 @@ function CodeComponentBasic.Component_StrIndexGet(const StrVarName,
   IndexVarName, ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(32));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(32));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(StrVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(IndexVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7135,7 +7744,7 @@ function CodeComponentBasic.Component_StrIndexSet(const StrVarName,
   IndexVarName, ValueVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(23));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(23));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(StrVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(IndexVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ValueVarName);
@@ -7147,7 +7756,7 @@ function CodeComponentBasic.Component_SetLength(const ArrayVarName,
   ArrayLengthVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(17));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(17));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ArrayVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ArrayLengthVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SetLength_Proc);
@@ -7158,7 +7767,7 @@ function CodeComponentBasic.Component_Length(const ArrayVarName,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(1));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(1));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ArrayVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.Length_Proc);
@@ -7169,7 +7778,7 @@ function CodeComponentBasic.Component_StrLength(const StrVarName,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(31));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(31));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(StrVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.StrLength_Proc);
@@ -7180,7 +7789,7 @@ function CodeComponentBasic.Component_JumpTo(const JumpToPortName: String
   ): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(2));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(2));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(JumpToPortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.JumpTo_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -7189,7 +7798,7 @@ end;
 function CodeComponentBasic.Component_Goto(const GotoPortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(22));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(22));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(GotoPortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.Goto_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -7198,7 +7807,7 @@ end;
 function CodeComponentBasic.Component_Exit: Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(10));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(10));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.Exit_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
 end;
@@ -7207,7 +7816,7 @@ function CodeComponentBasic.Component_MoveV2ToV1(const VarName1,
   VarName2: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(50));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.MoveV2ToV1_Proc);
@@ -7218,7 +7827,7 @@ function CodeComponentBasic.Component_MoveC2ToV1(const VarName: String;
   const AValue: Number): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(50));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamData(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.MoveV2ToV1_Number_Proc);
@@ -7229,7 +7838,7 @@ function CodeComponentBasic.Component_MoveC2ToV1(const VarName: String;
   const AValue: Integer): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(50));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.MoveV2ToV1_Integer_Proc);
@@ -7240,7 +7849,7 @@ function CodeComponentBasic.Component_MoveC2ToV1(const VarName: String;
   const AValue: Real): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(50));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataReal(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.MoveV2ToV1_Real_Proc);
@@ -7251,7 +7860,7 @@ function CodeComponentBasic.Component_MoveC2ToV1(const VarName: String;
   const AValue: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(50));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.MoveV2ToV1_String_Proc);
@@ -7262,7 +7871,7 @@ function CodeComponentBasic.Component_V1AndV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(55));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(55));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7274,7 +7883,7 @@ function CodeComponentBasic.Component_V1OrV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(77));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(77));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7286,7 +7895,7 @@ function CodeComponentBasic.Component_NotV1(const VarName1,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(24));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(24));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.NotV1_Proc);
@@ -7297,7 +7906,7 @@ function CodeComponentBasic.Component_V1XORV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(57));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(57));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7309,7 +7918,7 @@ function CodeComponentBasic.Component_V1SHLV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(48));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(48));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7321,7 +7930,7 @@ function CodeComponentBasic.Component_V1SHRV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(84));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(84));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7333,7 +7942,7 @@ function CodeComponentBasic.Component_V1EqV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(100));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(100));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7345,7 +7954,7 @@ function CodeComponentBasic.Component_V1NotEqV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(150));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(150));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7357,7 +7966,7 @@ function CodeComponentBasic.Component_V1GTV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(177));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(177));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7369,7 +7978,7 @@ function CodeComponentBasic.Component_V1GTEqV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(170));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(170));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7381,7 +7990,7 @@ function CodeComponentBasic.Component_V1LTV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(111));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(111));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7393,7 +8002,7 @@ function CodeComponentBasic.Component_V1LTEqV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(110));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(110));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7405,7 +8014,7 @@ function CodeComponentBasic.Component_CombineV2ToV1(const VarName1, VarName2,
   ResultVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(88));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName2);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultVarName);
@@ -7417,7 +8026,7 @@ function CodeComponentBasic.Component_IfV1(const VarName1, JumpToTruePortName,
   JumpToFalsePortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(36));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(36));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(JumpToTruePortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(JumpToFalsePortName);
@@ -7429,7 +8038,7 @@ function CodeComponentBasic.Component_IfV1True(const VarName1,
   JumpToTruePortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(13));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(13));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(JumpToTruePortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.IfV1True_Proc);
@@ -7440,7 +8049,7 @@ function CodeComponentBasic.Component_IfV1False(const VarName1,
   JumpToFalsePortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(60));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(60));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(JumpToFalsePortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.IfV1False_Proc);
@@ -7451,7 +8060,7 @@ function CodeComponentBasic.Component_IfV1_Goto(const VarName1,
   GotoTruePortName, GotoFalsePortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(96));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(96));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(GotoTruePortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(GotoFalsePortName);
@@ -7463,7 +8072,7 @@ function CodeComponentBasic.Component_IfV1True_Goto(const VarName1,
   GotoTruePortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(19));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(19));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(GotoTruePortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.IfV1True_Goto_Proc);
@@ -7474,7 +8083,7 @@ function CodeComponentBasic.Component_IfV1False_Goto(const VarName1,
   GotoFalsePortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(91));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(91));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName1);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(GotoFalsePortName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.IfV1False_Goto_Proc);
@@ -7485,7 +8094,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
   const AValue: Number): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(88));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamData(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_Number_Proc);
@@ -7496,7 +8105,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
   const AValue: Integer): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(88));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_Integer_Proc);
@@ -7507,7 +8116,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
   const AValue: Real): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(88));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataReal(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_Real_Proc);
@@ -7518,7 +8127,7 @@ function CodeComponentBasic.Component_AllocateMem(const VarName: String;
   const AValue: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(88));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(88));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.AllocateMem_String_Proc);
@@ -7529,7 +8138,7 @@ function CodeComponentBasic.Component_BinStr(const VarName, CountVarName,
   ResultStrVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(30));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(30));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(CountVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultStrVarName);
@@ -7545,7 +8154,7 @@ begin
   AStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(18));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(18));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AStr);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.StartMem_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -7557,7 +8166,7 @@ begin
   StartStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(18));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(18));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(StartStr);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.StartMem_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -7572,7 +8181,7 @@ begin
   AStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(81));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(81));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AStr);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.EndMem_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -7585,7 +8194,7 @@ begin
   EndStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
 
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(81));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(81));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(EndStr);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.EndMem_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
@@ -7597,7 +8206,7 @@ var
   AIndex:Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(80));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(80));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.Port_Proc);
   Result:=self.TCProperty^.Property_CodeArray.Lines_ArrLength-1;
 
@@ -7613,7 +8222,7 @@ function CodeComponentBasic.Component_SetVarMem(const VarName: String;
   const AValue: Number): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(188));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(188));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamData(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SetVarMem_Number_Proc);
@@ -7624,7 +8233,7 @@ function CodeComponentBasic.Component_SetVarMem(const VarName: String;
   const AValue: Integer): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(188));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(188));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataInt(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SetVarMem_Integer_Proc);
@@ -7635,7 +8244,7 @@ function CodeComponentBasic.Component_SetVarMem(const VarName: String;
   const AValue: Real): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(188));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(188));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataReal(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SetVarMem_Real_Proc);
@@ -7646,7 +8255,7 @@ function CodeComponentBasic.Component_SetVarMem(const VarName: String;
   const AValue: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(188));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(188));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(AValue);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.SetVarMem_String_Proc);
@@ -7657,7 +8266,7 @@ function CodeComponentBasic.Component_Round(const VarNameReal,
   ResultIntVarName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray.Lines_CreateLast;
-  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(AArrMath.IntToNumber(40));
+  self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetCodeData(ArrMath.IntToNumber(40));
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(VarNameReal);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_AddParamDataStr(ResultIntVarName);
   self.TCProperty^.Property_CodeArray.Lines_AtLast.Code_SetFuncData(@self.Round_Proc);
@@ -8030,7 +8639,7 @@ begin
   Result:=self.isVarNameExist(AVarName,AIndex);
   if(Result=False)and(AIndex=-1)then begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
-    self.TVarArr[Length(self.TVarArr)-1]:=AArrMath.IntToNumber(AValue);
+    self.TVarArr[Length(self.TVarArr)-1]:=ArrMath.IntToNumber(AValue);
 
     SetLength(self.TVarMode,Length(self.TVarMode)+1);
     self.TVarMode[Length(self.TVarMode)+1]:=3;
@@ -8051,7 +8660,7 @@ begin
   Result:=self.isVarNameExist(AVarName,AIndex);
   if(Result=False)and(AIndex=-1)then begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
-    self.TVarArr[Length(self.TVarArr)-1]:=AArrMath.RealToNumber(AValue);
+    self.TVarArr[Length(self.TVarArr)-1]:=ArrMath.RealToNumber(AValue);
 
     SetLength(self.TVarMode,Length(self.TVarMode)+1);
     self.TVarMode[Length(self.TVarMode)+1]:=4;
@@ -8072,7 +8681,7 @@ begin
   Result:=self.isVarNameExist(AVarName,AIndex);
   if(Result=False)and(AIndex=-1)then begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
-    self.TVarArr[Length(self.TVarArr)-1]:=AArrMath.StrToNumber(AValue);
+    self.TVarArr[Length(self.TVarArr)-1]:=ArrMath.StrToNumber(AValue);
 
     SetLength(self.TVarMode,Length(self.TVarMode)+1);
     self.TVarMode[Length(self.TVarMode)+1]:=2;
@@ -8108,7 +8717,7 @@ begin
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
     self.TVarMode[AIndex]:=3;
-    self.TVarArr[AIndex]:=AArrMath.IntToNumber(AValue);
+    self.TVarArr[AIndex]:=ArrMath.IntToNumber(AValue);
   end;
 end;
 
@@ -8119,7 +8728,7 @@ begin
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
     self.TVarMode[AIndex]:=4;
-    self.TVarArr[AIndex]:=AArrMath.RealToNumber(AValue);
+    self.TVarArr[AIndex]:=ArrMath.RealToNumber(AValue);
   end;
 end;
 
@@ -8130,7 +8739,7 @@ begin
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
     self.TVarMode[AIndex]:=2;
-    self.TVarArr[AIndex]:=AArrMath.StrToNumber(AValue);
+    self.TVarArr[AIndex]:=ArrMath.StrToNumber(AValue);
   end;
 end;
 
@@ -8146,21 +8755,21 @@ procedure CodeVariable.Var_SetValueInt(const AIndex: Integer; AValue: Integer);
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
   self.TVarMode[AIndex]:=3;
-  self.TVarArr[AIndex]:=AArrMath.IntToNumber(AValue);
+  self.TVarArr[AIndex]:=ArrMath.IntToNumber(AValue);
 end;
 
 procedure CodeVariable.Var_SetValueReal(const AIndex: Integer; AValue: Real);
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
   self.TVarMode[AIndex]:=4;
-  self.TVarArr[AIndex]:=AArrMath.RealToNumber(AValue);
+  self.TVarArr[AIndex]:=ArrMath.RealToNumber(AValue);
 end;
 
 procedure CodeVariable.Var_SetValueStr(const AIndex: Integer; AValue: String);
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
   self.TVarMode[AIndex]:=2;
-  self.TVarArr[AIndex]:=AArrMath.StrToNumber(AValue);
+  self.TVarArr[AIndex]:=ArrMath.StrToNumber(AValue);
 end;
 
 function CodeVariable.Var_GetVar(const AVarName: String): TPtrNumber;
@@ -8197,7 +8806,7 @@ begin
   Result:=0;
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=AArrMath.NumberToInt(self.TVarArr[AIndex]);
+    Result:=ArrMath.NumberToInt(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValueReal(const AVarName: String): Real;
@@ -8207,7 +8816,7 @@ begin
   Result:=0;
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=AArrMath.NumberToReal(self.TVarArr[AIndex]);
+    Result:=ArrMath.NumberToReal(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValueStr(const AVarName: String): String;
@@ -8217,7 +8826,7 @@ begin
   Result:='';
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=AArrMath.NumberToStr(self.TVarArr[AIndex]);
+    Result:=ArrMath.NumberToStr(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValue(const AIndex: Integer): Number;
@@ -8231,21 +8840,21 @@ function CodeVariable.Var_GetValueInt(const AIndex: Integer): Integer;
 begin
   Result:=0;
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=AArrMath.NumberToInt(self.TVarArr[AIndex]);
+  Result:=ArrMath.NumberToInt(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValueReal(const AIndex: Integer): Real;
 begin
   Result:=0;
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=AArrMath.NumberToReal(self.TVarArr[AIndex]);
+  Result:=ArrMath.NumberToReal(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValueStr(const AIndex: Integer): String;
 begin
   Result:='';
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=AArrMath.NumberToStr(self.TVarArr[AIndex]);
+  Result:=ArrMath.NumberToStr(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValueInt_Index(const AVarName: String): Integer;
@@ -8578,19 +9187,19 @@ end;
 procedure CodeLine.Code_AddParamDataInt(const ParamData: Integer);
 begin
   SetLength(self.TParaArr,Length(self.TParaArr)+1);
-  self.TParaArr[Length(self.TParaArr)-1]:=AArrMath.IntToNumber(ParamData);
+  self.TParaArr[Length(self.TParaArr)-1]:=ArrMath.IntToNumber(ParamData);
 end;
 
 procedure CodeLine.Code_AddParamDataReal(const ParamData: Real);
 begin
   SetLength(self.TParaArr,Length(self.TParaArr)+1);
-  self.TParaArr[Length(self.TParaArr)-1]:=AArrMath.RealToNumber(ParamData);
+  self.TParaArr[Length(self.TParaArr)-1]:=ArrMath.RealToNumber(ParamData);
 end;
 
 procedure CodeLine.Code_AddParamDataStr(const ParamData: String);
 begin
   SetLength(self.TParaArr,Length(self.TParaArr)+1);
-  self.TParaArr[Length(self.TParaArr)-1]:=AArrMath.StrToNumber(ParamData);
+  self.TParaArr[Length(self.TParaArr)-1]:=ArrMath.StrToNumber(ParamData);
 end;
 
 procedure CodeLine.Code_SetFuncData(const FuncData: TProcNor);
@@ -8621,21 +9230,21 @@ function CodeLine.Code_GetParamDataInt(const AIndexBaseZero: Integer): Integer;
 begin
   Result:=nil;
   if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
-  Result:=AArrMath.NumberToInt(self.TParaArr[AIndexBaseZero]);
+  Result:=ArrMath.NumberToInt(self.TParaArr[AIndexBaseZero]);
 end;
 
 function CodeLine.Code_GetParamDataReal(const AIndexBaseZero: Integer): Real;
 begin
   Result:=nil;
   if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
-  Result:=AArrMath.NumberToReal(self.TParaArr[AIndexBaseZero]);
+  Result:=ArrMath.NumberToReal(self.TParaArr[AIndexBaseZero]);
 end;
 
 function CodeLine.Code_GetParamDataStr(const AIndexBaseZero: Integer): String;
 begin
   Result:=nil;
   if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
-  Result:=AArrMath.NumberToStr(self.TParaArr[AIndexBaseZero]);
+  Result:=ArrMath.NumberToStr(self.TParaArr[AIndexBaseZero]);
 end;
 
 function CodeLine.Code_RunFuncData: Boolean;
@@ -8653,25 +9262,14 @@ end;
 
 { RealMath }
 
-constructor RealMath.Create;
-begin
-  self.TTL:=ArrMath.Create;
-end;
-
-destructor RealMath.Destroy;
-begin
-  inherited Destroy;
-  self.TTL.Free;
-end;
-
-function RealMath.CheckIntegrity(num: RealArr): Boolean;
+class function RealMath.CheckIntegrity(num: RealArr): Boolean;
 begin
   Result:=True;
   if(Length(num)<=4)then Result:=False else
   if(Length(num)<6)then Result:=False;
 end;
 
-function RealMath.DigitStr(const AStr: String): Boolean;
+class function RealMath.DigitStr(const AStr: String): Boolean;
 begin
   Result:=False;
   if(AStr='0')then Result:=True else
@@ -8687,8 +9285,8 @@ begin
   if(AStr='.')then Result:=True;
 end;
 
-procedure RealMath.CombineArr(FromNum1, FromNum2: IntArr; var ToNum: RealArr;
-  var NumAt: IntArr);
+class procedure RealMath.CombineArr(FromNum1, FromNum2: IntArr;
+  var ToNum: RealArr; var NumAt: IntArr);
 var
   i:Integer;
   TArr1:RealArr;
@@ -8697,14 +9295,14 @@ begin
   TArr1:=nil;
   TArr2:=nil;
   TArr3:=nil;
-  self.TTL.StrToIntArr('-1',NumAt);
-  self.TTL.StrToIntArr('1',TArr3);
+  ArrMath.StrToIntArr('-1',NumAt);
+  ArrMath.StrToIntArr('1',TArr3);
   for i:=0 to (Length(FromNum1)-1)do begin
     SetLength(TArr1,Length(TArr1)+1);
     TArr1[Length(TArr1)-1]:=FromNum1[i];
 
-    self.TTL.SetInt(NumAt,TArr2);
-    self.TTL.SumSubInt(TArr2,TArr3,NumAt);
+    ArrMath.SetInt(NumAt,TArr2);
+    ArrMath.SumSubInt(TArr2,TArr3,NumAt);
   end;
   for i:=0 to (Length(FromNum2)-1)do begin
     SetLength(TArr1,Length(TArr1)+1);
@@ -8717,7 +9315,7 @@ begin
   SetLength(TArr3,0);
 end;
 
-function RealMath.SplitArr(var FromNum1, FromNum2: IntArr;
+class function RealMath.SplitArr(var FromNum1, FromNum2: IntArr;
   const ToNum: RealArr; const NumAt: IntArr): Boolean;
 var
   i:Integer;
@@ -8729,13 +9327,13 @@ begin
   SetLength(FromNum1,0);
   SetLength(FromNum2,0);
 
-  self.TTL.StrToIntArr(IntToStr(Length(ToNum)-1),TArr2);
-  self.TTL.StrToIntArr('-1',TArr3);
+  ArrMath.StrToIntArr(IntToStr(Length(ToNum)-1),TArr2);
+  ArrMath.StrToIntArr('-1',TArr3);
   if(ConditionInt(NumAt,'<=',TArr3)=True)then Exit;
   if(ConditionInt(NumAt,'>=',TArr2)=True)then Exit;
 
-  self.TTL.StrToIntArr('0',TArr2);
-  self.TTL.StrToIntArr('0',TArr3);
+  ArrMath.StrToIntArr('0',TArr2);
+  ArrMath.StrToIntArr('0',TArr3);
   i:=0;
   While(InRangeInt(TArr2,TArr3,NumAt)=True)do begin
     SetLength(FromNum1,Length(FromNum1)+1);
@@ -8751,7 +9349,7 @@ begin
   Result:=True;
 end;
 
-procedure RealMath.CombineIntToArr(FromNum: IntArr; var ToNum: RealArr);
+class procedure RealMath.CombineIntToArr(FromNum: IntArr; var ToNum: RealArr);
 var
   i:Integer;
   TArr1:RealArr;
@@ -8771,7 +9369,7 @@ begin
   SetLength(TArr1,0);
 end;
 
-procedure RealMath.SplitIntToArr(var FromNum: IntArr; var ToNum: RealArr);
+class procedure RealMath.SplitIntToArr(var FromNum: IntArr; var ToNum: RealArr);
 var
   i:Integer;
   TArr1:RealArr;
@@ -8788,7 +9386,7 @@ begin
   SetLength(TArr1,0);
 end;
 
-procedure RealMath.StrToRealArr(AStr: String; var numResult: RealArr);
+class procedure RealMath.StrToRealArr(AStr: String; var numResult: RealArr);
 var
   bool1,bool2:Boolean;
   WholeN,DeciN,OneAll:String;
@@ -8847,17 +9445,17 @@ begin
   TArr2:=nil;
   TArr3:=nil;
   DeciN:='10'+DeciN;
-  self.TTL.StrToIntArr(WholeN,TArr1);
-  self.TTL.StrToIntArr(DeciN,TArr2);
+  ArrMath.StrToIntArr(WholeN,TArr1);
+  ArrMath.StrToIntArr(DeciN,TArr2);
 
   self.CombineArr(TArr1,TArr2,numResult,TArr3);
   self.CombineIntToArr(TArr3,numResult);
 
   if(bool2=False)then begin
-    if(bool1=False)then self.TTL.Shift(False,True,numResult) else
-    if(bool1=True)then self.TTL.Shift(False,False,numResult);
+    if(bool1=False)then ArrMath.Shift(False,True,numResult) else
+    if(bool1=True)then ArrMath.Shift(False,False,numResult);
   end else begin
-    self.TTL.Shift(False,True,numResult);
+    ArrMath.Shift(False,True,numResult);
   end;
 
   SetLength(TArr1,0);
@@ -8865,7 +9463,7 @@ begin
   SetLength(TArr3,0);
 end;
 
-procedure RealMath.RealArrToStr(num: RealArr; var AStr: String);
+class procedure RealMath.RealArrToStr(num: RealArr; var AStr: String);
 var
   TArr1,TArr2,TArr3:IntArr;
   bool1,bool2:Boolean;
@@ -8878,20 +9476,20 @@ begin
   Str2:='';
   AStr:='nil';
   if(Length(num)=0)then Exit;
-  if(self.TTL.IsBitSet(num[0],0)=True)then bool1:=False else bool1:=True;
-  self.TTL.Shift(True,False,num);
+  if(ArrMath.IsBitSet(num[0],0)=True)then bool1:=False else bool1:=True;
+  ArrMath.Shift(True,False,num);
 
   if(self.CheckIntegrity(num)=False)then Exit;
-  self.TTL.SetInt(num,TArr3);
-  self.TTL.CutSome(TArr3,num);
+  ArrMath.SetInt(num,TArr3);
+  ArrMath.CutSome(TArr3,num);
 
   self.SplitIntToArr(TArr3,num);
   bool2:=self.SplitArr(TArr1,TArr2,num,TArr3);
   if(bool2=False)then Exit;
   AStr:='';
 
-  self.TTL.IntArrToStr(TArr1,Str1);
-  self.TTL.IntArrToStr(TArr2,Str2);
+  ArrMath.IntArrToStr(TArr1,Str1);
+  ArrMath.IntArrToStr(TArr2,Str2);
 
   Str2:=Copy(Str2,3,Length(Str2));
   AStr:=Str1+'.'+Str2;
@@ -8902,18 +9500,20 @@ begin
   SetLength(TArr3,0);
 end;
 
-procedure RealMath.IntArrToRealArrEqual(num: IntArr; var numResult: RealArr);
+class procedure RealMath.IntArrToRealArrEqual(num: IntArr;
+  var numResult: RealArr);
 var
   StrA:String;
 begin
   SetLength(numResult,0);
   StrA:='';
-  self.TTL.IntArrToStr(num,StrA);
+  ArrMath.IntArrToStr(num,StrA);
   StrA:=StrA+'.0';
   self.StrToRealArr(StrA,numResult);
 end;
 
-procedure RealMath.RealArrToIntArrRound(num: RealArr; var numResult: IntArr);
+class procedure RealMath.RealArrToIntArrRound(num: RealArr;
+  var numResult: IntArr);
 var
   StrA:String;
   Str2:String;
@@ -8962,17 +9562,17 @@ begin
       break;
     end;
   end;
-  self.TTL.StrToIntArr(StrA,numResult);
+  ArrMath.StrToIntArr(StrA,numResult);
 end;
 
-procedure RealMath.RRR(num: RealArr; var numResult: IntArr);
+class procedure RealMath.RRR(num: RealArr; var numResult: IntArr);
 begin
   numResult:=RoundReal(num);
   if(ConditionReal(num,'<',IntReal(numResult))=True)then
     numResult:=SumSubInt(numResult,InitInt('-1'));
 end;
 
-procedure RealMath.RealArrRound(var num: RealArr;
+class procedure RealMath.RealArrRound(var num: RealArr;
   const ADeciDigitCountBaseOne: Integer);
 var
   TArr1,TArr2,TArr3:RealArr;
@@ -8987,7 +9587,7 @@ begin
   StrA:='';
   Int1:=0;
   TArr3:=nil;
-  self.TTL.SetInt(num,TArr3);
+  ArrMath.SetInt(num,TArr3);
   SetLength(num,0);
   self.RealArrToStr(TArr3,StrA);
   if(StrA='nil')then Exit;
@@ -9038,7 +9638,7 @@ begin
   self.StrToRealArr(Str1+'.'+Str2,num);
 end;
 
-function RealMath.GetDeciCountBaseOne(num: RealArr): Integer;
+class function RealMath.GetDeciCountBaseOne(num: RealArr): Integer;
 var
   StrA:String;
   i:Integer;
@@ -9057,7 +9657,8 @@ begin
   //End...
 end;
 
-procedure RealMath.RealCutDeciCountBaseOne(var num: RealArr; CutAt: Integer);
+class procedure RealMath.RealCutDeciCountBaseOne(var num: RealArr;
+  CutAt: Integer);
 var
   StrA:String;
   Str1,Str2:String;
@@ -9079,7 +9680,8 @@ begin
   //End...
 end;
 
-procedure RealMath.RealCutDeciCountBaseOneR(var num: RealArr; CutAt: Integer);
+class procedure RealMath.RealCutDeciCountBaseOneR(var num: RealArr;
+  CutAt: Integer);
 begin
   if(Length(num)=0)then Exit;
   if(CutAt<1)then CutAt:=1;
@@ -9087,7 +9689,8 @@ begin
   self.RealArrRound(num,CutAt);
 end;
 
-procedure RealMath.AlignStr(var AStr1, AStr2: String; const APlace: String);
+class procedure RealMath.AlignStr(var AStr1, AStr2: String; const APlace: String
+  );
 var
   i:Integer;
 begin
@@ -9099,7 +9702,8 @@ begin
   end;
 end;
 
-procedure RealMath.AlignStrLeft(var AStr1, AStr2: String; const APlace: String);
+class procedure RealMath.AlignStrLeft(var AStr1, AStr2: String;
+  const APlace: String);
 var
   i:Integer;
 begin
@@ -9111,16 +9715,16 @@ begin
   end;
 end;
 
-procedure RealMath.CutSomeR(var num: IntArr);
+class procedure RealMath.CutSomeR(var num: IntArr);
 var
   TArr1:IntArr;
 begin
   TArr1:=nil;
-  self.TTL.SetInt(num,TArr1);
-  self.TTL.CutSome(TArr1,num);
+  ArrMath.SetInt(num,TArr1);
+  ArrMath.CutSome(TArr1,num);
 end;
 
-procedure RealMath.CutSomeStr(var AStr: String);
+class procedure RealMath.CutSomeStr(var AStr: String);
 var
   i:Integer;
   bool1:Boolean;
@@ -9137,14 +9741,14 @@ begin
   AStr:='0';
 end;
 
-function RealMath.CutSomeStrLeft(AStr: String): String;
+class function RealMath.CutSomeStrLeft(AStr: String): String;
 begin
   AStr:=self.ReverseStr(AStr);
   self.CutSomeStr(AStr);
   Result:=self.ReverseStr(AStr);
 end;
 
-function RealMath.ReverseStr(const AStr: String): String;
+class function RealMath.ReverseStr(const AStr: String): String;
 var
   i:Integer;
 begin
@@ -9152,7 +9756,7 @@ begin
   for i:=Length(AStr)downto 1 do Result:=Result+AStr[i];
 end;
 
-function RealMath.isPositiveAd(num: RealArr): Byte;
+class function RealMath.isPositiveAd(num: RealArr): Byte;
 var
   TArr1,TArr2,TArr3:IntArr;
   bool1:Boolean;
@@ -9168,8 +9772,8 @@ begin
   bool4:=False;
   Str1:='';
 
-  if(self.TTL.IsBitSet(num[0],0)=True)then bool1:=False else bool1:=True;
-  self.TTL.Shift(True,False,num);
+  if(ArrMath.IsBitSet(num[0],0)=True)then bool1:=False else bool1:=True;
+  ArrMath.Shift(True,False,num);
 
   self.SplitIntToArr(TArr3,num);
   self.SplitArr(TArr1,TArr2,num,TArr3);
@@ -9196,7 +9800,7 @@ begin
   SetLength(TArr3,0);
 end;
 
-function RealMath.isPositive(num: RealArr): Boolean;
+class function RealMath.isPositive(num: RealArr): Boolean;
 var
   AMode:Byte;
 begin
@@ -9205,7 +9809,7 @@ begin
   if(AMode=1)then Result:=True else Result:=False;
 end;
 
-procedure RealMath.SumReal(num1, num2: RealArr; var numResult: RealArr;
+class procedure RealMath.SumReal(num1, num2: RealArr; var numResult: RealArr;
   ADeciDigitCountBaseOne: Integer);
 var
   TArr1,TArr2,TArr3:IntArr;
@@ -9229,15 +9833,15 @@ begin
   self.SplitIntToArr(TArr6,num2);
   self.SplitArr(TArr4,TArr5,num2,TArr6);
 
-  self.TTL.IntArrToStr(TArr2,Str1);
-  self.TTL.IntArrToStr(TArr5,Str2);
+  ArrMath.IntArrToStr(TArr2,Str1);
+  ArrMath.IntArrToStr(TArr5,Str2);
 
   self.AlignStr(Str1,Str2,'0');
-  self.TTL.StrToIntArr(Str1,TArr2);
-  self.TTL.StrToIntArr(Str2,TArr5);
+  ArrMath.StrToIntArr(Str1,TArr2);
+  ArrMath.StrToIntArr(Str2,TArr5);
 
-  self.TTL.SumSubInt(TArr2,TArr5,TArr6);
-  self.TTL.IntArrToStr(TArr6,Str1);
+  ArrMath.SumSubInt(TArr2,TArr5,TArr6);
+  ArrMath.IntArrToStr(TArr6,Str1);
   Str3:=Copy(Str1,3,Length(Str1));
   self.CutSomeStr(Str3);
   if(Length(Str3)>ADeciDigitCountBaseOne)then
@@ -9247,10 +9851,10 @@ begin
   Str1:=Copy(Str1,1,2);
   Str1:=Copy(Str1,2,Length(Str1));
 
-  self.TTL.StrToIntArr(Str3,TArr6);
-  self.TTL.StrToIntArr(Str1,TArr5);
-  self.TTL.SumSubInt(TArr1,TArr5,TArr2);
-  self.TTL.SumSubInt(TArr2,TArr4,TArr3);
+  ArrMath.StrToIntArr(Str3,TArr6);
+  ArrMath.StrToIntArr(Str1,TArr5);
+  ArrMath.SumSubInt(TArr1,TArr5,TArr2);
+  ArrMath.SumSubInt(TArr2,TArr4,TArr3);
 
   self.CombineArr(TArr3,TArr6,numResult,TArr1);
   self.CombineIntToArr(TArr1,numResult);
@@ -9263,8 +9867,8 @@ begin
   SetLength(TArr6,0);
 end;
 
-procedure RealMath.SubReal(num1, num2: RealArr; var numResult: RealArr; out
-  NumBiggerMode: Byte; ADeciDigitCountBaseOne: Integer);
+class procedure RealMath.SubReal(num1, num2: RealArr; var numResult: RealArr;
+  out NumBiggerMode: Byte; ADeciDigitCountBaseOne: Integer);
 var
   TArr1,TArr2,TArr3:IntArr;
   TArr4,TArr5,TArr6:IntArr;
@@ -9297,11 +9901,11 @@ begin
   self.SplitIntToArr(TArr6,num2);
   self.SplitArr(TArr4,TArr5,num2,TArr6);
 
-  self.TTL.IntArrToStr(TArr1,Str4);
-  self.TTL.IntArrToStr(TArr4,Str5);
+  ArrMath.IntArrToStr(TArr1,Str4);
+  ArrMath.IntArrToStr(TArr4,Str5);
 
-  self.TTL.IntArrToStr(TArr2,Str1);
-  self.TTL.IntArrToStr(TArr5,Str2);
+  ArrMath.IntArrToStr(TArr2,Str1);
+  ArrMath.IntArrToStr(TArr5,Str2);
 
   self.AlignStr(Str1,Str2,'0');
   Str7:=Copy(Str1,3,Length(Str1));
@@ -9311,8 +9915,8 @@ begin
   self.AlignStrLeft(Str7,Str8,'0');
   Str7:='1'+Str7;
   Str8:='1'+Str8;
-  self.TTL.StrToIntArr(Str7,TArr3);
-  self.TTL.StrToIntArr(Str8,TArr6);
+  ArrMath.StrToIntArr(Str7,TArr3);
+  ArrMath.StrToIntArr(Str8,TArr6);
 
   if(ConditionInt(TArr3,'>',TArr6)=True)then NumBiggerMode:=1 else
   if(ConditionInt(TArr3,'<',TArr6)=True)then NumBiggerMode:=0 else
@@ -9329,24 +9933,24 @@ begin
   if(NumBiggerMode>=1)then begin
     Str1:='2'+Str1;
     Str2:='1'+Str2;
-    self.TTL.StrToIntArr(Str1,TArr3);
-    self.TTL.StrToIntArr(Str2,TArr6);
+    ArrMath.StrToIntArr(Str1,TArr3);
+    ArrMath.StrToIntArr(Str2,TArr6);
 
-    self.TTL.StrToIntArr('-1',TArr1);
-    self.TTL.MulDivInt(TArr6,TArr1,TArr4,True);
-    self.TTL.SumSubInt(TArr3,TArr4,TArr1);
-    self.TTL.IntArrToStr(TArr1,Str3);
+    ArrMath.StrToIntArr('-1',TArr1);
+    ArrMath.MulDivInt(TArr6,TArr1,TArr4,True);
+    ArrMath.SumSubInt(TArr3,TArr4,TArr1);
+    ArrMath.IntArrToStr(TArr1,Str3);
   end else
   if(NumBiggerMode=0)then begin
     Str1:='1'+Str1;
     Str2:='2'+Str2;
-    self.TTL.StrToIntArr(Str1,TArr3);
-    self.TTL.StrToIntArr(Str2,TArr6);
+    ArrMath.StrToIntArr(Str1,TArr3);
+    ArrMath.StrToIntArr(Str2,TArr6);
 
-    self.TTL.StrToIntArr('-1',TArr1);
-    self.TTL.MulDivInt(TArr3,TArr1,TArr4,True);
-    self.TTL.SumSubInt(TArr6,TArr4,TArr1);
-    self.TTL.IntArrToStr(TArr1,Str3);
+    ArrMath.StrToIntArr('-1',TArr1);
+    ArrMath.MulDivInt(TArr3,TArr1,TArr4,True);
+    ArrMath.SumSubInt(TArr6,TArr4,TArr1);
+    ArrMath.IntArrToStr(TArr1,Str3);
   end;
 
   if(Str3[1]='-')then Str3:=Copy(Str3,2,Length(Str3));
@@ -9361,8 +9965,8 @@ begin
   if(Str6='')then Str6:='0';
   Str6:='10'+Str6;
 
-  self.TTL.StrToIntArr(Str3,TArr3);
-  self.TTL.StrToIntArr(Str6,TArr6);
+  ArrMath.StrToIntArr(Str3,TArr3);
+  ArrMath.StrToIntArr(Str6,TArr6);
   self.CombineArr(TArr3,TArr6,numResult,TArr1);
   self.CombineIntToArr(TArr1,numResult);
 
@@ -9374,8 +9978,8 @@ begin
   SetLength(TArr6,0);
 end;
 
-procedure RealMath.SumSubReal(num1, num2: RealArr; var numResult: RealArr;
-  ADeciDigitCountBaseOne: Integer);
+class procedure RealMath.SumSubReal(num1, num2: RealArr;
+  var numResult: RealArr; ADeciDigitCountBaseOne: Integer);
 var
   bool1,bool2:Boolean;
   AMode:Byte;
@@ -9385,8 +9989,8 @@ begin
   if(Length(num2)=0)then Exit;
   bool1:=self.isPositive(num1);
   bool2:=self.isPositive(num2);
-  self.TTL.Shift(True,False,num1);
-  self.TTL.Shift(True,False,num2);
+  ArrMath.Shift(True,False,num1);
+  ArrMath.Shift(True,False,num2);
   self.CutSomeR(num1);
   self.CutSomeR(num2);
   if(self.CheckIntegrity(num1)=False)then Exit;
@@ -9395,27 +9999,27 @@ begin
   AMode:=0;
   if(bool1=False)and(bool2=False)then begin
     self.SumReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-    self.TTL.Shift(False,False,numResult);
+    ArrMath.Shift(False,False,numResult);
   end else
   if(bool1=True)and(bool2=False)then begin
     self.SubReal(num1,num2,numResult,AMode,ADeciDigitCountBaseOne);
-    if(AMode=1)then self.TTL.Shift(False,True,numResult) else
-    if(AMode=0)then self.TTL.Shift(False,False,numResult) else
-    if(AMode=2)then self.TTL.Shift(False,True,numResult);
+    if(AMode=1)then ArrMath.Shift(False,True,numResult) else
+    if(AMode=0)then ArrMath.Shift(False,False,numResult) else
+    if(AMode=2)then ArrMath.Shift(False,True,numResult);
   end else
   if(bool1=False)and(bool2=True)then begin
     self.SubReal(num1,num2,numResult,AMode,ADeciDigitCountBaseOne);
-    if(AMode=1)then self.TTL.Shift(False,False,numResult) else
-    if(AMode=0)then self.TTL.Shift(False,True,numResult) else
-    if(AMode=2)then self.TTL.Shift(False,True,numResult);
+    if(AMode=1)then ArrMath.Shift(False,False,numResult) else
+    if(AMode=0)then ArrMath.Shift(False,True,numResult) else
+    if(AMode=2)then ArrMath.Shift(False,True,numResult);
   end else
   if(bool1=True)and(bool2=True)then begin
     self.SumReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-    self.TTL.Shift(False,True,numResult);
+    ArrMath.Shift(False,True,numResult);
   end;
 end;
 
-procedure RealMath.MulReal(num1, num2: RealArr; var numResult: RealArr;
+class procedure RealMath.MulReal(num1, num2: RealArr; var numResult: RealArr;
   ADeciDigitCountBaseOne: Integer);
 var
   TArr1,TArr2,TArr3:IntArr;
@@ -9445,27 +10049,27 @@ begin
   self.SplitIntToArr(TArr6,num2);
   self.SplitArr(TArr4,TArr5,num2,TArr6);
 
-  self.TTL.IntArrToStr(TArr2,Str1);
-  self.TTL.IntArrToStr(TArr5,Str2);
+  ArrMath.IntArrToStr(TArr2,Str1);
+  ArrMath.IntArrToStr(TArr5,Str2);
   Str1:=Copy(Str1,3,Length(Str1));
   Str2:=Copy(Str2,3,Length(Str2));
   Int1:=Length(Str1);
   Int2:=Length(Str2);
 
-  self.TTL.IntArrToStr(TArr1,Str3);
+  ArrMath.IntArrToStr(TArr1,Str3);
   Str1:=Str3+Str1;
-  self.TTL.IntArrToStr(TArr4,Str3);
+  ArrMath.IntArrToStr(TArr4,Str3);
   Str2:=Str3+Str2;
 
   Int3:=0;
   for i:=1 to Length(Str1)do if(Str1[i]<>'0')then break else Int3:=Int3+1;
   for i:=1 to Length(Str2)do if(Str2[i]<>'0')then break else Int3:=Int3+1;
 
-  self.TTL.StrToIntArr(Str1,TArr3);
-  self.TTL.StrToIntArr(Str2,TArr6);
+  ArrMath.StrToIntArr(Str1,TArr3);
+  ArrMath.StrToIntArr(Str2,TArr6);
 
-  self.TTL.MulDivInt(TArr3,TArr6,TArr1,True);
-  self.TTL.IntArrToStr(TArr1,Str3);
+  ArrMath.MulDivInt(TArr3,TArr6,TArr1,True);
+  ArrMath.IntArrToStr(TArr1,Str3);
   for i:=1 to Int3 do Str3:='0'+Str3;
 
   Str1:=Copy(Str3,1,Length(Str3)-(Int1+Int2));
@@ -9477,11 +10081,11 @@ begin
   if(Str2='')then Str2:='0';
   Str2:='10'+Str2;
 
-  self.TTL.StrToIntArr(Str1,TArr3);
-  self.TTL.StrToIntArr(Str2,TArr6);
+  ArrMath.StrToIntArr(Str1,TArr3);
+  ArrMath.StrToIntArr(Str2,TArr6);
 
-  self.TTL.IntArrToStr(TArr3,Str1);
-  self.TTL.IntArrToStr(TArr6,Str2);
+  ArrMath.IntArrToStr(TArr3,Str1);
+  ArrMath.IntArrToStr(TArr6,Str2);
 
   self.CombineArr(TArr3,TArr6,numResult,TArr1);
   self.CombineIntToArr(TArr1,numResult);
@@ -9494,7 +10098,7 @@ begin
   SetLength(TArr6,0);
 end;
 
-procedure RealMath.DivReal(num1, num2: RealArr; var numResult: RealArr;
+class procedure RealMath.DivReal(num1, num2: RealArr; var numResult: RealArr;
   ADeciDigitCountBaseOne: Integer);
 var
   TArr1,TArr2,TArr3:IntArr;
@@ -9526,10 +10130,10 @@ begin
   self.SplitIntToArr(TArr6,num2);
   self.SplitArr(TArr4,TArr5,num2,TArr6);
 
-  self.TTL.IntArrToStr(TArr1,Str1);
-  self.TTL.IntArrToStr(TArr2,Str2);
-  self.TTL.IntArrToStr(TArr4,Str4);
-  self.TTL.IntArrToStr(TArr5,Str5);
+  ArrMath.IntArrToStr(TArr1,Str1);
+  ArrMath.IntArrToStr(TArr2,Str2);
+  ArrMath.IntArrToStr(TArr4,Str4);
+  ArrMath.IntArrToStr(TArr5,Str5);
   Str2:=Copy(Str2,3,Length(Str2));
   Str5:=Copy(Str5,3,Length(Str5));
 
@@ -9546,23 +10150,23 @@ begin
   for i:=1 to Int1 do Str3:=Str3+'0';
   for i:=1 to Int2 do Str6:=Str6+'0';
 
-  self.TTL.StrToIntArr(Str3,TArr3);
-  self.TTL.StrToIntArr(Str6,TArr6);
+  ArrMath.StrToIntArr(Str3,TArr3);
+  ArrMath.StrToIntArr(Str6,TArr6);
 
-  self.TTL.MulDivInt(TArr3,TArr6,TArr1,False);
-  self.TTL.IntArrToStr(TArr1,Str5);
+  ArrMath.MulDivInt(TArr3,TArr6,TArr1,False);
+  ArrMath.IntArrToStr(TArr1,Str5);
   if(Str5='nil')then Str5:='0';
 
   Int1:=0;
   TArr4:=InitInt('1');
   Str2:='1';
   for i:=1 to (ADeciDigitCountBaseOne+1) do begin
-    self.TTL.MulDivInt(TArr4,TArr3,TArr2,True);
-    self.TTL.MulDivInt(TArr2,TArr6,TArr1,False);
-    self.TTL.IntArrToStr(TArr1,Str4);
+    ArrMath.MulDivInt(TArr4,TArr3,TArr2,True);
+    ArrMath.MulDivInt(TArr2,TArr6,TArr1,False);
+    ArrMath.IntArrToStr(TArr1,Str4);
     if(Str4='0')then begin
       Str2:=Str2+'0';
-      self.TTL.StrToIntArr(Str2,TArr4);
+      ArrMath.StrToIntArr(Str2,TArr4);
       Int1:=Int1+1;
     end else
     if(Str4='nil')then break else break;
@@ -9583,12 +10187,12 @@ begin
     for i:=1 to ((ADeciDigitCountBaseOne+1)-Length(Str1))do Str1:=Str1+'0';
   end;
 
-  self.TTL.StrToIntArr(Str1,TArr1);
-  self.TTL.StrToIntArr(Str3,TArr2);
-  self.TTL.StrToIntArr(Str6,TArr4);
-  self.TTL.MulDivInt(TArr1,TArr2,TArr5,True);
-  self.TTL.MulDivInt(TArr5,TArr4,TArr1,False);
-  self.TTL.IntArrToStr(TArr1,Str1);
+  ArrMath.StrToIntArr(Str1,TArr1);
+  ArrMath.StrToIntArr(Str3,TArr2);
+  ArrMath.StrToIntArr(Str6,TArr4);
+  ArrMath.MulDivInt(TArr1,TArr2,TArr5,True);
+  ArrMath.MulDivInt(TArr5,TArr4,TArr1,False);
+  ArrMath.IntArrToStr(TArr1,Str1);
   if(Str1='nil')then Str1:='0';
 
   for i:=1 to Int1 do Str1:='0'+Str1;
@@ -9600,8 +10204,8 @@ begin
   if(Str1='')then Str1:='0';
   Str1:='10'+Str1;
 
-  self.TTL.StrToIntArr(Str5,TArr3);
-  self.TTL.StrToIntArr(Str1,TArr6);
+  ArrMath.StrToIntArr(Str5,TArr3);
+  ArrMath.StrToIntArr(Str1,TArr6);
   self.CombineArr(TArr3,TArr6,numResult,TArr1);
   self.CombineIntToArr(TArr1,numResult);
 
@@ -9613,8 +10217,9 @@ begin
   SetLength(TArr6,0);
 end;
 
-procedure RealMath.MulDivReal(num1, num2: RealArr; var numResult: RealArr;
-  const doMul: Boolean; ADeciDigitCountBaseOne: Integer);
+class procedure RealMath.MulDivReal(num1, num2: RealArr;
+  var numResult: RealArr; const doMul: Boolean; ADeciDigitCountBaseOne: Integer
+  );
 var
   bool1,bool2:Boolean;
 begin
@@ -9624,8 +10229,8 @@ begin
   if(self.isPositiveAd(num2)=2)and(doMul=False)then Exit;
   bool1:=self.isPositive(num1);
   bool2:=self.isPositive(num2);
-  self.TTL.Shift(True,False,num1);
-  self.TTL.Shift(True,False,num2);
+  ArrMath.Shift(True,False,num1);
+  ArrMath.Shift(True,False,num2);
   self.CutSomeR(num1);
   self.CutSomeR(num2);
   if(self.CheckIntegrity(num1)=False)then Exit;
@@ -9634,27 +10239,28 @@ begin
   if(bool1=False)and(bool2=False)then begin
     if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
     if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-    self.TTL.Shift(False,True,numResult);
+    ArrMath.Shift(False,True,numResult);
   end else
   if(bool1=True)and(bool2=False)then begin
     if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
     if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-    self.TTL.Shift(False,False,numResult);
+    ArrMath.Shift(False,False,numResult);
   end else
   if(bool1=False)and(bool2=True)then begin
     if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
     if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-    self.TTL.Shift(False,False,numResult);
+    ArrMath.Shift(False,False,numResult);
   end else
   if(bool1=True)and(bool2=True)then begin
     if(doMul=True)then self.MulReal(num1,num2,numResult,ADeciDigitCountBaseOne) else
     if(doMul=False)then self.DivReal(num1,num2,numResult,ADeciDigitCountBaseOne);
-    self.TTL.Shift(False,True,numResult);
+    ArrMath.Shift(False,True,numResult);
   end;
   //End...
 end;
 
-procedure RealMath.RealArrMod(num1, num2: RealArr; var numResult: RealArr);
+class procedure RealMath.RealArrMod(num1, num2: RealArr; var numResult: RealArr
+  );
 var
   TArr1,TArr2,TArr3:RealArr;
 begin
@@ -9674,7 +10280,7 @@ begin
   SetLength(TArr3,0);
 end;
 
-function RealMath.RealXPowerInt(Abase, Apower: RealArr;
+class function RealMath.RealXPowerInt(Abase, Apower: RealArr;
   const ADeciDigitCountBaseOne: Integer): RealArr;
 var
   Amode:RealArr;
@@ -9691,7 +10297,7 @@ begin
   end;
 end;
 
-function RealMath.RealXPowerIntStr(Abase, Apower: RealArr;
+class function RealMath.RealXPowerIntStr(Abase, Apower: RealArr;
   const ADeciDigitCountBaseOne: Integer): RealArr;
 var
   StrA:StringMath;
@@ -9708,7 +10314,7 @@ begin
   StrA.Free;
 end;
 
-procedure RealMath.lynReal(num: RealArr; var numResult: RealArr;
+class procedure RealMath.lynReal(num: RealArr; var numResult: RealArr;
   const ADeciDigitCountBaseOne: Integer);
 var
   n1,n2:RealArr;
@@ -9741,7 +10347,7 @@ begin
   ADeciDigitCountBaseOne,True);
 end;
 
-procedure RealMath.lynRealR(num: RealArr; var numResult: RealArr;
+class procedure RealMath.lynRealR(num: RealArr; var numResult: RealArr;
   const ADeciDigitCountBaseOne: Integer);
 var
   n1,n2,n3:RealArr;
@@ -9764,7 +10370,7 @@ begin
   numResult:=StrMath.SumSubReal(n2,n3,ADeciDigitCountBaseOne);
 end;
 
-procedure RealMath.logaReal(num, base: RealArr; var numResult: RealArr;
+class procedure RealMath.logaReal(num, base: RealArr; var numResult: RealArr;
   const ADeciDigitCountBaseOne: Integer);
 var
   n1,n2:RealArr;
@@ -9778,7 +10384,7 @@ begin
   numResult:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne,False);
 end;
 
-procedure RealMath.Root2Real(num: RealArr; var numResult: RealArr;
+class procedure RealMath.Root2Real(num: RealArr; var numResult: RealArr;
   const ADeciDigitCountBaseOne: Integer);
 var
   i:Integer;
@@ -9806,7 +10412,7 @@ begin
   SetLength(n3,0);
 end;
 
-function RealMath.SinReal(Degrees: RealArr;
+class function RealMath.SinReal(Degrees: RealArr;
   const ADeciDigitCountBaseOne: Integer): RealArr;
 begin
   Result:=nil;
@@ -9846,7 +10452,7 @@ begin
     ADeciDigitCountBaseOne,True);
 end;
 
-function RealMath.CosReal(Degrees: RealArr;
+class function RealMath.CosReal(Degrees: RealArr;
   const ADeciDigitCountBaseOne: Integer): RealArr;
 begin
   Result:=nil;
@@ -9887,7 +10493,7 @@ begin
     ADeciDigitCountBaseOne,True),ADeciDigitCountBaseOne));
 end;
 
-function RealMath.TanReal(Degrees: RealArr;
+class function RealMath.TanReal(Degrees: RealArr;
   const ADeciDigitCountBaseOne: Integer): RealArr;
 begin
   Result:=nil;
@@ -9897,8 +10503,8 @@ begin
   self.CosReal(Degrees,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False);
 end;
 
-function RealMath.InSinReal(SinX: RealArr; const ADeciDigitCountBaseOne: Integer
-  ): RealArr;
+class function RealMath.InSinReal(SinX: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
 begin
   Result:=nil;
   SetLength(Result,0);
@@ -9907,8 +10513,8 @@ begin
   ADeciDigitCountBaseOne),InitReal('90.0'),ADeciDigitCountBaseOne,True);
 end;
 
-function RealMath.InCosReal(CosX: RealArr; const ADeciDigitCountBaseOne: Integer
-  ): RealArr;
+class function RealMath.InCosReal(CosX: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
 begin
   Result:=nil;
   SetLength(Result,0);
@@ -9920,8 +10526,8 @@ begin
   ADeciDigitCountBaseOne),InitReal('90.0'),ADeciDigitCountBaseOne,True);
 end;
 
-function RealMath.InTanReal(TanX: RealArr; const ADeciDigitCountBaseOne: Integer
-  ): RealArr;
+class function RealMath.InTanReal(TanX: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
 begin
   Result:=nil;
   SetLength(Result,0);
@@ -9933,7 +10539,7 @@ begin
   InitReal('90.0'),ADeciDigitCountBaseOne,True);
 end;
 
-function RealMath.RealFactorialIntStr(num: RealArr;
+class function RealMath.RealFactorialIntStr(num: RealArr;
   const ADeciDigitCountBaseOne: Integer): RealArr;
 var
   StrA:StringMath;
@@ -9951,8 +10557,8 @@ begin
   StrA.Free;
 end;
 
-function RealMath.ePower(num: RealArr; const ADeciDigitCountBaseOne: Integer
-  ): RealArr;
+class function RealMath.ePower(num: RealArr;
+  const ADeciDigitCountBaseOne: Integer): RealArr;
 var
   n1,n2,n3:RealArr;
   i:Integer;
@@ -9978,7 +10584,7 @@ begin
   end;
 end;
 
-function RealMath.ePowerX(num: RealArr; ADeciDigitCountBaseOne: Integer
+class function RealMath.ePowerX(num: RealArr; ADeciDigitCountBaseOne: Integer
   ): RealArr;
 var
   n1,n2,n3:RealArr;
@@ -9996,8 +10602,8 @@ begin
   Result:=StrMath.MulDivReal(n3,self.ePower(n2,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
 end;
 
-function RealMath.xPower(Abase, Apower: RealArr; ADeciDigitCountBaseOne: Integer
-  ): RealArr;
+class function RealMath.xPower(Abase, Apower: RealArr;
+  ADeciDigitCountBaseOne: Integer): RealArr;
 var
   n1,n2:RealArr;
 begin
@@ -10014,7 +10620,7 @@ begin
   Result:=StrMath.MulDivReal(n1,n2,ADeciDigitCountBaseOne);
 end;
 
-procedure RealMath.xPowerDiv2(var Abase, Apower: RealArr;
+class procedure RealMath.xPowerDiv2(var Abase, Apower: RealArr;
   ADeciDigitCountBaseOne: Integer);
 var
   n1,n2,n3:RealArr;
@@ -10037,7 +10643,7 @@ begin
   //End...
 end;
 
-function RealMath.xPowerX(Abase, Apower: RealArr;
+class function RealMath.xPowerX(Abase, Apower: RealArr;
   ADeciDigitCountBaseOne: Integer): RealArr;
 var
   AMode:Byte;
@@ -10061,17 +10667,7 @@ end;
 
 { ArrMath }
 
-constructor ArrMath.Create;
-begin
-  //nothing...
-end;
-
-destructor ArrMath.Destroy;
-begin
-  inherited Destroy;
-end;
-
-function ArrMath.StrToNumber(const AStr: String): Number;
+class function ArrMath.StrToNumber(const AStr: String): Number;
 var
   i:Integer;
 begin
@@ -10082,7 +10678,7 @@ begin
   end;
 end;
 
-function ArrMath.NumberToStr(const Anum: Number): String;
+class function ArrMath.NumberToStr(const Anum: Number): String;
 var
   i:Integer;
 begin
@@ -10090,87 +10686,87 @@ begin
   for i:=0 to (Length(Anum)-1)do Result:=Result+Char(Anum[i]);
 end;
 
-function ArrMath.BoolToNumber(const bool1: Boolean): Number;
+class function ArrMath.BoolToNumber(const bool1: Boolean): Number;
 begin
   Result:=nil;
   SetLength(Result,SizeOf(bool1));
   Move(bool1,Result[0],SizeOf(bool1));
 end;
 
-function ArrMath.NumberToBool(const num: Number): Boolean;
+class function ArrMath.NumberToBool(const num: Number): Boolean;
 begin
   Result:=False;
   if(Length(num)<SizeOf(Boolean))then SetLength(num,SizeOf(Boolean));
   Move(num[0],Result,SizeOf(Boolean));
 end;
 
-function ArrMath.IntToNumber(const Int1: Integer): Number;
+class function ArrMath.IntToNumber(const Int1: Integer): Number;
 begin
   Result:=nil;
   SetLength(Result,SizeOf(Int1));
   Move(Int1,Result[0],SizeOf(Int1));
 end;
 
-function ArrMath.NumberToInt(const num: Number): Integer;
+class function ArrMath.NumberToInt(const num: Number): Integer;
 begin
   Result:=0;
   if(Length(num)<SizeOf(Integer))then SetLength(num,SizeOf(Integer));
   Move(num[0],Result,SizeOf(Integer));
 end;
 
-function ArrMath.RealToNumber(const Real1: Real): Number;
+class function ArrMath.RealToNumber(const Real1: Real): Number;
 begin
   Result:=nil;
   SetLength(Result,SizeOf(Real1));
   Move(Int1,Result[0],SizeOf(Real1));
 end;
 
-function ArrMath.NumberToReal(const num: Number): Real;
+class function ArrMath.NumberToReal(const num: Number): Real;
 begin
   Result:=0;
   if(Length(num)<SizeOf(Real))then SetLength(num,SizeOf(Real));
   Move(num[0],Result,SizeOf(Real));
 end;
 
-function ArrMath.RR(const x: Real): Integer;
+class function ArrMath.RR(const x: Real): Integer;
 begin
   Result:=Round(x);
   if(Round(x)>x)then Result:=Round(x)-1;
 end;
 
-function ArrMath.unNum(const x: Integer): Integer;
+class function ArrMath.unNum(const x: Integer): Integer;
 begin
   Result:=x;
   if(x<0)then Result:=Result*(-1);
 end;
 
-function ArrMath.unNum(const x: Real): Real;
+class function ArrMath.unNum(const x: Real): Real;
 begin
   Result:=x;
   if(x<0)then Result:=Result*(-1);
 end;
 
-procedure ArrMath.SetBit(var B: Byte; const PosBaseZero: Byte);
+class procedure ArrMath.SetBit(var B: Byte; const PosBaseZero: Byte);
 begin
   B:=B or (1 shl PosBaseZero);
 end;
 
-procedure ArrMath.ClearBit(var B: Byte; const PosBaseZero: Byte);
+class procedure ArrMath.ClearBit(var B: Byte; const PosBaseZero: Byte);
 begin
   B:=B and not (1 shl PosBaseZero);
 end;
 
-procedure ArrMath.ReverseBit(var B: Byte; const PosBaseZero: Byte);
+class procedure ArrMath.ReverseBit(var B: Byte; const PosBaseZero: Byte);
 begin
   B:=B xor (1 shl PosBaseZero);
 end;
 
-function ArrMath.IsBitSet(B: Byte; const PosBaseZero: Byte): Boolean;
+class function ArrMath.IsBitSet(B: Byte; const PosBaseZero: Byte): Boolean;
 begin
   Result:=(B and (1 shl PosBaseZero)) <> 0;
 end;
 
-procedure ArrMath.BitsToStr(const num: IntArr; var AStrBits: String);
+class procedure ArrMath.BitsToStr(const num: IntArr; var AStrBits: String);
 var
   i:Integer;
 begin
@@ -10178,7 +10774,7 @@ begin
   for i:=0 to (Length(num)-1)do AStrBits:=BinStr(num[i],8)+' '+AStrBits;
 end;
 
-function ArrMath.BitsLength(const num: IntArr): Integer;
+class function ArrMath.BitsLength(const num: IntArr): Integer;
 var
   i:Integer;
   AStr:String;
@@ -10189,7 +10785,7 @@ begin
   Result:=Length(AStr);
 end;
 
-procedure ArrMath.SetInt(const num: IntArr; var numResult: IntArr);
+class procedure ArrMath.SetInt(const num: IntArr; var numResult: IntArr);
 var
   i:Integer;
 begin
@@ -10197,7 +10793,7 @@ begin
   for i:=0 to (Length(num)-1)do numResult[i]:=num[i];
 end;
 
-procedure ArrMath.ReverseInt(const num: IntArr; var numResult: IntArr);
+class procedure ArrMath.ReverseInt(const num: IntArr; var numResult: IntArr);
 var
   i,j:Integer;
 begin
@@ -10207,7 +10803,7 @@ begin
     for j:=0 to 7 do if(self.IsBitSet(num[i],j)=True)then self.SetBit(numResult[(Length(numResult)-1)-i],7-j);
 end;
 
-function ArrMath.isIntZero(const num: IntArr): Boolean;
+class function ArrMath.isIntZero(const num: IntArr): Boolean;
 var
   i:Integer;
 begin
@@ -10215,7 +10811,7 @@ begin
   for i:=0 to (Length(num)-1)do if(num[i]<>0)then begin Result:=False; Exit; end;
 end;
 
-procedure ArrMath.MatchLength(const isLeft: Boolean; const num: IntArr;
+class procedure ArrMath.MatchLength(const isLeft: Boolean; const num: IntArr;
   var numResult: IntArr);
 var
   i:Integer;
@@ -10234,7 +10830,7 @@ begin
     end;
 end;
 
-procedure ArrMath.Shift(const isLeft, isSet: Boolean; var num: IntArr);
+class procedure ArrMath.Shift(const isLeft, isSet: Boolean; var num: IntArr);
 var
   i,j:Integer;
   TArr1:IntArr;
@@ -10283,7 +10879,7 @@ begin
   SetLength(TArr1,0);
 end;
 
-procedure ArrMath.Shift(const isLeft: Boolean; PaceBaseOne: Integer;
+class procedure ArrMath.Shift(const isLeft: Boolean; PaceBaseOne: Integer;
   var num: IntArr);
 var
   i:Integer;
@@ -10336,7 +10932,7 @@ begin
   SetLength(TArr1,0);
 end;
 
-function ArrMath.isPositiveAd(var num: IntArr): Byte;
+class function ArrMath.isPositiveAd(var num: IntArr): Byte;
 var
   bool1:Boolean;
 begin
@@ -10347,7 +10943,7 @@ begin
   if(bool1=True)then Result:=1 else Result:=0;
 end;
 
-function ArrMath.isPositive(var num: IntArr): Boolean;
+class function ArrMath.isPositive(var num: IntArr): Boolean;
 var
   ByteA:Byte;
 begin
@@ -10356,7 +10952,7 @@ begin
   if(ByteA=0)then Result:=False else Result:=False;
 end;
 
-function ArrMath.isNum1Bigger(var num1, num2: IntArr): Byte;
+class function ArrMath.isNum1Bigger(var num1, num2: IntArr): Byte;
 var
   i,j:Integer;
   bool1,bool2:Boolean;
@@ -10374,13 +10970,13 @@ begin
   Result:=2;
 end;
 
-function ArrMath.isNum1BiggerAlign(num1, num2: IntArr): Byte;
+class function ArrMath.isNum1BiggerAlign(num1, num2: IntArr): Byte;
 begin
   self.AlignNums(num1,num2);
   Result:=self.isNum1Bigger(num1,num2);
 end;
 
-function ArrMath.isIntNumber(const Digit: String): Boolean;
+class function ArrMath.isIntNumber(const Digit: String): Boolean;
 begin
   Result:=False;
   if(Length(Digit)=0)then Exit;
@@ -10397,7 +10993,7 @@ begin
   if(Digit='9')then Result:=True;
 end;
 
-function ArrMath.GetIntDigit(const Digit: Byte): String;
+class function ArrMath.GetIntDigit(const Digit: Byte): String;
 begin
   Result:='';
   if(Digit=0)then Result:='0' else
@@ -10412,7 +11008,7 @@ begin
   if(Digit=9)then Result:='9';
 end;
 
-procedure ArrMath.InitZeroToNine(const isNeg: Boolean; const Digit: Byte;
+class procedure ArrMath.InitZeroToNine(const isNeg: Boolean; const Digit: Byte;
   var num: IntArr);
 begin
   SetLength(num,1);
@@ -10445,18 +11041,18 @@ begin
   if(isNeg=False)then self.Shift(False,True,num) else self.Shift(False,False,num);
 end;
 
-procedure ArrMath.AlignNums(var num1, num2: IntArr);
+class procedure ArrMath.AlignNums(var num1, num2: IntArr);
 begin
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num2)>Length(num1))then SetLength(num1,Length(num2));
 end;
 
-procedure ArrMath.AssignIntNum(num: IntArr; var numResult: IntArr);
+class procedure ArrMath.AssignIntNum(num: IntArr; var numResult: IntArr);
 begin
   self.SetInt(num,numResult);
 end;
 
-procedure ArrMath.CutSome(num: IntArr; var numResult: IntArr);
+class procedure ArrMath.CutSome(num: IntArr; var numResult: IntArr);
 var
   i:Integer;
   bool1:Boolean;
@@ -10479,13 +11075,13 @@ begin
   for i:=0 to (Length(num)-1)do numResult[i]:=num[i];
 end;
 
-procedure ArrMath.SetBitPosZero(var num: TBitPos);
+class procedure ArrMath.SetBitPosZero(var num: TBitPos);
 begin
   num.ByteAtBaseZero:=0;
   num.BitAtBaseZero:=0;
 end;
 
-procedure ArrMath.CopyBitPos(const CopyNum: TBitPos; var ToNum: TBitPos);
+class procedure ArrMath.CopyBitPos(const CopyNum: TBitPos; var ToNum: TBitPos);
 begin
   ToNum.ByteAtBaseZero:=CopyNum.ByteAtBaseZero;
   ToNum.BitAtBaseZero:=CopyNum.BitAtBaseZero;
@@ -10494,7 +11090,7 @@ begin
   if(ToNum.BitAtBaseZero>7)then ToNum.BitAtBaseZero:=0;
 end;
 
-procedure ArrMath.SetBitPos(var num: TBitPos; const ByteAtBaseZero,
+class procedure ArrMath.SetBitPos(var num: TBitPos; const ByteAtBaseZero,
   BitAtBaseZero: Integer);
 begin
   num.ByteAtBaseZero:=ByteAtBaseZero;
@@ -10503,7 +11099,7 @@ begin
   if(BitAtBaseZero>7)then num.BitAtBaseZero:=0 else num.BitAtBaseZero:=BitAtBaseZero;
 end;
 
-procedure ArrMath.IncBitPos(var num: TBitPos);
+class procedure ArrMath.IncBitPos(var num: TBitPos);
 begin
   if(num.BitAtBaseZero<0)then num.BitAtBaseZero:=7 else
   if(num.BitAtBaseZero>7)then num.BitAtBaseZero:=0;
@@ -10515,7 +11111,7 @@ begin
   end;
 end;
 
-procedure ArrMath.DecBitPos(var num: TBitPos);
+class procedure ArrMath.DecBitPos(var num: TBitPos);
 begin
   if(num.BitAtBaseZero<0)then num.BitAtBaseZero:=7 else
   if(num.BitAtBaseZero>7)then num.BitAtBaseZero:=0;
@@ -10528,7 +11124,7 @@ begin
   if(num.ByteAtBaseZero<0)then num.ByteAtBaseZero:=0;
 end;
 
-procedure ArrMath.GetLastBit(var num: TBitPos; const numArr: IntArr);
+class procedure ArrMath.GetLastBit(var num: TBitPos; const numArr: IntArr);
 var
   i:Integer;
   bool1:Boolean;
@@ -10550,7 +11146,7 @@ begin
   end;
 end;
 
-function ArrMath.IsBitPosEqual(num1, num2: TBitPos): Boolean;
+class function ArrMath.IsBitPosEqual(num1, num2: TBitPos): Boolean;
 begin
   Result:=False;
 
@@ -10569,7 +11165,8 @@ begin
   Result:=True;
 end;
 
-function ArrMath.IsBitPosSet(const num: TBitPos; const numArr: IntArr): Boolean;
+class function ArrMath.IsBitPosSet(const num: TBitPos; const numArr: IntArr
+  ): Boolean;
 begin
   Result:=False;
 
@@ -10579,7 +11176,7 @@ begin
   Result:=self.IsBitSet(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
 end;
 
-procedure ArrMath.BitPosSetArr(const num: TBitPos; var numArr: IntArr);
+class procedure ArrMath.BitPosSetArr(const num: TBitPos; var numArr: IntArr);
 begin
   if(Length(numArr)=0)then Exit;
   if(num.ByteAtBaseZero<0)or(num.ByteAtBaseZero>(Length(numArr)-1))then Exit;
@@ -10587,13 +11184,13 @@ begin
   self.SetBit(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
 end;
 
-procedure ArrMath.BitPosAddSetArr(const num: TBitPos; var numArr: IntArr);
+class procedure ArrMath.BitPosAddSetArr(const num: TBitPos; var numArr: IntArr);
 begin
   if(num.ByteAtBaseZero>(Length(numArr)-1))then SetLength(numArr,num.ByteAtBaseZero+1);
   self.SetBit(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
 end;
 
-procedure ArrMath.SumInt(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.SumInt(num1, num2: IntArr; var numResult: IntArr);
 var
   i:Integer;
   bool1,bool2,bool3:Boolean;
@@ -10629,7 +11226,7 @@ begin
   //End...
 end;
 
-procedure ArrMath.SubInt(num1, num2: IntArr; var numResult: IntArr; out
+class procedure ArrMath.SubInt(num1, num2: IntArr; var numResult: IntArr; out
   num1Bigger: Byte);
 var
   i:Integer;
@@ -10683,7 +11280,7 @@ begin
   SetLength(TArr2,0);
 end;
 
-procedure ArrMath.SumSubInt(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.SumSubInt(num1, num2: IntArr; var numResult: IntArr);
 var
   bool1,bool2:Boolean;
   ByteA:Byte;
@@ -10719,7 +11316,7 @@ begin
   end;
 end;
 
-procedure ArrMath.MulInt(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.MulInt(num1, num2: IntArr; var numResult: IntArr);
 var
   //k:Integer;
   i,j:Integer;
@@ -10750,7 +11347,7 @@ begin
   SetLength(TArr2,0);
 end;
 
-procedure ArrMath.MulIntSum(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.MulIntSum(num1, num2: IntArr; var numResult: IntArr);
 var
   AMode:Byte;
   TArr1,TArr2,TArr3,TArr4:IntArr;
@@ -10790,7 +11387,7 @@ begin
   SetLength(TArr4,0);
 end;
 
-procedure ArrMath.MulIntBit(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.MulIntBit(num1, num2: IntArr; var numResult: IntArr);
 var
   i:Integer;
   n1PosCount:TBitPos;
@@ -10863,7 +11460,7 @@ begin
   if(CData0=1)then self.BitPosAddSetArr(n1PosCount,numResult);
 end;
 
-procedure ArrMath.DivInt(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.DivInt(num1, num2: IntArr; var numResult: IntArr);
 var
   i:Integer;
   TArr2,TArr3:IntArr;
@@ -10899,7 +11496,7 @@ begin
   SetLength(TArr3,0);
 end;
 
-procedure ArrMath.MulDivInt(num1, num2: IntArr; var numResult: IntArr;
+class procedure ArrMath.MulDivInt(num1, num2: IntArr; var numResult: IntArr;
   const doMul: Boolean);
 var
   bool1,bool2:Boolean;
@@ -10944,7 +11541,8 @@ begin
   end;
 end;
 
-procedure ArrMath.xPowerIntArr(Base, Power: IntArr; var numResult: IntArr);
+class procedure ArrMath.xPowerIntArr(Base, Power: IntArr; var numResult: IntArr
+  );
 var
   TArr1,TArr2:IntArr;
   ByteA:Byte;
@@ -10978,7 +11576,7 @@ begin
   SetLength(TArr2,0);
 end;
 
-procedure ArrMath.StrToIntArr(AStr: String; var numResult: IntArr);
+class procedure ArrMath.StrToIntArr(AStr: String; var numResult: IntArr);
 var
   bool1:Boolean;
   i:Integer;
@@ -11040,7 +11638,7 @@ begin
   SetLength(TArr5,0);
 end;
 
-procedure ArrMath.IntArrToStr(num: IntArr; var AStr: String);
+class procedure ArrMath.IntArrToStr(num: IntArr; var AStr: String);
 var
   n1Str,n2Str:String;
   n1Pos,n1PosF1:TBitPos;
@@ -11060,21 +11658,21 @@ begin
   self.GetLastBit(n1PosF1,num);
 
   While(self.IsBitPosEqual(n1Pos,n1PosF1)=False)do begin
-    n1Str:=AStrMath.SumSub(n1Str,n2Str);
-    if(self.IsBitPosSet(n1Pos,num)=True)then AStr:=AStrMath.SumSub(AStr,n1Str);
+    n1Str:=StringMath.SumSub(n1Str,n2Str);
+    if(self.IsBitPosSet(n1Pos,num)=True)then AStr:=StringMath.SumSub(AStr,n1Str);
     n2Str:=n1Str;
     self.IncBitPos(n1Pos);
   end;
   if(self.IsBitPosSet(n1Pos,num)=True)then begin
-    n1Str:=AStrMath.SumSub(n1Str,n2Str);
-    AStr:=AStrMath.SumSub(AStr,n1Str);
+    n1Str:=StringMath.SumSub(n1Str,n2Str);
+    AStr:=StringMath.SumSub(AStr,n1Str);
   end;
 
-  AStr:=AStrMath.RR(AStr,False);
+  AStr:=StringMath.RR(AStr,False);
   if(ByteA=0)then AStr:='-'+AStr;
 end;
 
-procedure ArrMath.IntArrToStr_Old1(num: IntArr; var AStr: String);
+class procedure ArrMath.IntArrToStr_Old1(num: IntArr; var AStr: String);
 var
   TArr1,TArr2,TArr3,TArr4,TArr5:IntArr;
   TArr6,TArr7,TArr8:IntArr;
@@ -11179,7 +11777,7 @@ begin
   SetLength(StrArr,0);
 end;
 
-procedure ArrMath.IntArrMod(num1, num2: IntArr; var numResult: IntArr);
+class procedure ArrMath.IntArrMod(num1, num2: IntArr; var numResult: IntArr);
 var
   TArr1,TArr2,TArr3:IntArr;
 begin
@@ -11200,28 +11798,18 @@ end;
 
 { StringMath }
 
-constructor StringMath.Create;
-begin
-  //nothing...
-end;
-
-destructor StringMath.Destroy;
-begin
-  inherited Destroy;
-end;
-
-function StringMath.RR(const x: Real): Integer;
+class function StringMath.RR(const x: Real): Integer;
 begin
   Result:=Round(x);
   if(Round(x)>x)then Result:=Round(x)-1;
 end;
 
-function StringMath.unNum(const x: Integer): Integer;
+class function StringMath.unNum(const x: Integer): Integer;
 begin
   if(x<0)then Result:=x*(-1) else Result:=x;
 end;
 
-procedure StringMath.MoveDeciDiv(var Num1, Num2: String);
+class procedure StringMath.MoveDeciDiv(var Num1, Num2: String);
 var
   AWhole1,ADeci1,AWhole2,ADeci2:String;
   i:Integer;
@@ -11244,8 +11832,8 @@ begin
   end;
 end;
 
-procedure StringMath.getWholeDeci(const NumV: String; out AWhole, ADeci: String
-  );
+class procedure StringMath.getWholeDeci(const NumV: String; out AWhole,
+  ADeci: String);
 var
   i:Integer;
   bool1:Boolean;
@@ -11265,7 +11853,7 @@ begin
   if(bool1=False)then AWhole:=NumV;
 end;
 
-function StringMath.isPositiveAd(const NumV: String): Byte;
+class function StringMath.isPositiveAd(const NumV: String): Byte;
 begin
   Result:=2;
   if(NumV='0')or(NumV='0.0')then Exit;
@@ -11273,13 +11861,13 @@ begin
   else Result:=1;
 end;
 
-function StringMath.isPositive(const NumV: String): Boolean;
+class function StringMath.isPositive(const NumV: String): Boolean;
 begin
   if(Copy(NumV,1,1)='-')then Result:=False
   else Result:=True;
 end;
 
-function StringMath.CleanNum(const NumV: String): String;
+class function StringMath.CleanNum(const NumV: String): String;
 var
   i:Integer;
   AWhole,ADeci:String;
@@ -11341,8 +11929,8 @@ begin
   if(ASign=1)then Result:=AWhole+'.'+ADeci else Result:='-'+AWhole+'.'+ADeci;
 end;
 
-procedure StringMath.GetAlign(var num1, num2: String; const StrPlace: String;
-  const isRight: Boolean);
+class procedure StringMath.GetAlign(var num1, num2: String;
+  const StrPlace: String; const isRight: Boolean);
 var
   i:Integer;
 begin
@@ -11361,7 +11949,7 @@ begin
   end;
 end;
 
-function StringMath.isNum1Bigger(const num1, num2: String): Byte;
+class function StringMath.isNum1Bigger(const num1, num2: String): Byte;
 var
   AWhole1,ADeci1,AWhole2,ADeci2:String;
   n1,n2:String;
@@ -11389,7 +11977,7 @@ begin
   end;
 end;
 
-procedure StringMath.Carrying(const num1, num2: String; var TArr1,
+class procedure StringMath.Carrying(const num1, num2: String; var TArr1,
   TArr2: TNumArr);
 var
   i:Integer;
@@ -11420,7 +12008,7 @@ begin
   end;
 end;
 
-function StringMath.Reverse(const Num1: String): String;
+class function StringMath.Reverse(const Num1: String): String;
 var
   i:Integer;
 begin
@@ -11428,7 +12016,7 @@ begin
   for i:=1 to Length(Num1)do Result:=Num1[i]+Result;
 end;
 
-function StringMath.RR(x: String; const WithDeci: Boolean): String;
+class function StringMath.RR(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
   ASign:Boolean;
@@ -11447,7 +12035,7 @@ begin
   if(ASign=False)then Result:='-'+Result;
 end;
 
-function StringMath.RD(x: String; const WithDeci: Boolean): String;
+class function StringMath.RD(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
   ASign:Boolean;
@@ -11466,7 +12054,7 @@ begin
   if(ASign=False)then Result:='-'+Result;
 end;
 
-function StringMath.RX(x: String; const WithDeci: Boolean): String;
+class function StringMath.RX(x: String; const WithDeci: Boolean): String;
 var
   AWhole,ADeci:String;
   ASign:Boolean;
@@ -11492,7 +12080,7 @@ begin
   if(ASign=False)then Result:='-'+Result;
 end;
 
-function StringMath.GetDeciCountBaseOne(num: String): Integer;
+class function StringMath.GetDeciCountBaseOne(num: String): Integer;
 var
   Str1,Str2:String;
 begin
@@ -11502,29 +12090,31 @@ begin
   Result:=Length(Str2);
 end;
 
-procedure StringMath.RealCutDeciCountBaseOne(var num: String; CutAt: Integer);
+class procedure StringMath.RealCutDeciCountBaseOne(var num: String;
+  CutAt: Integer);
 var
   TArr1:RealArr;
 begin
   TArr1:=nil;
   TArr1:=InitReal(num);
-  ARealMath.RealCutDeciCountBaseOne(TArr1,CutAt);
+  RealMath.RealCutDeciCountBaseOne(TArr1,CutAt);
   num:=RealStr(TArr1);
   SetLength(TArr1,0);
 end;
 
-procedure StringMath.RealCutDeciCountBaseOneR(var num: String; CutAt: Integer);
+class procedure StringMath.RealCutDeciCountBaseOneR(var num: String;
+  CutAt: Integer);
 var
   TArr1:RealArr;
 begin
   TArr1:=nil;
   TArr1:=InitReal(num);
-  ARealMath.RealCutDeciCountBaseOneR(TArr1,CutAt);
+  RealMath.RealCutDeciCountBaseOneR(TArr1,CutAt);
   num:=RealStr(TArr1);
   SetLength(TArr1,0);
 end;
 
-function StringMath.Sum(const num1, num2: String): String;
+class function StringMath.Sum(const num1, num2: String): String;
 var
   AWhole1,ADeci1,AWhole2,ADeci2:String;
   n1,n2:String;
@@ -11553,7 +12143,7 @@ begin
   Result:=Reverse(Result);
 end;
 
-function StringMath.Sub(const num1, num2: String): String;
+class function StringMath.Sub(const num1, num2: String): String;
 var
   AWhole1,ADeci1,AWhole2,ADeci2:String;
   n1,n2,BB,SS:String;
@@ -11591,7 +12181,7 @@ begin
   Result:=Reverse(Result);
 end;
 
-function StringMath.SumSub(const num1, num2: String): String;
+class function StringMath.SumSub(const num1, num2: String): String;
 var
   n1,n2:String;
   iNB:Byte;
@@ -11626,7 +12216,7 @@ begin
   Result:=CleanNum(Result);
 end;
 
-function StringMath.Mul(const num1, num2: String): String;
+class function StringMath.Mul(const num1, num2: String): String;
 var
   AWhole1,ADeci1,AWhole2,ADeci2:String;
   n1,n2:String;
@@ -11692,7 +12282,7 @@ begin
   Result:=Reverse(Result);
 end;
 
-function StringMath.DivA(const num1, num2: String;
+class function StringMath.DivA(const num1, num2: String;
   const DeciDigitCountBaseOne: Integer): String;
 var
   numv1,numv2:String;
@@ -11817,7 +12407,7 @@ begin
   Copy(Result,Length(AWhole1)+1,Length(Result));
 end;
 
-function StringMath.MulDiv(const num1, num2: String;
+class function StringMath.MulDiv(const num1, num2: String;
   const ADeciDigitCountBaseOne: Integer; const doMul: Boolean): String;
 var
   n1,n2:String;
@@ -11865,7 +12455,7 @@ begin
   Result:=CleanNum(Result);
 end;
 
-function StringMath.xPowerInt(Abase, Apower: String;
+class function StringMath.xPowerInt(Abase, Apower: String;
   const ADeciDigitCountBaseOne: Integer): String;
 var
   Amode:String;
@@ -11881,7 +12471,7 @@ begin
   end;
 end;
 
-function StringMath.lyn(x: String; const ADeciDigitCountBaseOne: Integer
+class function StringMath.lyn(x: String; const ADeciDigitCountBaseOne: Integer
   ): String;
 var
   n1,n2:String;
@@ -11913,7 +12503,8 @@ begin
   Result:=StrMath.MulDiv(Result,'2.0',ADeciDigitCountBaseOne,True);
 end;
 
-function StringMath.lnx(x: String; ADeciDigitCountBaseOne: Integer): String;
+class function StringMath.lnx(x: String; ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   n1,n2,n3:String;
 begin
@@ -11931,7 +12522,7 @@ begin
   Result:=StrMath.SumSub(n1,n3,ADeciDigitCountBaseOne);
 end;
 
-function StringMath.log(num, base: String; ADeciDigitCountBaseOne: Integer
+class function StringMath.log(num, base: String; ADeciDigitCountBaseOne: Integer
   ): String;
 var
   n1,n2:String;
@@ -11951,8 +12542,8 @@ begin
   Result:=StrMath.MulDiv(n1,n2,ADeciDigitCountBaseOne,False);
 end;
 
-function StringMath.SqrRoot(x: String; const ADeciDigitCountBaseOne: Integer
-  ): String;
+class function StringMath.SqrRoot(x: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 var
   i:Integer;
   n1:String;
@@ -11976,8 +12567,8 @@ begin
     Result:=self.MulDiv(n1,self.SumSub(Result,self.MulDiv(x,Result,ADeciDigitCountBaseOne,False)),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.Sine(Degrees: String; const ADeciDigitCountBaseOne: Integer
-  ): String;
+class function StringMath.Sine(Degrees: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 var
   BigN1,BigN2:Byte;
   BigN3,BigN4:Byte;
@@ -12024,7 +12615,7 @@ begin
     ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.Cosine(Degrees: String;
+class function StringMath.Cosine(Degrees: String;
   const ADeciDigitCountBaseOne: Integer): String;
 var
   BigN1,BigN2:Byte;
@@ -12074,7 +12665,7 @@ begin
     ADeciDigitCountBaseOne),ADeciDigitCountBaseOne)),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.Tangent(Degrees: String;
+class function StringMath.Tangent(Degrees: String;
   const ADeciDigitCountBaseOne: Integer): String;
 begin
   Degrees:=self.CleanNum(Degrees);
@@ -12086,8 +12677,8 @@ begin
   self.Cosine(Degrees,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False);
 end;
 
-function StringMath.InSine(SineX: String; const ADeciDigitCountBaseOne: Integer
-  ): String;
+class function StringMath.InSine(SineX: String;
+  const ADeciDigitCountBaseOne: Integer): String;
 begin
   SineX:=self.CleanNum(SineX);
   if(SineX='nan')then begin
@@ -12098,7 +12689,7 @@ begin
   ADeciDigitCountBaseOne);
 end;
 
-function StringMath.InCosine(CosineX: String;
+class function StringMath.InCosine(CosineX: String;
   const ADeciDigitCountBaseOne: Integer): String;
 begin
   CosineX:=self.CleanNum(CosineX);
@@ -12112,7 +12703,7 @@ begin
   ADeciDigitCountBaseOne),'90',ADeciDigitCountBaseOne);
 end;
 
-function StringMath.InTangent(TangentX: String;
+class function StringMath.InTangent(TangentX: String;
   const ADeciDigitCountBaseOne: Integer): String;
 begin
   TangentX:=self.CleanNum(TangentX);
@@ -12126,7 +12717,7 @@ begin
   false),'2',ADeciDigitCountBaseOne),'90',ADeciDigitCountBaseOne);
 end;
 
-function StringMath.FactorialInt(x: String;
+class function StringMath.FactorialInt(x: String;
   const ADeciDigitCountBaseOne: Integer): String;
 var
   Ct1:String;
@@ -12147,7 +12738,8 @@ begin
   end;
 end;
 
-function StringMath.ePower(x: String; ADeciDigitCountBaseOne: Integer): String;
+class function StringMath.ePower(x: String; ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   n1,n2,n3:String;
   i:Integer;
@@ -12167,7 +12759,8 @@ begin
   end;
 end;
 
-function StringMath.ePowerX(x: String; ADeciDigitCountBaseOne: Integer): String;
+class function StringMath.ePowerX(x: String; ADeciDigitCountBaseOne: Integer
+  ): String;
 var
   n1,n2,n3:String;
 begin
@@ -12187,7 +12780,7 @@ begin
   Result:=StrMath.MulDiv(n3,self.ePower(n2,ADeciDigitCountBaseOne),ADeciDigitCountBaseOne);
 end;
 
-function StringMath.xPower(Abase, Apower: String;
+class function StringMath.xPower(Abase, Apower: String;
   ADeciDigitCountBaseOne: Integer): String;
 var
   n1,n2:String;
@@ -12201,7 +12794,7 @@ begin
   Result:=StrMath.MulDiv(n1,n2,ADeciDigitCountBaseOne);
 end;
 
-procedure StringMath.xPowerDiv2(var Abase, Apower: String;
+class procedure StringMath.xPowerDiv2(var Abase, Apower: String;
   ADeciDigitCountBaseOne: Integer);
 var
   n1,n2,n3:String;
@@ -12224,7 +12817,7 @@ begin
   //End...
 end;
 
-function StringMath.xPowerX(Abase, Apower: String;
+class function StringMath.xPowerX(Abase, Apower: String;
   ADeciDigitCountBaseOne: Integer): String;
 begin
   Abase:=self.CleanNum(Abase);
@@ -12253,7 +12846,7 @@ begin
   Result:=self.xPower(Abase,Apower,ADeciDigitCountBaseOne);
 end;
 
-function StringMath.xModX(num1, num2: String): String;
+class function StringMath.xModX(num1, num2: String): String;
 var
   TArr1,TArr2,TArr3:String;
 begin
@@ -12272,15 +12865,6 @@ begin
   SetLength(TArr2,0);
   SetLength(TArr3,0);
 end;
-
-initialization
-  AArrMath:=ArrMath.Create;
-  ARealMath:=RealMath.Create;
-  AStrMath:=StringMath.Create;
-finalization
-  AArrMath.Free;
-  ARealMath.Free;
-  AStrMath.Free;
 
 end.
 
