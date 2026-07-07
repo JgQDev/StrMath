@@ -665,6 +665,21 @@ type
     function Component_AlignNums(const num1VarName,num2VarName:String):Integer;
     function Component_AssignIntNum(const numVarName,numResultVarName:String):Integer;
     function Component_CutSome(const numVarName,numResultVarName:String):Integer;
+
+    function Component_IsBitPosVar(const numVarName,ResultBoolVarName:String):Integer;
+    function Component_CreateBitPosVar(const numResultVarName:String):Integer;
+    function Component_GetBitPos(const numBitPos,ResultIntByteAtBaseZero,ResultIntBitAtBaseZero:String):Integer;
+
+    function Component_SetBitPosZero(const numResultBitPos:String):Integer;
+    function Component_CopyBitPos(const CopyNumBitPos,ToNumResultBitPos:String):Integer;
+    function Component_SetBitPos(const numResultBitPos,IntByteAtBaseZero,IntBitAtBaseZero:String):Integer;
+    function Component_IncBitPos(const numResultBitPos:String):Integer;
+    function Component_DecBitPos(const numResultBitPos:String):Integer;
+    function Component_GetLastBit(const numResultBitPos,numIntArr:String):Integer;
+    function Component_IsBitPosEqual(const num1BitPos,num2BitPos,ResultBoolVarName:String):Integer;
+    function Component_IsBitPosSet(const numBitPos,numIntArr,ResultBoolVarName:String):Integer;
+    function Component_BitPosSetArr(const numBitPos,numResultIntArr:String):Integer;
+    function Component_BitPosAddSetArr(const numBitPos,numResultIntArr:String):Integer;
   end;
 
   { CodeBuild }
@@ -5501,6 +5516,534 @@ begin
   self.TPtrCComponent^.Component_JumpTo(AMem1+'kForBegin');
 
   self.TPtrCComponent^.Component_Port('kForEnd');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_IsBitPosVar(const numVarName,
+  ResultBoolVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  Result:=False;
+  if(Length(num)=8)then Result:=True;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('NumLength',0);
+
+  self.TPtrCComponent^.Component_SetVarMem(ResultBoolVarName,0);
+
+  self.TPtrCComponent^.Component_Length(numVarName,AMem1+'NumLength');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'NumLength',AMem1+'Num8',ResultBoolVarName);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_CreateBitPosVar(const numResultVarName: String
+  ): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  TBitPos = Record
+    ByteAtBaseZero:Integer;
+    BitAtBaseZero:Integer;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'NumZero');
+  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'Num8');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_GetBitPos(const numBitPos,
+  ResultIntByteAtBaseZero, ResultIntBitAtBaseZero: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  TBitPos = Record
+    ByteAtBaseZero:Integer;
+    BitAtBaseZero:Integer;
+  end;
+  }
+
+  {
+  ResultIntByteAtBaseZero:=numBitPos[0];
+  ResultIntBitAtBaseZero:=numBitPos[1];
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('Num4',4);
+  self.TPtrCComponent^.Component_AllocateMem('Num3',3);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('NumCal',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+
+  self.TPtrCComponent^.Component_SetVarMem(ResultIntByteAtBaseZero,-1);
+  self.TPtrCComponent^.Component_SetVarMem(ResultIntBitAtBaseZero,-1);
+
+  self.Component_IsBitPosVar(numBitPos,AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'jForEnd');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'Num3',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numBitPos,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(ResultIntByteAtBaseZero,AMem1+'i',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
+  self.TPtrCComponent^.Component_Port('jForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'Num7',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'jForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numBitPos,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'Num4',AMem1+'NumCal');
+  self.TPtrCComponent^.Component_ArrayIndexSet(ResultIntBitAtBaseZero,AMem1+'NumCal',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'jForBegin');
+
+  self.TPtrCComponent^.Component_Port('jForEnd');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_SetBitPosZero(const numResultBitPos: String
+  ): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.SetBitPosZero(var num: TBitPos);
+  begin
+    num.ByteAtBaseZero:=0;
+    num.BitAtBaseZero:=0;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.Component_IsBitPosVar(numResultBitPos,AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_SetLength(numResultBitPos,AMem1+'NumZero');
+  self.TPtrCComponent^.Component_SetLength(numResultBitPos,AMem1+'Num8');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_CopyBitPos(const CopyNumBitPos,
+  ToNumResultBitPos: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.CopyBitPos(const CopyNum: TBitPos; var ToNum: TBitPos);
+  begin
+    ToNum.ByteAtBaseZero:=CopyNum.ByteAtBaseZero;
+    ToNum.BitAtBaseZero:=CopyNum.BitAtBaseZero;
+
+    if(ToNum.BitAtBaseZero<0)then ToNum.BitAtBaseZero:=7 else
+    if(ToNum.BitAtBaseZero>7)then ToNum.BitAtBaseZero:=0;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumByte',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumBit',0);
+
+  self.Component_GetBitPos(CopyNumBitPos,AMem1+'NumByte',AMem1+'NumBit');
+  self.Component_SetBitPos(ToNumResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_SetBitPos(const numResultBitPos,
+  IntByteAtBaseZero, IntBitAtBaseZero: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.SetBitPos(var num: TBitPos; const ByteAtBaseZero,
+    BitAtBaseZero: Integer);
+  begin
+    num.ByteAtBaseZero:=ByteAtBaseZero;
+    if(num.ByteAtBaseZero<0)then num.ByteAtBaseZero:=0;
+    if(BitAtBaseZero<0)then num.BitAtBaseZero:=7 else
+    if(BitAtBaseZero>7)then num.BitAtBaseZero:=0 else num.BitAtBaseZero:=BitAtBaseZero;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('Num4',4);
+  self.TPtrCComponent^.Component_AllocateMem('Num3',3);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('NumCal',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumByte',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumBit',0);
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_V1LTV2(IntByteAtBaseZero,AMem1+'NumZero',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumByte',AMem1+'NumZero');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse5');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumByte',IntByteAtBaseZero);
+
+  self.TPtrCComponent^.Component_Port('JumpFalse5');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_V1LTV2(IntBitAtBaseZero,AMem1+'NumZero',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'Num7');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1GTV2(IntBitAtBaseZero,AMem1+'Num7',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'NumZero');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',IntBitAtBaseZero);
+
+  self.TPtrCComponent^.Component_Port('JumpFalse4');
+
+  //============================================================================
+
+  self.Component_IsBitPosVar(numResultBitPos,AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'jForEnd');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'Num3',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'NumByte',AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultBitPos,AMem1+'i',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
+  self.TPtrCComponent^.Component_Port('jForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'Num7',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'jForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'Num4',AMem1+'NumCal');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'NumBit',AMem1+'NumCal',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultBitPos,AMem1+'i',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'jForBegin');
+
+  self.TPtrCComponent^.Component_Port('jForEnd');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_IncBitPos(const numResultBitPos: String
+  ): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.IncBitPos(var num: TBitPos);
+  begin
+    if(num.BitAtBaseZero<0)then num.BitAtBaseZero:=7 else
+    if(num.BitAtBaseZero>7)then num.BitAtBaseZero:=0;
+
+    num.BitAtBaseZero:=num.BitAtBaseZero+1;
+    if(num.BitAtBaseZero>7)then begin
+      num.BitAtBaseZero:=0;
+      num.ByteAtBaseZero:=num.ByteAtBaseZero+1;
+    end;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumByte',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumBit',0);
+
+  self.Component_GetBitPos(numResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'NumBit',AMem1+'NumOne',AMem1+'NumBit');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'NumBit',AMem1+'Num7',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'NumZero');
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'NumByte',AMem1+'NumOne',AMem1+'NumByte');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.Component_SetBitPos(numResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_DecBitPos(const numResultBitPos: String
+  ): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.DecBitPos(var num: TBitPos);
+  begin
+    if(num.BitAtBaseZero<0)then num.BitAtBaseZero:=7 else
+    if(num.BitAtBaseZero>7)then num.BitAtBaseZero:=0;
+
+    num.BitAtBaseZero:=num.BitAtBaseZero-1;
+    if(num.BitAtBaseZero<0)then begin
+      num.BitAtBaseZero:=7;
+      num.ByteAtBaseZero:=num.ByteAtBaseZero-1;
+    end;
+    if(num.ByteAtBaseZero<0)then num.ByteAtBaseZero:=0;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumByte',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumBit',0);
+
+  self.Component_GetBitPos(numResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'NumBit',AMem1+'NumOne',AMem1+'NumBit');
+  self.TPtrCComponent^.Component_V1LTV2(AMem1+'NumBit',AMem1+'NumZero',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'Num7');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'NumByte',AMem1+'NumOne',AMem1+'NumByte');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.Component_SetBitPos(numResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_GetLastBit(const numResultBitPos,
+  numIntArr: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.GetLastBit(var num: TBitPos; const numArr: IntArr);
+  var
+    i:Integer;
+    bool1:Boolean;
+    n1PosZero:TBitPos;
+  begin
+    if(Length(numArr)=0)then Exit;
+    bool1:=False;
+    for i:=0 to (Length(numArr)-1)do if(numArr[i]<>0)then begin bool1:=True;break;end;
+    if(bool1=False)then begin
+      num.ByteAtBaseZero:=0;
+      num.BitAtBaseZero:=0;
+      Exit;
+    end;
+    self.SetBitPos(num,Length(numArr)-1,7);
+    self.SetBitPosZero(n1PosZero);
+    While(self.IsBitPosEqual(num,n1PosZero)=False)do begin
+      if(self.IsBitPosSet(num,numArr)=True)then Exit
+      else self.DecBitPos(num);
+    end;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_IsBitPosEqual(const num1BitPos, num2BitPos,
+  ResultBoolVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class function ArrMath.IsBitPosEqual(num1, num2: TBitPos): Boolean;
+  begin
+    Result:=False;
+
+    if(num1.BitAtBaseZero<0)then num1.BitAtBaseZero:=7 else
+    if(num1.BitAtBaseZero>7)then num1.BitAtBaseZero:=0;
+
+    if(num2.BitAtBaseZero<0)then num2.BitAtBaseZero:=7 else
+    if(num2.BitAtBaseZero>7)then num2.BitAtBaseZero:=0;
+
+    if(num1.ByteAtBaseZero<0)then num1.ByteAtBaseZero:=0;
+    if(num2.ByteAtBaseZero<0)then num2.ByteAtBaseZero:=0;
+
+    if(num1.ByteAtBaseZero<>num2.ByteAtBaseZero)or
+    (num1.BitAtBaseZero<>num2.BitAtBaseZero)then Exit;
+
+    Result:=True;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_IsBitPosSet(const numBitPos, numIntArr,
+  ResultBoolVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class function ArrMath.IsBitPosSet(const num: TBitPos; const numArr: IntArr
+    ): Boolean;
+  begin
+    Result:=False;
+
+    if(Length(numArr)=0)then Exit;
+    if(num.ByteAtBaseZero<0)or(num.ByteAtBaseZero>(Length(numArr)-1))then Exit;
+
+    Result:=self.IsBitSet(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_BitPosSetArr(const numBitPos,
+  numResultIntArr: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.BitPosSetArr(const num: TBitPos; var numArr: IntArr);
+  begin
+    if(Length(numArr)=0)then Exit;
+    if(num.ByteAtBaseZero<0)or(num.ByteAtBaseZero>(Length(numArr)-1))then Exit;
+
+    self.SetBit(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_BitPosAddSetArr(const numBitPos,
+  numResultIntArr: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.BitPosAddSetArr(const num: TBitPos; var numArr: IntArr);
+  begin
+    if(num.ByteAtBaseZero>(Length(numArr)-1))then SetLength(numArr,num.ByteAtBaseZero+1);
+    self.SetBit(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
 
