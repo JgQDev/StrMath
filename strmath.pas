@@ -4550,7 +4550,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForEnd');
 
-  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
   self.TPtrCComponent^.Component_SetLength(AMem1+'TArr1',AMem1+'i');
 
   self.TPtrCComponent^.Component_Length(AMem1+'TArr1',AMem1+'TArrLength');
@@ -4804,14 +4803,14 @@ begin
   self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd1',AMem1+'JumpFalse3');
 
   self.TPtrCComponent^.Component_MoveV2ToV1(ResultByteVarName,AMem1+'True');
-  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit1');
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
   self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd2',AMem1+'JumpFalse4');
 
   self.TPtrCComponent^.Component_MoveV2ToV1(ResultByteVarName,AMem1+'False');
-  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit1');
 
   self.TPtrCComponent^.Component_Port('JumpFalse4');
 
@@ -4830,6 +4829,8 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_MoveV2ToV1(ResultByteVarName,AMem1+'True2');
+
+  self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
 
@@ -6314,6 +6315,157 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('bool4',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteB',0);
+  self.TPtrCComponent^.Component_AllocateMem('num1',0);
+  self.TPtrCComponent^.Component_AllocateMem('num2',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd1',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd2',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd3',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool2',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool3',0);
+
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'NumZero');
+  self.Component_AlignNums(num1IntArr,num2IntArr);
+  self.TPtrCComponent^.Component_Length(num1IntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool3',AMem1+'False');
+
+  self.Component_BitsLength(num1IntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'numLength',AMem1+'NumOne',AMem1+'numLength');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool4',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool2',AMem1+'False');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'i',AMem1+'Num8',AMem1+'num1');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'num1',AMem1+'Num8',AMem1+'num2');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'num2',AMem1+'num2');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(num1IntArr,AMem1+'num1',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexGet(num2IntArr,AMem1+'num1',AMem1+'ByteB');
+
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'num2',AMem1+'bool4');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool4',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.Component_IsBitSet(AMem1+'ByteB',AMem1+'num2',AMem1+'bool4');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool4',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool2',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'False',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse4');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool3',AMem1+'False');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'False',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse5');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse5');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse5');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'True',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse6');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse6');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse6');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'True',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse8');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse8');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool3',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse7');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse9');
+
+  self.Component_SetLengthInc(numResultIntArr,AMem1+'False');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'i',AMem1+'Num8',AMem1+'num1');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'num1',AMem1+'Num8',AMem1+'num2');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'num2',AMem1+'num2');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse9');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -6381,6 +6533,172 @@ begin
   }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('bool4',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteB',0);
+  self.TPtrCComponent^.Component_AllocateMem('num1',0);
+  self.TPtrCComponent^.Component_AllocateMem('num2',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd1',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd2',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd3',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool2',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool3',0);
+  self.TPtrCComponent^.Component_AllocateMem('TArr1',nil);
+  self.TPtrCComponent^.Component_AllocateMem('TArr2',nil);
+
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'NumZero');
+  self.Component_AlignNums(num1IntArr,num2IntArr);
+  self.TPtrCComponent^.Component_Length(num1IntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'numLength');
+  self.Component_isNum1Bigger(num1IntArr,num2IntArr,num1BiggerByteResult);
+
+  self.TPtrCComponent^.Component_V1EqV2(num1BiggerByteResult,AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse8');
+
+  self.Component_SetInt(num2IntArr,AMem1+'TArr1');
+  self.Component_SetInt(num1IntArr,AMem1+'TArr2');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse8');
+
+  self.TPtrCComponent^.Component_V1EqV2(num1BiggerByteResult,AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse9');
+
+  self.Component_SetInt(num1IntArr,AMem1+'TArr1');
+  self.Component_SetInt(num2IntArr,AMem1+'TArr2');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse9');
+
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'NumZero');
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'NumOne');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse10');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool3',AMem1+'False');
+
+  self.Component_BitsLength(num1IntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'numLength',AMem1+'NumOne',AMem1+'numLength');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool4',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool2',AMem1+'False');
+
+  self.TPtrCComponent^.Component_DivInteger(AMem1+'i',AMem1+'Num8',AMem1+'num1');
+  self.TPtrCComponent^.Component_MulInteger(AMem1+'num1',AMem1+'Num8',AMem1+'num2');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'num2',AMem1+'num2');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'TArr1',AMem1+'num1',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'TArr2',AMem1+'num1',AMem1+'ByteB');
+
+  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'num2',AMem1+'bool4');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool4',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.Component_IsBitSet(AMem1+'ByteB',AMem1+'num2',AMem1+'bool4');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool4',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool2',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'False',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'False',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse5');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool3',AMem1+'False');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse5');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse4');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse5');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse5');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'True',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse6');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse6');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool3',AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse6');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'True',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool3',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+  self.Component_SetBit(AMem1+'ByteA',AMem1+'num2',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'num1',AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse7');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
 
