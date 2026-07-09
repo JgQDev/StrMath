@@ -684,6 +684,10 @@ type
     function Component_SumInt(const num1IntArr,num2IntArr,numResultIntArr:String):Integer;
     function Component_SubInt(const num1IntArr,num2IntArr,numResultIntArr,num1BiggerByteResult:String):Integer;
     function Component_SumSubInt(const num1IntArr,num2IntArr,numResultIntArr:String):Integer;
+
+    function Component_MulIntBit(const num1IntArr,num2IntArr,numResultIntArr:String):Integer;
+    function Component_DivInt(const num1IntArr,num2IntArr,numResultIntArr:String):Integer;
+    function Component_MulDivInt(const num1IntArr,num2IntArr,numResultIntArr,doMulBool:String):Integer;
   end;
 
   { CodeBuild }
@@ -6750,6 +6754,346 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('True2',2);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool4',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength',0);
+  self.TPtrCComponent^.Component_AllocateMem('num1',nil);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd1',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd2',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd3',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True2',AMem1+'NumZero',AMem1+'True2');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('bool2',0);
+  self.TPtrCComponent^.Component_AllocateMem('AByte',0);
+
+  self.TPtrCComponent^.Component_SetLength(numResultIntArr,AMem1+'NumZero');
+
+  self.TPtrCComponent^.Component_Length(num1IntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength',AMem1+'NumZero',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool4',AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_Length(num2IntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength',AMem1+'NumZero',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool4',AMem1+'JumpExit1');
+
+  self.Component_isPositive(num1IntArr,AMem1+'bool1');
+  self.Component_isPositive(num2IntArr,AMem1+'bool2');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'False',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse1');
+
+  self.Component_SumInt(num1IntArr,num2IntArr,numResultIntArr);
+  self.Component_Shift(AMem1+'False',AMem1+'False',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'False',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse3');
+
+  self.Component_SubInt(num1IntArr,num2IntArr,numResultIntArr,AMem1+'AByte');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'AByte',AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse4');
+
+  self.Component_Shift(AMem1+'False',AMem1+'False',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse4');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'AByte',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse5');
+
+  self.Component_Shift(AMem1+'False',AMem1+'True',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse5');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'AByte',AMem1+'True2',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse6');
+
+  self.Component_Shift(AMem1+'False',AMem1+'True',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse6');
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'True',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse10');
+
+  self.Component_SubInt(num1IntArr,num2IntArr,numResultIntArr,AMem1+'AByte');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'AByte',AMem1+'False',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse7');
+
+  self.Component_Shift(AMem1+'False',AMem1+'True',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse7');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'AByte',AMem1+'True',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse8');
+
+  self.Component_Shift(AMem1+'False',AMem1+'False',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse8');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'AByte',AMem1+'True2',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpFalse9');
+
+  self.Component_Shift(AMem1+'False',AMem1+'True',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse9');
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse10');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'True',AMem1+'boolAnd1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool2',AMem1+'True',AMem1+'boolAnd2');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd1',AMem1+'boolAnd2',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse2');
+
+  self.Component_SumInt(num1IntArr,num2IntArr,numResultIntArr);
+  self.Component_Shift(AMem1+'False',AMem1+'True',numResultIntArr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_Length(numResultIntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'numLength',AMem1+'NumOne',AMem1+'bool4');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool4',AMem1+'JumpExit1');
+
+  self.Component_CutSome(numResultIntArr,AMem1+'num1');
+  self.Component_SetInt(AMem1+'num1',numResultIntArr);
+
+  self.TPtrCComponent^.Component_Port('JumpExit1');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_MulIntBit(const num1IntArr, num2IntArr,
+  numResultIntArr: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.MulIntBit(num1, num2: IntArr; var numResult: IntArr);
+  var
+    i:Integer;
+    n1PosCount:TBitPos;
+    n1Pos,n1PosF1,n2Pos,n2PosF1,n2PosF3:TBitPos;
+    n1PosF2,n2PosF2:TBitPos;
+    bool1,bool2,bool3:Boolean;
+    AData:Byte;
+    CData0,CData1:Integer;
+  begin
+    SetLength(numResult,0);
+    self.SetBitPosZero(n1PosCount);
+
+    self.SetBitPosZero(n1Pos);
+    self.SetBitPosZero(n1PosF1);
+    self.GetLastBit(n1PosF2,num1);
+
+    self.SetBitPosZero(n2Pos);
+    self.SetBitPosZero(n2PosF1);
+    self.GetLastBit(n2PosF2,num2);
+    self.SetBitPosZero(n2PosF3);
+
+    CData0:=0;
+    CData1:=0;
+    bool2:=False;
+    bool3:=False;
+    While(bool3=False)do begin
+      bool1:=False;
+      AData:=0;
+      CData1:=0;
+      repeat
+        if(bool1=True)then begin self.DecBitPos(n1Pos);self.IncBitPos(n2Pos);end;
+        if(self.IsBitPosSet(n1Pos,num1)=True)and
+        (self.IsBitPosSet(n2Pos,num2)=True)then begin
+          if(CData0>0)then begin CData0:=CData0-1;AData:=AData+2;end else AData:=AData+1;
+          if(AData=2)then begin AData:=0;CData1:=CData1+1;end else
+          if(AData=3)then begin AData:=1;CData1:=CData1+1;end;
+        end else
+        if(CData0>0)then begin
+          CData0:=CData0-1;AData:=AData+1;
+          if(AData=2)then begin AData:=0;CData1:=CData1+1;end else
+          if(AData=3)then begin AData:=1;CData1:=CData1+1;end;
+        end;
+        if(self.IsBitPosEqual(n1Pos,n1PosF2)=True)and(bool2=False)then bool2:=True;
+        if(bool1=False)then bool1:=True;
+        if(self.IsBitPosEqual(n1Pos,n1PosF2)=True)and
+        (self.IsBitPosEqual(n2Pos,n2PosF2)=True)then bool3:=True;
+      until(self.IsBitPosEqual(n2Pos,n2PosF1)=True);
+
+      for i:=1 to CData0 do begin
+        if(CData0>0)then begin
+          CData0:=CData0-1;AData:=AData+1;
+          if(AData=2)then begin AData:=0;CData1:=CData1+1;end else
+          if(AData=3)then begin AData:=1;CData1:=CData1+1;end;
+        end;
+      end;
+
+      CData0:=CData0+CData1;
+      if(AData=1)then self.BitPosAddSetArr(n1PosCount,numResult);
+      self.IncBitPos(n1PosCount);
+      if(self.IsBitPosEqual(n1PosF1,n1PosF2)=False)then self.IncBitPos(n1PosF1);
+      if(self.IsBitPosEqual(n2PosF1,n2PosF2)=False)then self.IncBitPos(n2PosF1);
+      self.CopyBitPos(n1PosF1,n1Pos);
+      if(bool2=False)then self.SetBitPosZero(n2Pos)else
+      if(bool2=True)and(self.IsBitPosEqual(n2PosF3,n2PosF2)=False)then begin
+        self.IncBitPos(n2PosF3);
+        self.CopyBitPos(n2PosF3,n2Pos);
+      end;
+    end;
+
+    if(CData0=1)then self.BitPosAddSetArr(n1PosCount,numResult);
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_DivInt(const num1IntArr, num2IntArr,
+  numResultIntArr: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.DivInt(num1, num2: IntArr; var numResult: IntArr);
+  var
+    i:Integer;
+    TArr2,TArr3:IntArr;
+    AMode,Num1Big:Byte;
+  begin
+    TArr2:=nil;
+    TArr3:=nil;
+    SetLength(numResult,1);
+    numResult[0]:=0;
+    SetLength(TArr2,1);
+    TArr2[0]:=0;
+    AMode:=0;
+    Num1Big:=0;
+    for i:=(self.BitsLength(num1)-1) downto 0 do begin
+      if(self.IsBitSet(num1[self.RR(i/8)],i-(self.RR(i/8)*8))=True)
+      then self.Shift(False,True,TArr2) else self.Shift(False,False,TArr2);
+      AMode:=self.isNum1BiggerAlign(num2,TArr2);
+      if(AMode=0)then begin
+        self.Shift(False,True,numResult);
+        self.SubInt(TArr2,num2,TArr3,Num1Big);
+        self.SetInt(TArr3,TArr2);
+      end else
+      if(AMode=1)then begin
+        self.Shift(False,False,numResult);
+      end else
+      if(AMode=2)then begin
+        self.Shift(False,True,numResult);
+        self.InitZeroToNine(False,0,TArr2);
+        self.Shift(True,False,TArr2);
+      end;
+    end;
+    SetLength(TArr2,0);
+    SetLength(TArr3,0);
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_MulDivInt(const num1IntArr, num2IntArr,
+  numResultIntArr, doMulBool: String): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.MulDivInt(num1, num2: IntArr; var numResult: IntArr;
+    const doMul: Boolean);
+  var
+    bool1,bool2:Boolean;
+  begin
+    SetLength(numResult,0);
+    if(Length(num1)=0)then Exit;
+    if(Length(num2)=0)then Exit;
+    bool1:=self.isPositive(num1);
+    bool2:=self.isPositive(num2);
+    if(self.isIntZero(num2)=True)and(doMul=False)then Exit;
+    if(bool1=False)and(bool2=False)then begin
+      //if(doMul=True)then self.MulInt(num1,num2,numResult) else
+      if(doMul=True)then self.MulIntBit(num1,num2,numResult) else
+      //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
+      if(doMul=False)then self.DivInt(num1,num2,numResult);
+      self.Shift(False,True,numResult);
+    end else
+    if(bool1=True)and(bool2=False)then begin
+      //if(doMul=True)then self.MulInt(num1,num2,numResult) else
+      if(doMul=True)then self.MulIntBit(num1,num2,numResult) else
+      //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
+      if(doMul=False)then self.DivInt(num1,num2,numResult);
+      self.Shift(False,False,numResult);
+    end else
+    if(bool1=False)and(bool2=True)then begin
+      //if(doMul=True)then self.MulInt(num1,num2,numResult) else
+      if(doMul=True)then self.MulIntBit(num1,num2,numResult) else
+      //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
+      if(doMul=False)then self.DivInt(num1,num2,numResult);
+      self.Shift(False,False,numResult);
+    end else
+    if(bool1=True)and(bool2=True)then begin
+      //if(doMul=True)then self.MulInt(num1,num2,numResult) else
+      if(doMul=True)then self.MulIntBit(num1,num2,numResult) else
+      //if(doMul=True)then self.MulIntSum(num1,num2,numResult) else
+      if(doMul=False)then self.DivInt(num1,num2,numResult);
+      self.Shift(False,True,numResult);
+    end;
+    if(Length(numResult)>1)then begin
+      self.CutSome(numResult,num1);
+      self.SetInt(num1,numResult);
+    end;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -6845,16 +7189,12 @@ begin
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
     bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
-    if(bool1=False)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
-    if(bool1=True)and(bool2=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
   bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
-  if(bool1=False)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
-  if(bool1=True)and(bool2=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+  if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
 end;
 
 function CodeComponentBasic.GetNot(const num1: Number): Number;
@@ -6892,8 +7232,8 @@ begin
   Result:=nil;
   SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
   if(Length(num1)=0)and(Length(num2)=0)then Exit;
-  if(Length(num1)>Length(num2))then Exit;
-  if(Length(num1)<Length(num2))then Exit;
+  if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
+  if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
 
   for i:=0 to (Length(num1)-1)do if(num1[i]<>num2[i])then Exit;
   Result[Length(Result)-1]:=1;
