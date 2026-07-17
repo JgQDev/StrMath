@@ -324,6 +324,8 @@ type
     constructor Create(var ACodePoint:CodePoint);
     destructor Destroy; override;
     procedure ChangeTo(var ACodePoint:CodePoint);
+    procedure Point_Continue;
+    procedure Point_ToPrevious;
     procedure Point_SetPoint(const APoint:Integer);
     procedure Point_AddLast;
     procedure Point_AddLast(const APoint:Integer);
@@ -568,6 +570,7 @@ type
   CodeComponentBasic = class(TObject)
   private
     TCProperty:PtrCodeProperties;
+    TCMemCapNum:^Integer;
     function isVarNameValid(const VarName:String):Boolean;
   public
     constructor Create;
@@ -715,6 +718,9 @@ type
     function Component_MulIntBit(const num1IntArr,num2IntArr,numResultIntArr:String):Integer;
     function Component_DivInt(const num1IntArr,num2IntArr,numResultIntArr:String):Integer;
     function Component_MulDivInt(const num1IntArr,num2IntArr,numResultIntArr,doMulBool:String):Integer;
+
+    function Component_StrToIntArr(const AStr,numResultIntArr:String):Integer;
+    function Component_IntArrToStr(const numIntArr,AStrResult:String):Integer;
   end;
 
   { CodeBuild }
@@ -723,6 +729,7 @@ type
   private
     TCodeComponentBasic:CodeComponentBasic;
     TCodeComponent:CodeComponent;
+    TCMemCapNum:Integer;
   public
     Build_Basic:^CodeComponentBasic;
     Build_Advance:^CodeComponent;
@@ -3300,18 +3307,21 @@ begin
   TCBuild:=CodeBuild.Create(@TCProperty);
   TCCores:=CodeCores.Create;
 
-  TCBuild.Build_Basic^.UnComponent_CreateVariable('Real1',10.5);
+  TCBuild.Build_Basic^.UnComponent_CreateVariable('NumLength1',0);
+  TCBuild.Build_Basic^.UnComponent_CreateVariable('NumLength2',0);
   TCBuild.Build_Basic^.UnComponent_CreateVariable('Num1',0);
 
-  TCBuild.Build_Advance^.Component_RR('Real1','Num1');
+  TCBuild.Build_Basic^.Component_ArrayIndexGet('Num1','NumLength1','Num1');
+  TCBuild.Build_Advance^.Component_SetBit('Num1','NumLength2','Num1');
+  TCBuild.Build_Advance^.Component_ClearBit('Num1','NumLength2','Num1');
 
   TCCores.Cores_AddProperty(TCProperty);
   While(TCCores.Cores_isPropertyDone=False)do begin
+    if(TCCores.Cores_ErrorLength>0)then Break;
     TCCores.Cores_RunProperty;
     TCCores.Cores_Continue;
   end;
 
-  Real1:=TCCores.Cores_GetPropertyVar_Real(0,'Real1');
   Num1:=TCCores.Cores_GetPropertyVar_Integer(0,'Num1');
 
   TCCores.Free;
@@ -7693,6 +7703,130 @@ begin
 
 end;
 
+function CodeComponent.Component_StrToIntArr(const AStr, numResultIntArr: String
+  ): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.StrToIntArr(AStr: String; var numResult: IntArr);
+  var
+    bool1:Boolean;
+    i:Integer;
+    TArr1,TArr2,TArr3,TArr4,TArr5:IntArr;
+  begin
+    SetLength(numResult,0);
+    if(Length(AStr)=0)then Exit;
+    TArr1:=nil;
+    TArr2:=nil;
+    TArr3:=nil;
+    TArr4:=nil;
+    TArr5:=nil;
+    bool1:=False;
+    if(AStr[1]='-')then begin
+      bool1:=True;
+      AStr:=Copy(AStr,2,Length(AStr));
+    end else
+    if(AStr[1]='+')then AStr:=Copy(AStr,2,Length(AStr));
+    for i:=1 to Length(AStr)do if(self.isIntNumber(AStr[i])=False)then Exit;
+    if(Length(AStr)=1)then begin
+      self.InitZeroToNine(bool1,StrToInt(AStr),numResult);
+    end else
+    if(Length(AStr)>1)then begin
+      self.InitZeroToNine(False,StrToInt(AStr[Length(AStr)]),numResult);
+      AStr:=Copy(AStr,1,Length(AStr)-1);
+      self.InitZeroToNine(False,5,TArr1);
+      self.InitZeroToNine(False,5,TArr2);
+      self.SumSubInt(TArr1,TArr2,TArr3);
+      self.SetInt(TArr3,TArr4);
+      self.SetInt(TArr3,TArr5);
+      for i:=1 to Length(AStr)do begin
+        self.SetInt(TArr5,TArr1);
+        self.MulDivInt(TArr1,TArr4,TArr5,True);
+      end;
+      self.SetInt(numResult,TArr1);
+      self.SumSubInt(TArr5,TArr1,numResult);
+      for i:=Length(AStr) downto 1 do begin
+        self.InitZeroToNine(False,StrToInt(AStr[i]),TArr1);
+        self.MulDivInt(TArr3,TArr1,TArr2,True);
+        self.SetInt(numResult,TArr1);
+        self.SumSubInt(TArr1,TArr2,numResult);
+        self.SetInt(TArr3,TArr2);
+        self.MulDivInt(TArr2,TArr4,TArr3,True);
+      end;
+      self.SetInt(numResult,TArr1);
+      self.InitZeroToNine(True,1,TArr2);
+      self.MulDivInt(TArr5,TArr2,TArr4,True);
+      self.SumSubInt(TArr1,TArr4,numResult);
+      if(bool1=True)then begin
+        self.SetInt(numResult,TArr1);
+        self.InitZeroToNine(True,1,TArr2);
+        self.MulDivInt(TArr1,TArr2,numResult,True);
+      end;
+    end;
+    SetLength(TArr1,0);
+    SetLength(TArr2,0);
+    SetLength(TArr3,0);
+    SetLength(TArr4,0);
+    SetLength(TArr5,0);
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
+function CodeComponent.Component_IntArrToStr(const numIntArr, AStrResult: String
+  ): Integer;
+var
+  AMem1:String;
+begin
+
+  {
+  class procedure ArrMath.IntArrToStr(num: IntArr; var AStr: String);
+  var
+    n1Str,n2Str:String;
+    n1Pos,n1PosF1:TBitPos;
+    ByteA:Byte;
+  begin
+    AStr:='nil';
+    if(Length(num)=0)then Exit;
+    ByteA:=isPositiveIntAdvance(num);  // 0 = False, 1 = True, 2 = Zero, 3 = Error
+    if(ByteA=3)then Exit;
+    self.Shift(True,False,num);
+
+    AStr:='0.0';
+    n1Str:='1';
+    n2Str:='0';
+
+    self.SetBitPosZero(n1Pos);
+    self.GetLastBit(n1PosF1,num);
+
+    While(self.IsBitPosEqual(n1Pos,n1PosF1)=False)do begin
+      n1Str:=StringMath.SumSub(n1Str,n2Str);
+      if(self.IsBitPosSet(n1Pos,num)=True)then AStr:=StringMath.SumSub(AStr,n1Str);
+      n2Str:=n1Str;
+      self.IncBitPos(n1Pos);
+    end;
+    if(self.IsBitPosSet(n1Pos,num)=True)then begin
+      n1Str:=StringMath.SumSub(n1Str,n2Str);
+      AStr:=StringMath.SumSub(AStr,n1Str);
+    end;
+
+    AStr:=StringMath.RR(AStr,False);
+    if(ByteA=0)then AStr:='-'+AStr;
+  end;
+  }
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
 { CodeComponentBasic }
 
 function CodeComponentBasic.isVarNameValid(const VarName: String): Boolean;
@@ -7739,18 +7873,21 @@ end;
 constructor CodeComponentBasic.Create;
 begin
   self.TCProperty:=nil;
+  self.TCMemCapNum:=nil;
 end;
 
 constructor CodeComponentBasic.Create(
   const APtrCodeProperties: PtrCodeProperties);
 begin
   self.TCProperty:=APtrCodeProperties;
+  self.TCMemCapNum:=nil;
 end;
 
 constructor CodeComponentBasic.Create(
   var ACodeComponentBasic: CodeComponentBasic);
 begin
   self.TCProperty:=nil;
+  self.TCMemCapNum:=nil;
   self.changeTo(ACodeComponentBasic);
 end;
 
@@ -7758,12 +7895,14 @@ destructor CodeComponentBasic.Destroy;
 begin
   inherited Destroy;
   self.TCProperty:=nil;
+  self.TCMemCapNum:=nil;
 end;
 
 procedure CodeComponentBasic.changeTo(
   var ACodeComponentBasic: CodeComponentBasic);
 begin
   self.TCProperty:=ACodeComponentBasic.TCProperty;
+  self.TCMemCapNum:=ACodeComponentBasic.TCMemCapNum;
 end;
 
 procedure CodeComponentBasic.UnComponent_SetProperty(
@@ -8463,8 +8602,8 @@ function CodeComponentBasic.Component_StartMem: Integer;
 var
   AStr:String;
 begin
-  self.TCProperty^.TCMemCapNum:=self.TCProperty^.TCMemCapNum+1;
-  AStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
+  self.TCMemCapNum^:=self.TCMemCapNum^+1;
+  AStr:='#'+IntToStr(self.TCMemCapNum^)+'_';
 
   self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(18));
@@ -8475,8 +8614,8 @@ end;
 
 function CodeComponentBasic.Component_StartMem(out StartStr: String): Integer;
 begin
-  self.TCProperty^.TCMemCapNum:=self.TCProperty^.TCMemCapNum+1;
-  StartStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
+  self.TCMemCapNum^:=self.TCMemCapNum^+1;
+  StartStr:='#'+IntToStr(self.TCMemCapNum^)+'_';
 
   self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(18));
@@ -8489,9 +8628,9 @@ function CodeComponentBasic.Component_EndMem: Integer;
 var
   AStr:String;
 begin
-  self.TCProperty^.TCMemCapNum:=self.TCProperty^.TCMemCapNum-1;
-  if(self.TCProperty^.TCMemCapNum<0)then self.TCProperty^.TCMemCapNum:=0;
-  AStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
+  //self.TCMemCapNum^:=self.TCMemCapNum^-1;
+  if(self.TCMemCapNum^<0)then self.TCMemCapNum^:=0;
+  AStr:='#'+IntToStr(self.TCMemCapNum^)+'_';
 
   self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(81));
@@ -8502,9 +8641,9 @@ end;
 
 function CodeComponentBasic.Component_EndMem(out EndStr: String): Integer;
 begin
-  self.TCProperty^.TCMemCapNum:=self.TCProperty^.TCMemCapNum-1;
-  if(self.TCProperty^.TCMemCapNum<0)then self.TCProperty^.TCMemCapNum:=0;
-  EndStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
+  //self.TCMemCapNum^:=self.TCMemCapNum^-1;
+  if(self.TCMemCapNum^<0)then self.TCMemCapNum^:=0;
+  EndStr:='#'+IntToStr(self.TCMemCapNum^)+'_';
 
   self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(81));
@@ -8523,7 +8662,7 @@ begin
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Port_Proc);
   Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
 
-  AStr:='#'+IntToStr(self.TCProperty^.TCMemCapNum)+'_';
+  AStr:='#'+IntToStr(self.TCMemCapNum^)+'_';
   if(self.isVarNameValid(PortName)=False)then Exit;
 
   AIndex:=self.TCProperty^.Property_CodePorts^.Var_GetValueInt_Index(AStr+PortName);
@@ -8594,6 +8733,8 @@ begin
   self.TCPropertyArr[Length(self.TCPropertyArr)-1]:=CodeProperties.Create(ACodeProperties);
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCPoint.Point_AddLast(0);
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCLogs:=@self.TCLogs;
+  self.TCPropertyArr[Length(self.TCPropertyArr)-1].Property_CodeArray^.TCCodeProperties:=@self.TCPropertyArr[Length(self.TCPropertyArr)-1];
+  self.TCPropertyArr[Length(self.TCPropertyArr)-1].Property_CodeArray^.SetPtrCodeProperties;
 end;
 
 constructor CodeCores.Create;
@@ -8729,9 +8870,9 @@ begin
   if(self.TCLogs.Error_ArrLength>0)then Exit;
   AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
   Result:=self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines^[AIndex].Code_RunFuncData;
-  AIndex:=AIndex+1;
-  if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then AIndex:=AIndex-1;
-  self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_SetPoint(AIndex);
+  self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_Continue;
+  AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
+  if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_ToPrevious;
 
   if(self.TCLogs.Error_ArrLength>0)then self.TCLogs.Error_AppendLastLog(' | At-Core: '+IntToStr(self.TCoreIndex));
 
@@ -8795,6 +8936,16 @@ var
 begin
   SetLength(self.TPointArr,Length(ACodePoint.TPointArr));
   for i:=0 to (Length(self.TPointArr)-1)do self.TPointArr[i]:=ACodePoint.TPointArr[i];
+end;
+
+procedure CodePoint.Point_Continue;
+begin
+  if(Length(self.TPointArr)>0)then self.TPointArr[Length(self.TPointArr)-1]:=self.TPointArr[Length(self.TPointArr)-1]+1;
+end;
+
+procedure CodePoint.Point_ToPrevious;
+begin
+  if(Length(self.TPointArr)>0)then self.TPointArr[Length(self.TPointArr)-1]:=self.TPointArr[Length(self.TPointArr)-1]-1;
 end;
 
 procedure CodePoint.Point_SetPoint(const APoint: Integer);
@@ -9337,7 +9488,10 @@ end;
 
 constructor CodeBuild.Create;
 begin
+  self.TCMemCapNum:=0;
+
   self.TCodeComponentBasic:=CodeComponentBasic.Create;
+  self.TCodeComponentBasic.TCMemCapNum:=@self.TCMemCapNum;
   self.TCodeComponent:=CodeComponent.Create(@self.TCodeComponentBasic);
 
   self.Build_Basic:=@self.TCodeComponentBasic;
@@ -9346,7 +9500,10 @@ end;
 
 constructor CodeBuild.Create(const APtrCodeProperties: PtrCodeProperties);
 begin
+  self.TCMemCapNum:=0;
+
   self.TCodeComponentBasic:=CodeComponentBasic.Create(APtrCodeProperties);
+  self.TCodeComponentBasic.TCMemCapNum:=@self.TCMemCapNum;
   self.TCodeComponent:=CodeComponent.Create(@self.TCodeComponentBasic);
 
   self.Build_Basic:=@self.TCodeComponentBasic;
@@ -9355,7 +9512,10 @@ end;
 
 constructor CodeBuild.Create(var ACodeBuild: CodeBuild);
 begin
+  self.TCMemCapNum:=0;
+
   self.TCodeComponentBasic:=CodeComponentBasic.Create;
+  self.TCodeComponentBasic.TCMemCapNum:=@self.TCMemCapNum;
   self.TCodeComponent:=CodeComponent.Create(@self.TCodeComponentBasic);
 
   self.Build_Basic:=@self.TCodeComponentBasic;
@@ -9367,6 +9527,8 @@ end;
 destructor CodeBuild.Destroy;
 begin
   inherited Destroy;
+  self.TCMemCapNum:=0;
+
   self.TCodeComponentBasic.Free;
   self.TCodeComponent.Free;
 
@@ -9376,7 +9538,10 @@ end;
 
 procedure CodeBuild.changeTo(var ACodeBuild: CodeBuild);
 begin
+  self.TCMemCapNum:=ACodeBuild.TCMemCapNum;
+
   self.TCodeComponentBasic.changeTo(ACodeBuild.TCodeComponentBasic);
+  self.TCodeComponentBasic.TCMemCapNum:=@self.TCMemCapNum;
   self.TCodeComponent.changeTo(ACodeBuild.TCodeComponent);
 end;
 
@@ -10350,7 +10515,7 @@ begin
   Anum2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(IndexAIndex);
 
   SetLength(Anum3,SizeOf(Anum1[Anum2]));
-  Move(Anum1[Anum2],Anum3,SizeOf(Anum1[Anum2]));
+  Move(Anum1[Anum2],Anum3[0],SizeOf(Anum1[Anum2]));
 
   ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
 
@@ -10398,7 +10563,7 @@ begin
   Anum3:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(ValueVarAIndex);
 
   SetLength(Anum3,SizeOf(Anum1^[Anum2]));
-  Move(Anum3,Anum1^[Anum2],SizeOf(Anum3));
+  Move(Anum3[0],Anum1^[Anum2],SizeOf(Anum3));
 
   Anum1:=nil;
   SetLength(Anum3,0);
@@ -10443,7 +10608,7 @@ begin
   Anum2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(IndexAIndex);
 
   SetLength(Anum3,SizeOf(Anum1[Anum2]));
-  Move(Anum1[Anum2],Anum3,SizeOf(Anum1[Anum2]));
+  Move(Anum1[Anum2],Anum3[0],SizeOf(Anum1[Anum2]));
 
   ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
 
@@ -10490,7 +10655,7 @@ begin
   Anum3:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(ValueVarAIndex);
 
   SetLength(Anum3,SizeOf(Anum1[Anum2]));
-  Move(Anum3,Anum1[Anum2],SizeOf(Anum3));
+  Move(Anum3[0],Anum1[Anum2],SizeOf(Anum3));
 
   ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(StrAIndex,Anum1);
 
@@ -10606,7 +10771,7 @@ var
 begin
   JumpToStr:=ArrMath.NumberToStr(AParamArr[0]);
 
-  JumpToAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(JumpToStr);
+  JumpToAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(JumpToStr);
 
   if(JumpToAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+JumpToStr+'" does not Exists');
@@ -10628,7 +10793,7 @@ var
 begin
   GotoStr:=ArrMath.NumberToStr(AParamArr[0]);
 
-  GotoAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(GotoStr);
+  GotoAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(GotoStr);
 
   if(GotoAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+GotoStr+'" does not Exists');
@@ -11577,8 +11742,8 @@ begin
   JumpToFalseStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   VarName1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
-  JumpToTrueAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(JumpToTrueStr);
-  JumpToFalseAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(JumpToFalseStr);
+  JumpToTrueAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(JumpToTrueStr);
+  JumpToFalseAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(JumpToFalseStr);
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
@@ -11618,7 +11783,7 @@ begin
   JumpToTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   VarName1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
-  JumpToTrueAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(JumpToTrueStr);
+  JumpToTrueAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(JumpToTrueStr);
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
@@ -11652,7 +11817,7 @@ begin
   JumpToFalseStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   VarName1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
-  JumpToFalseAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(JumpToFalseStr);
+  JumpToFalseAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(JumpToFalseStr);
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
@@ -11687,8 +11852,8 @@ begin
   GotoFalseStr:=ArrMath.NumberToStr(AParamArr[2]);
 
   VarName1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
-  GotoTrueAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(GotoTrueStr);
-  GotoFalseAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(GotoFalseStr);
+  GotoTrueAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(GotoTrueStr);
+  GotoFalseAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(GotoFalseStr);
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
@@ -11728,7 +11893,7 @@ begin
   GotoTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   VarName1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
-  GotoTrueAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(GotoTrueStr);
+  GotoTrueAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(GotoTrueStr);
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
@@ -11762,7 +11927,7 @@ begin
   GotoFalseStr:=ArrMath.NumberToStr(AParamArr[1]);
 
   VarName1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
-  GotoFalseAIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(GotoFalseStr);
+  GotoFalseAIndex:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt_Index(GotoFalseStr);
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
@@ -11946,16 +12111,16 @@ end;
 procedure CodeLine.EndMem_Proc(AParamArr: TParamArr;
   var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
-var
-  TArr1:TNumArr;
+//var
+  //TArr1:TNumArr;
 begin
-  TArr1:=nil;
+  {TArr1:=nil;
 
-  ATCCodeProperties^.Property_CodeVariable^.Var_GetVarNameParts(TCMemCapStr^,TArr1);
+  ATCCodeProperties^.Property_CodeVariable^.Var_GetVarNameParts(ATCMemCapStr^,TArr1);
   ATCCodeProperties^.Property_CodeVariable^.Var_DeleteVarNames(TArr1);
 
-  TCMemCapStr^:=ArrMath.NumberToStr(AParamArr[0]);
-  SetLength(TArr1,0);
+  ATCMemCapStr^:=ArrMath.NumberToStr(AParamArr[0]);
+  SetLength(TArr1,0);}
 end;
 
 procedure CodeLine.Port_Proc(AParamArr: TParamArr;
