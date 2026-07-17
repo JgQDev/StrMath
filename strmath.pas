@@ -733,6 +733,7 @@ type
     //StringMath
 
     function Component_IsIntegerArr(const numVarNameArr,ResultBoolVarName:String):Integer;
+    function Component_LengthIntegerArr(const numVarNameArr,ResultIntVarName:String):Integer;
     function Component_CreateIntegerArr(const numResultVarNameArr,ArrayLengthVarName:String):Integer;
     function Component_SetIntegerArr(const numVarNameArr,IndexVarNameInt,SetIntValue:String):Integer;
     function Component_GetIntegerArr(const numVarNameArr,IndexVarNameInt,GetIntValue:String):Integer;
@@ -8080,6 +8081,59 @@ begin
 
 end;
 
+function CodeComponent.Component_LengthIntegerArr(const numVarNameArr,
+  ResultIntVarName: String): Integer;
+var
+  AMem1:String;
+begin
+
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NegNumOne',-1);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('num1',0);
+
+  self.TPtrCComponent^.Component_Length(numVarNameArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_DivReal(AMem1+'numLength',AMem1+'NumFour',AMem1+'numLength');
+
+  self.Component_RR(AMem1+'numLength',AMem1+'num1');
+  self.TPtrCComponent^.Component_MoveV2ToV1(ResultIntVarName,AMem1+'NegNumOne');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength',AMem1+'NumZero',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(ResultIntVarName,AMem1+'NumZero');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_V1LTV2(AMem1+'numLength',AMem1+'NumZero',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength',AMem1+'num1',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(ResultIntVarName,AMem1+'num1');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  self.TPtrCComponent^.Component_EndMem;
+
+end;
+
 function CodeComponent.Component_CreateIntegerArr(const numResultVarNameArr,
   ArrayLengthVarName: String): Integer;
 var
@@ -8087,6 +8141,12 @@ var
 begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('num1',0);
+
+  self.TPtrCComponent^.Component_MulInteger(ArrayLengthVarName,AMem1+'NumFour',AMem1+'num1');
+  self.TPtrCComponent^.Component_SetLength(numResultVarNameArr,AMem1+'num1');
 
   self.TPtrCComponent^.Component_EndMem;
 
@@ -8100,6 +8160,41 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_AllocateMem('num1',0);
+  self.TPtrCComponent^.Component_AllocateMem('num2',0);
+  self.TPtrCComponent^.Component_AllocateMem('num3',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+
+  self.TPtrCComponent^.Component_MulInteger(IndexVarNameInt,AMem1+'NumFour',AMem1+'num1');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'NumFour',AMem1+'NumOne',AMem1+'num2');
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'num2',AMem1+'num1',AMem1+'num2');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'i',AMem1+'num1');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'num2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'num1',AMem1+'num3');
+  self.TPtrCComponent^.Component_ArrayIndexGet(SetIntValue,AMem1+'num3',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(numVarNameArr,AMem1+'i',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -8112,6 +8207,41 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.TPtrCComponent^.Component_AllocateMem('i',0);
+  self.TPtrCComponent^.Component_AllocateMem('num1',0);
+  self.TPtrCComponent^.Component_AllocateMem('num2',0);
+  self.TPtrCComponent^.Component_AllocateMem('num3',0);
+  self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
+
+  self.TPtrCComponent^.Component_MulInteger(IndexVarNameInt,AMem1+'NumFour',AMem1+'num1');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'NumFour',AMem1+'NumOne',AMem1+'num2');
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'num2',AMem1+'num1',AMem1+'num2');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'i',AMem1+'num1');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'num2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(numVarNameArr,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'num1',AMem1+'num3');
+  self.TPtrCComponent^.Component_ArrayIndexSet(GetIntValue,AMem1+'num3',AMem1+'ByteA');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -8121,6 +8251,31 @@ function CodeComponent.Component_MoveDeciDiv(const VarNameResultNum1Str,
 var
   AMem1:String;
 begin
+
+  {
+  class procedure StringMath.MoveDeciDiv(var Num1, Num2: String);
+  var
+    AWhole1,ADeci1,AWhole2,ADeci2:String;
+    i:Integer;
+  begin
+    GetWholeDeci(Num1,AWhole1,ADeci1);
+    GetWholeDeci(Num2,AWhole2,ADeci2);
+    if(Length(ADeci1)=Length(ADeci2))then begin
+      Num1:=AWhole1+ADeci1;
+      Num2:=AWhole2+ADeci2;
+    end else
+    if(Length(ADeci1)>Length(ADeci2))then begin
+      Num2:=AWhole2+ADeci2;
+      Num1:=AWhole1+Copy(ADeci1,1,Length(ADeci2))+'.'+
+      Copy(ADeci1,Length(ADeci2)+1,Length(ADeci1));
+    end else
+    if(Length(ADeci1)<Length(ADeci2))then begin
+      Num2:=AWhole2+ADeci2;
+      Num1:=AWhole1+ADeci1;
+      for i:=1 to (Length(ADeci2)-Length(ADeci1))do Num1:=Num1+'0';
+    end;
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8134,6 +8289,29 @@ var
   AMem1:String;
 begin
 
+  {
+  class procedure StringMath.getWholeDeci(const NumV: String; out AWhole,
+    ADeci: String);
+  var
+    i:Integer;
+    bool1:Boolean;
+  begin
+    AWhole:='0';
+    ADeci:='0';
+    if(Length(NumV)=0)then Exit;
+    bool1:=False;
+    for i:=1 to Length(NumV)do begin
+      if(NumV[i]='.')then begin
+        bool1:=True;
+        AWhole:=Copy(NumV,1,i-1);
+        ADeci:=Copy(NumV,i+1,Length(NumV));
+        Break;
+      end;
+    end;
+    if(bool1=False)then AWhole:=NumV;
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8145,6 +8323,16 @@ function CodeComponent.Component_isPositiveAd_Str(const VarNameNumVStr,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.isPositiveAd(const NumV: String): Byte;
+  begin
+    Result:=2;
+    if(NumV='0')or(NumV='0.0')then Exit;
+    if(Copy(NumV,1,1)='-')then Result:=0
+    else Result:=1;
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8158,6 +8346,14 @@ var
   AMem1:String;
 begin
 
+  {
+  class function StringMath.isPositive(const NumV: String): Boolean;
+  begin
+    if(Copy(NumV,1,1)='-')then Result:=False
+    else Result:=True;
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8169,6 +8365,70 @@ function CodeComponent.Component_CleanNum(const VarNameNumVStr,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.CleanNum(const NumV: String): String;
+  var
+    i:Integer;
+    AWhole,ADeci:String;
+    bool1:Boolean;
+    ASign:Byte;
+  begin
+    Result:='nan';
+    if(NumV='nan')then Exit;
+    if(Length(NumV)=0)then Exit;
+    getWholeDeci(NumV,AWhole,ADeci);
+    if(AWhole[1]='+')then begin
+      ASign:=1;
+      AWhole:=Copy(AWhole,2,Length(AWhole));
+    end else
+    if(AWhole[1]='-')then begin
+      ASign:=0;
+      AWhole:=Copy(AWhole,2,Length(AWhole));
+    end else begin
+      ASign:=1;
+    end;
+
+    bool1:=False;
+    for i:=Length(ADeci) downto 1 do begin
+      if(ADeci[i]<>'0')then begin
+        ADeci:=Copy(ADeci,1,i);
+        bool1:=True;
+        break;
+      end;
+    end;
+    if(bool1=False)then ADeci:='0';
+
+    bool1:=False;
+    for i:=1 to Length(AWhole)do begin
+      if(AWhole[i]<>'0')then begin
+        AWhole:=Copy(AWhole,i,Length(AWhole));
+        bool1:=True;
+        break;
+      end;
+    end;
+    if(bool1=False)then begin
+      AWhole:='0';
+      if(ADeci='0')then ASign:=1;
+    end;
+
+    for i:=1 to Length(AWhole)do begin
+      if(Ord(AWhole[i])-48<0)or(Ord(AWhole[i])-48>9)then begin
+        Result:='nan';
+        Exit;
+      end;
+    end;
+
+    for i:=1 to Length(ADeci)do begin
+      if(Ord(ADeci[i])-48<0)or(Ord(ADeci[i])-48>9)then begin
+        Result:='nan';
+        Exit;
+      end;
+    end;
+
+    if(ASign=1)then Result:=AWhole+'.'+ADeci else Result:='-'+AWhole+'.'+ADeci;
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8182,6 +8442,28 @@ var
   AMem1:String;
 begin
 
+  {
+  class procedure StringMath.GetAlign(var num1, num2: String;
+   const StrPlace: String; const isRight: Boolean);
+  var
+   i:Integer;
+  begin
+   if(Length(num1)=Length(num2))then Exit;
+   if(isRight=True)then begin
+     if(Length(Num1)>Length(Num2))then
+       for i:=1 to (Length(Num1)-Length(Num2))do Num2:=Num2+StrPlace
+     else
+       for i:=1 to (Length(Num2)-Length(Num1))do Num1:=Num1+StrPlace;
+   end else
+   if(isRight=False)then begin
+     if(Length(Num1)>Length(Num2))then
+       for i:=1 to (Length(Num1)-Length(Num2))do Num2:=StrPlace+Num2
+     else
+       for i:=1 to (Length(Num2)-Length(Num1))do Num1:=StrPlace+Num1;
+   end;
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8193,6 +8475,36 @@ function CodeComponent.Component_isNum1Bigger_Str(const VarNameNum1Str,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.isNum1Bigger(const num1, num2: String): Byte;
+  var
+   AWhole1,ADeci1,AWhole2,ADeci2:String;
+   n1,n2:String;
+   i:Integer;
+  begin
+   getWholeDeci(num1,AWhole1,ADeci1);
+   getWholeDeci(num2,AWhole2,ADeci2);
+   GetAlign(ADeci1,ADeci2,'0',True);
+   n1:=AWhole1+ADeci1;
+   n2:=AWhole2+ADeci2;
+   if(Length(n1)>Length(n2))then Result:=1 else
+   if(Length(n1)<Length(n2))then Result:=0 else
+   if(Length(n1)=Length(n2))then begin
+     for i:=1 to Length(n1)do begin
+       if(StrToInt(n1[i])>StrToInt(n2[i]))then begin
+         Result:=1;
+         Exit;
+       end else
+       if(StrToInt(n1[i])<StrToInt(n2[i]))then begin
+         Result:=0;
+         Exit;
+       end;
+     end;
+     Result:=2;
+   end;
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8206,6 +8518,39 @@ var
   AMem1:String;
 begin
 
+  {
+  class procedure StringMath.Carrying(const num1, num2: String; var TArr1,
+   TArr2: TNumArr);
+  var
+   i:Integer;
+   Cr:Byte;
+  begin
+   if(Length(num1)<>Length(num2))then Exit;
+   SetLength(TArr1,Length(num1));
+   SetLength(TArr2,Length(num2));
+   for i:=1 to Length(num1)do TArr1[i-1]:=StrToInt(num1[i]);
+   for i:=1 to Length(num2)do TArr2[i-1]:=StrToInt(num2[i]);
+   Cr:=0;
+   for i:=(Length(TArr1)-1)downto 0 do begin
+     if(TArr1[i]>TArr2[i])then begin
+       TArr1[i]:=(TArr1[i]-Cr);
+       Cr:=0;
+     end else
+     if(TArr1[i]<TArr2[i])then begin
+       TArr1[i]:=((10+TArr1[i])-Cr);
+       Cr:=1;
+     end else
+     if(TArr1[i]=TArr2[i])then begin
+       TArr1[i]:=(TArr1[i]-Cr);
+       if(TArr1[i]<TArr2[i])then begin
+         TArr1[i]:=(TArr1[i]+10);
+         Cr:=1;
+       end else Cr:=0;
+     end;
+   end;
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8217,6 +8562,16 @@ function CodeComponent.Component_Reverse(const VarNameNum1Str,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.Reverse(const Num1: String): String;
+  var
+   i:Integer;
+  begin
+   Result:='';
+   for i:=1 to Length(Num1)do Result:=Num1[i]+Result;
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8230,6 +8585,27 @@ var
   AMem1:String;
 begin
 
+  {
+  class function StringMath.RR(x: String; const WithDeci: Boolean): String;
+  var
+   AWhole,ADeci:String;
+   ASign:Boolean;
+  begin
+   x:=self.CleanNum(x);
+   if(x='nan')then begin
+     Result:='nan';
+     Exit;
+   end;
+   if(self.isPositive(x)=False)then begin
+     x:=Copy(x,2,Length(x));
+     ASign:=False;
+   end else ASign:=True;
+   GetWholeDeci(x,AWhole,ADeci);
+   if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
+   if(ASign=False)then Result:='-'+Result;
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8241,6 +8617,27 @@ function CodeComponent.Component_RD_Str(const VarNameXStr, VarNameBoolWithDeci,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.RD(x: String; const WithDeci: Boolean): String;
+  var
+   AWhole,ADeci:String;
+   ASign:Boolean;
+  begin
+   x:=self.CleanNum(x);
+   if(x='nan')then begin
+     Result:='nan';
+     Exit;
+   end;
+   if(self.isPositive(x)=False)then begin
+     x:=Copy(x,2,Length(x));
+     ASign:=False;
+   end else ASign:=True;
+   GetWholeDeci(x,AWhole,ADeci);
+   if(WithDeci=True)then Result:=ADeci+'.0' else Result:=ADeci;
+   if(ASign=False)then Result:='-'+Result;
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8254,6 +8651,34 @@ var
   AMem1:String;
 begin
 
+  {
+  class function StringMath.RX(x: String; const WithDeci: Boolean): String;
+  var
+   AWhole,ADeci:String;
+   ASign:Boolean;
+  begin
+   x:=self.CleanNum(x);
+   if(x='nan')then begin
+     Result:='nan';
+     Exit;
+   end;
+   if(self.isPositive(x)=False)then begin
+     x:=Copy(x,2,Length(x));
+     ASign:=False;
+   end else ASign:=True;
+   GetWholeDeci(x,AWhole,ADeci);
+   if(StrToInt(ADeci[1])<=5)then begin
+     if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
+   end else
+   if(StrToInt(ADeci[1])>5)then begin
+     Result:=self.SumSub(AWhole,'1');
+     GetWholeDeci(Result,AWhole,ADeci);
+     if(WithDeci=True)then Result:=AWhole+'.0' else Result:=AWhole;
+   end;
+   if(ASign=False)then Result:='-'+Result;
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8265,6 +8690,18 @@ function CodeComponent.Component_GetDeciCountBaseOne(const VarNameNumStr,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.GetDeciCountBaseOne(num: String): Integer;
+  var
+   Str1,Str2:String;
+  begin
+   Str1:='';
+   Str2:='';
+   self.getWholeDeci(num,Str1,Str2);
+   Result:=Length(Str2);
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8278,6 +8715,20 @@ var
   AMem1:String;
 begin
 
+  {
+  class procedure StringMath.RealCutDeciCountBaseOne(var num: String;
+   CutAt: Integer);
+  var
+   TArr1:RealArr;
+  begin
+   TArr1:=nil;
+   TArr1:=InitReal(num);
+   RealMath.RealCutDeciCountBaseOne(TArr1,CutAt);
+   num:=RealStr(TArr1);
+   SetLength(TArr1,0);
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8289,6 +8740,20 @@ function CodeComponent.Component_RealCutDeciCountBaseOneR(
 var
   AMem1:String;
 begin
+
+  {
+  class procedure StringMath.RealCutDeciCountBaseOneR(var num: String;
+   CutAt: Integer);
+  var
+   TArr1:RealArr;
+  begin
+   TArr1:=nil;
+   TArr1:=InitReal(num);
+   RealMath.RealCutDeciCountBaseOneR(TArr1,CutAt);
+   num:=RealStr(TArr1);
+   SetLength(TArr1,0);
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8302,6 +8767,37 @@ var
   AMem1:String;
 begin
 
+  {
+  class function StringMath.Sum(const num1, num2: String): String;
+  var
+   AWhole1,ADeci1,AWhole2,ADeci2:String;
+   n1,n2:String;
+   i:Integer;
+   Cr,nf1,nf2:Byte;
+  begin
+   getWholeDeci(num1,AWhole1,ADeci1);
+   getWholeDeci(num2,AWhole2,ADeci2);
+   GetAlign(AWhole1,AWhole2,'0',False);
+   GetAlign(ADeci1,ADeci2,'0',True);
+   n1:=AWhole1+ADeci1;
+   n2:=AWhole2+ADeci2;
+   Cr:=0;
+   nf1:=0;
+   nf2:=0;
+   Result:='';
+   for i:=Length(n1) downto 1 do begin
+     nf1:=StrToInt(n1[i])+StrToInt(n2[i])+Cr;
+     nf2:=(nf1-(RR(nf1/10)*10));
+     Result:=Result+IntToStr(nf2);
+     Cr:=RR(nf1/10);
+   end;
+   if(Cr<>0)then Result:=Result+IntToStr(Cr);
+   Result:=Copy(Result,1,Length(ADeci1))+'.'+
+   Copy(Result,Length(ADeci1)+1,Length(Result));
+   Result:=Reverse(Result);
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8313,6 +8809,46 @@ function CodeComponent.Component_Sub(const VarNameNum1Str, VarNameNum2Str,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.Sub(const num1, num2: String): String;
+  var
+   AWhole1,ADeci1,AWhole2,ADeci2:String;
+   n1,n2,BB,SS:String;
+   i:Integer;
+   iNB:Byte;
+   TArr1,TArr2:TNumArr;
+  begin
+   getWholeDeci(num1,AWhole1,ADeci1);
+   getWholeDeci(num2,AWhole2,ADeci2);
+   GetAlign(AWhole1,AWhole2,'0',False);
+   GetAlign(ADeci1,ADeci2,'0',True);
+   n1:=AWhole1+ADeci1;
+   n2:=AWhole2+ADeci2;
+   iNB:=isNum1Bigger(n1,n2);
+   if(iNB=0)then begin
+     BB:=n2;
+     SS:=n1;
+   end else
+   if(iNB=1)then begin
+     BB:=n1;
+     SS:=n2;
+   end else begin
+     BB:=n1;
+     SS:=n2;
+   end;
+   TArr1:=nil;
+   TArr2:=nil;
+   Carrying(BB,SS,TArr1,TArr2);
+   Result:='';
+   for i:=(Length(TArr1)-1)downto 0 do Result:=Result+IntToStr(TArr1[i]-TArr2[i]);
+   SetLength(TArr1,0);
+   SetLength(TArr2,0);
+   Result:=Copy(Result,1,Length(ADeci1))+'.'+
+   Copy(Result,Length(ADeci1)+1,Length(Result));
+   Result:=Reverse(Result);
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8326,6 +8862,43 @@ var
   AMem1:String;
 begin
 
+  {
+  class function StringMath.SumSub(const num1, num2: String): String;
+  var
+   n1,n2:String;
+   iNB:Byte;
+  begin
+   Result:='nan';
+   n1:=CleanNum(num1);
+   n2:=CleanNum(num2);
+   if(n1='nan')then Exit;
+   if(n2='nan')then Exit;
+   if(isPositive(n1)=True)and(isPositive(n2)=True)then begin
+     Result:=Sum(n1,n2);
+   end else
+   if(isPositive(n1)=False)and(isPositive(n2)=True)then begin
+     n1:=Copy(n1,2,Length(n1));
+     iNB:=isNum1Bigger(n1,n2);
+     if(iNB=0)then Result:=Sub(n1,n2) else
+     if(iNB=1)then Result:='-'+Sub(n1,n2) else
+     if(iNB=2)then Result:='0';
+   end else
+   if(isPositive(n1)=True)and(isPositive(n2)=False)then begin
+     n2:=Copy(n2,2,Length(n2));
+     iNB:=isNum1Bigger(n1,n2);
+     if(iNB=0)then Result:='-'+Sub(n1,n2) else
+     if(iNB=1)then Result:=Sub(n1,n2) else
+     if(iNB=2)then Result:='0';
+   end else
+   if(isPositive(n1)=False)and(isPositive(n2)=False)then begin
+     n1:=Copy(n1,2,Length(n1));
+     n2:=Copy(n2,2,Length(n2));
+     Result:='-'+Sum(n1,n2);
+   end;
+   Result:=CleanNum(Result);
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8337,6 +8910,74 @@ function CodeComponent.Component_Mul(const VarNameNum1Str, VarNameNum2Str,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.Mul(const num1, num2: String): String;
+  var
+   AWhole1,ADeci1,AWhole2,ADeci2:String;
+   n1,n2:String;
+   i:Integer;
+   Cr,nf1,nf2:Byte;
+   BIx,BIy:Integer;
+   NData,CountZ:String;
+  function AddSum(numA1,numA2:String):String;
+  var
+   Cr,nA1,nA2:Byte;
+   i:Integer;
+  begin
+   GetAlign(numA1,numA2,'0',False);
+   Cr:=0;
+   nA1:=0;
+   nA2:=0;
+   Result:='';
+   for i:=Length(numA1) downto 1 do begin
+     nA1:=StrToInt(numA1[i])+StrToInt(numA2[i])+Cr;
+     nA2:=(nA1-(RR(nA1/10)*10));
+     Result:=IntToStr(nA2)+Result;
+     Cr:=RR(nA1/10);
+   end;
+   if(Cr<>0)then Result:=IntToStr(Cr)+Result;
+  end;
+  begin
+   getWholeDeci(num1,AWhole1,ADeci1);
+   getWholeDeci(num2,AWhole2,ADeci2);
+   n1:=AWhole1+ADeci1;
+   n2:=AWhole2+ADeci2;
+   Cr:=0;
+   nf1:=0;
+   nf2:=0;
+   Result:='0';
+   BIx:=Length(n1);
+   BIy:=Length(n2);
+   NData:='';
+   CountZ:='';
+   for i:=1 to (Length(n1)*Length(n2))do begin
+     if(BIy=0)then break;
+     nf1:=(StrToInt(n1[BIx])*StrToInt(n2[BIy]))+Cr;
+     nf2:=(nf1-(RR(nf1/10)*10));
+     NData:=IntToStr(nf2)+NData;
+     Cr:=RR(nf1/10);
+     BIx:=BIx-1;
+     if(BIx=0)then begin
+       BIx:=Length(n1);
+       BIy:=BIy-1;
+       if(Cr<>0)then NData:=IntToStr(Cr)+NData;
+       NData:=NData+CountZ;
+       CountZ:=CountZ+'0';
+       Result:=AddSum(Result,NData);
+       NData:='';
+       Cr:=0;
+       nf1:=0;
+       nf2:=0;
+     end;
+   end;
+   if(Cr<>0)then NData:=IntToStr(Cr)+NData;
+   Result:=Reverse(Result);
+   Result:=Copy(Result,1,Length(ADeci1+ADeci2))+'.'+
+   Copy(Result,Length(ADeci1+ADeci2)+1,Length(Result));
+   Result:=Reverse(Result);
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
@@ -8350,6 +8991,133 @@ var
   AMem1:String;
 begin
 
+  {
+  class function StringMath.DivA(const num1, num2: String;
+   const DeciDigitCountBaseOne: Integer): String;
+  var
+   numv1,numv2:String;
+   AWhole1,ADeci1,AWhole2,ADeci2:String;
+   n1,n2:String;
+   i:Integer;
+   Ct,nf1,nf2:String;
+   Ctl,nl2:String;
+   BigN:Byte;
+  function Num1Bigger(numB1,numB2:String):Byte;
+  var
+   i:Integer;
+  begin
+   GetAlign(numB1,numB2,'0',False);
+   for i:=1 to Length(numB1)do begin
+     if(StrToInt(numB1[i])>StrToInt(numB2[i]))then begin
+       Result:=1;
+       Exit;
+     end else
+     if(StrToInt(numB1[i])<StrToInt(numB2[i]))then begin
+       Result:=0;
+       Exit;
+     end;
+   end;
+   Result:=2;
+  end;
+  function AddSum(numA1,numA2:String):String;
+  var
+   Cr,nA1,nA2:Byte;
+   i:Integer;
+  begin
+   GetAlign(numA1,numA2,'0',False);
+   Cr:=0;
+   nA1:=0;
+   nA2:=0;
+   Result:='';
+   for i:=Length(numA1) downto 1 do begin
+     nA1:=StrToInt(numA1[i])+StrToInt(numA2[i])+Cr;
+     nA2:=(nA1-(RR(nA1/10)*10));
+     Result:=IntToStr(nA2)+Result;
+     Cr:=RR(nA1/10);
+   end;
+   if(Cr<>0)then Result:=IntToStr(Cr)+Result;
+  end;
+  function SubSub(numS1,numS2:String):String;
+  var
+   BB,SS:String;
+   iNB:Byte;
+   TArr1,TArr2:TNumArr;
+   i:Integer;
+  begin
+   GetAlign(numS1,numS2,'0',False);
+   iNB:=Num1Bigger(numS1,numS2);
+   if(iNB=0)then begin
+     BB:=numS2;
+     SS:=numS1;
+   end else
+   if(iNB=1)then begin
+     BB:=numS1;
+     SS:=numS2;
+   end else begin
+     BB:=numS1;
+     SS:=numS2;
+   end;
+   TArr1:=nil;
+   TArr2:=nil;
+   Carrying(BB,SS,TArr1,TArr2);
+   Result:='';
+   for i:=(Length(TArr1)-1)downto 0 do Result:=IntToStr(TArr1[i]-TArr2[i])+Result;
+   SetLength(TArr1,0);
+   SetLength(TArr2,0);
+  end;
+  procedure AddUp(var Ct,Ctl,nl2,nf2:String;const n2:String;var BigN:Byte);
+  begin
+   nl2:=nf2;
+   Ctl:=Ct;
+   nf2:=AddSum(nf2,n2);
+   Ct:=AddSum(Ct,'1');
+   BigN:=Num1Bigger(nf1,nf2);
+  end;
+  //BeginAndEnd...
+  begin
+   numv1:=num1;
+   numv2:=num2;
+   MoveDeciDiv(numv1,numv2);
+   getWholeDeci(numv1,AWhole1,ADeci1);
+   getWholeDeci(numv2,AWhole2,ADeci2);
+   if(DeciDigitCountBaseOne>Length(ADeci1))then begin
+     n1:=AWhole1+ADeci1;
+     for i:=1 to (DeciDigitCountBaseOne-Length(ADeci1))do n1:=n1+'0';
+   end else begin
+     ADeci1:=Copy(ADeci1,1,DeciDigitCountBaseOne);
+     n1:=AWhole1+ADeci1;
+   end;
+   n2:=AWhole2;
+   if(CleanNum(n2)='0.0')then begin
+     Result:='nan';
+     Exit;
+   end;
+   Ct:='0';
+   Ctl:='0';
+   nf1:='';
+   nf2:='0';
+   nl2:='0';
+   Result:='';
+   for i:=1 to Length(n1) do begin
+     nf1:=nf1+n1[i];
+     BigN:=Num1Bigger(nf1,n2);
+     if(BigN=1)or(BigN=2)then begin
+       while((BigN=1)or(BigN=2))do AddUp(Ct,Ctl,nl2,nf2,n2,BigN);
+       Result:=Result+Ctl;
+       nf1:=SubSub(nf1,nl2);
+       Ct:='0';
+       Ctl:='0';
+       nf2:='0';
+       nl2:='0';
+     end else begin
+       Result:=Result+'0';
+     end;
+   end;
+   if(Length(Result)>Length(AWhole1))then Result:=Copy(Result,1,Length(AWhole1))+'.'+
+   Copy(Result,Length(AWhole1)+1,Length(Result));
+  end;
+  }
+
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8362,6 +9130,56 @@ function CodeComponent.Component_MulDiv(const VarNameNum1Str, VarNameNum2Str,
 var
   AMem1:String;
 begin
+
+  {
+  class function StringMath.MulDiv(const num1, num2: String;
+   const ADeciDigitCountBaseOne: Integer; const doMul: Boolean): String;
+  var
+   n1,n2:String;
+  begin
+   Result:='nan';
+   n1:=CleanNum(num1);
+   n2:=CleanNum(num2);
+   if(n1='nan')then Exit;
+   if(n2='nan')then Exit;
+   if(doMul=True)then begin
+     if(isPositive(n1)=True)and(isPositive(n2)=True)then begin
+       Result:=Mul(n1,n2);
+     end else
+     if(isPositive(n1)=False)and(isPositive(n2)=True)then begin
+       n1:=Copy(n1,2,Length(n1));
+       Result:='-'+Mul(n1,n2);
+     end else
+     if(isPositive(n1)=True)and(isPositive(n2)=False)then begin
+       n2:=Copy(n2,2,Length(n2));
+       Result:='-'+Mul(n1,n2);
+     end else
+     if(isPositive(n1)=False)and(isPositive(n2)=False)then begin
+       n1:=Copy(n1,2,Length(n1));
+       n2:=Copy(n2,2,Length(n2));
+       Result:=Mul(n1,n2);
+     end;
+   end else begin
+     if(isPositive(n1)=True)and(isPositive(n2)=True)then begin
+       Result:=DivA(n1,n2,ADeciDigitCountBaseOne);
+     end else
+     if(isPositive(n1)=False)and(isPositive(n2)=True)then begin
+       n1:=Copy(n1,2,Length(n1));
+       Result:='-'+DivA(n1,n2,ADeciDigitCountBaseOne);
+     end else
+     if(isPositive(n1)=True)and(isPositive(n2)=False)then begin
+       n2:=Copy(n2,2,Length(n2));
+       Result:='-'+DivA(n1,n2,ADeciDigitCountBaseOne);
+     end else
+     if(isPositive(n1)=False)and(isPositive(n2)=False)then begin
+       n1:=Copy(n1,2,Length(n1));
+       n2:=Copy(n2,2,Length(n2));
+       Result:=DivA(n1,n2,ADeciDigitCountBaseOne);
+     end;
+   end;
+   Result:=CleanNum(Result);
+  end;
+  }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
