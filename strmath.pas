@@ -751,8 +751,6 @@ type
     function Component_RD_Str(const VarNameXStr,VarNameBoolWithDeci,VarNameResultStr:String):Integer;
     function Component_RX_Str(const VarNameXStr,VarNameBoolWithDeci,VarNameResultStr:String):Integer;
     function Component_GetDeciCountBaseOne(const VarNameNumStr,VarNameResultInt:String):Integer;
-    function Component_RealCutDeciCountBaseOne(const VarNemResultNumStr,VarNameIntCutAt:String):Integer;
-    function Component_RealCutDeciCountBaseOneR(var VarNameResultNumStr,VarNameIntCutAt:String):Integer;
     function Component_Sum(const VarNameNum1Str,VarNameNum2Str,VarNameResultStr:String):Integer;
     function Component_Sub(const VarNameNum1Str,VarNameNum2Str,VarNameResultStr:String):Integer;
     function Component_SumSub(const VarNameNum1Str,VarNameNum2Str,VarNameResultStr:String):Integer;
@@ -8336,6 +8334,43 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('True2',2);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolOr1',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolOr2',0);
+  self.TPtrCComponent^.Component_AllocateMem('ZeroInt','0');
+  self.TPtrCComponent^.Component_AllocateMem('ZeroReal','0.0');
+  self.TPtrCComponent^.Component_AllocateMem('StrMinus','-');
+  self.TPtrCComponent^.Component_AllocateMem('StrA','');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True2',AMem1+'NumZero',AMem1+'True2');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(VarNameResultByte,AMem1+'True2');
+
+  self.TPtrCComponent^.Component_V1EqV2(VarNameNumVStr,AMem1+'ZeroInt',AMem1+'boolOr1');
+  self.TPtrCComponent^.Component_V1EqV2(VarNameNumVStr,AMem1+'ZeroReal',AMem1+'boolOr2');
+  self.TPtrCComponent^.Component_V1OrV2(AMem1+'boolOr1',AMem1+'boolOr2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_CopyStr(VarNameNumVStr,AMem1+'NumOne',AMem1+'NumOne',AMem1+'StrA');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrA',AMem1+'StrMinus',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(VarNameResultByte,AMem1+'False');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(VarNameResultByte,AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpExit1');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -8355,6 +8390,30 @@ begin
   }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('StrMinus','-');
+  self.TPtrCComponent^.Component_AllocateMem('StrA','');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_CopyStr(VarNameNumVStr,AMem1+'NumOne',AMem1+'NumOne',AMem1+'StrA');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrA',AMem1+'StrMinus',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(VarNameResultBool,AMem1+'False');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(VarNameResultBool,AMem1+'True');
+
+  self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
 
@@ -8575,6 +8634,32 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength',0);
+  self.TPtrCComponent^.Component_AllocateMem('StrA','');
+  self.TPtrCComponent^.Component_AllocateMem('i',1);
+
+  self.TPtrCComponent^.Component_SetVarMem(VarNameResultStr,'');
+  self.TPtrCComponent^.Component_StrLength(VarNameNum1Str,AMem1+'numLength');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_StrIndexGet(VarNameNum1Str,AMem1+'i',AMem1+'StrA');
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'StrA',VarNameResultStr,VarNameResultStr);
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -8700,58 +8785,6 @@ begin
    Str2:='';
    self.getWholeDeci(num,Str1,Str2);
    Result:=Length(Str2);
-  end;
-  }
-
-  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
-
-  self.TPtrCComponent^.Component_EndMem;
-
-end;
-
-function CodeComponent.Component_RealCutDeciCountBaseOne(
-  const VarNemResultNumStr, VarNameIntCutAt: String): Integer;
-var
-  AMem1:String;
-begin
-
-  {
-  class procedure StringMath.RealCutDeciCountBaseOne(var num: String;
-   CutAt: Integer);
-  var
-   TArr1:RealArr;
-  begin
-   TArr1:=nil;
-   TArr1:=InitReal(num);
-   RealMath.RealCutDeciCountBaseOne(TArr1,CutAt);
-   num:=RealStr(TArr1);
-   SetLength(TArr1,0);
-  end;
-  }
-
-  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
-
-  self.TPtrCComponent^.Component_EndMem;
-
-end;
-
-function CodeComponent.Component_RealCutDeciCountBaseOneR(
-  var VarNameResultNumStr, VarNameIntCutAt: String): Integer;
-var
-  AMem1:String;
-begin
-
-  {
-  class procedure StringMath.RealCutDeciCountBaseOneR(var num: String;
-   CutAt: Integer);
-  var
-   TArr1:RealArr;
-  begin
-   TArr1:=nil;
-   TArr1:=InitReal(num);
-   RealMath.RealCutDeciCountBaseOneR(TArr1,CutAt);
-   num:=RealStr(TArr1);
-   SetLength(TArr1,0);
   end;
   }
 
