@@ -8434,6 +8434,79 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength1',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength2',0);
+  self.TPtrCComponent^.Component_AllocateMem('dot','.');
+  self.TPtrCComponent^.Component_AllocateMem('ZeroStr','0');
+  self.TPtrCComponent^.Component_AllocateMem('StrA1','');
+  self.TPtrCComponent^.Component_AllocateMem('StrA2','');
+
+  self.TPtrCComponent^.Component_AllocateMem('AWhole1','');
+  self.TPtrCComponent^.Component_AllocateMem('ADeci1','');
+  self.TPtrCComponent^.Component_AllocateMem('AWhole2','');
+  self.TPtrCComponent^.Component_AllocateMem('ADeci2','');
+  self.TPtrCComponent^.Component_AllocateMem('i',1);
+
+  self.Component_getWholeDeci(VarNameResultNum1Str,AMem1+'AWhole1',AMem1+'ADeci1');
+  self.Component_getWholeDeci(VarNameResultNum2Str,AMem1+'AWhole2',AMem1+'ADeci2');
+
+  self.TPtrCComponent^.Component_StrLength(AMem1+'ADeci1',AMem1+'numLength1');
+  self.TPtrCComponent^.Component_StrLength(AMem1+'ADeci2',AMem1+'numLength2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength1',AMem1+'numLength2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'AWhole1',AMem1+'ADeci1',VarNameResultNum1Str);
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'AWhole2',AMem1+'ADeci2',VarNameResultNum2Str);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'numLength1',AMem1+'numLength2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'AWhole2',AMem1+'ADeci2',VarNameResultNum2Str);
+
+  self.TPtrCComponent^.Component_CopyStr(AMem1+'ADeci1',AMem1+'NumOne',AMem1+'numLength2',AMem1+'StrA1');
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'numLength2',AMem1+'NumOne',AMem1+'numLength2');
+  self.TPtrCComponent^.Component_CopyStr(AMem1+'ADeci1',AMem1+'numLength2',AMem1+'numLength1',AMem1+'StrA2');
+
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'AWhole1',AMem1+'StrA1',VarNameResultNum1Str);
+  self.TPtrCComponent^.Component_CombineV2ToV1(VarNameResultNum1Str,AMem1+'dot',VarNameResultNum1Str);
+  self.TPtrCComponent^.Component_CombineV2ToV1(VarNameResultNum1Str,AMem1+'StrA2',VarNameResultNum1Str);
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1LTV2(AMem1+'numLength1',AMem1+'numLength2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'AWhole2',AMem1+'ADeci2',VarNameResultNum2Str);
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'AWhole1',AMem1+'ADeci1',VarNameResultNum1Str);
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'numLength2',AMem1+'numLength1',AMem1+'numLength2');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_CombineV2ToV1(VarNameResultNum1Str,AMem1+'ZeroStr',VarNameResultNum1Str);
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -8468,6 +8541,69 @@ begin
   }
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
+
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool2',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength1',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength2',0);
+  self.TPtrCComponent^.Component_AllocateMem('dot','.');
+  self.TPtrCComponent^.Component_AllocateMem('StrA','');
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('i',1);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+
+  self.TPtrCComponent^.Component_SetVarMem(OutStrAWhole,'0');
+  self.TPtrCComponent^.Component_SetVarMem(OutStrADeci,'0');
+
+  self.TPtrCComponent^.Component_StrLength(VarNameNumVStr,AMem1+'numLength1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength1',AMem1+'NumZero',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
+
+  self.TPtrCComponent^.Component_Port('iForBegin');
+
+  self.TPtrCComponent^.Component_V1GTV2(AMem1+'i',AMem1+'numLength1',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool2',AMem1+'iForEnd');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_StrIndexGet(VarNameNumVStr,AMem1+'i',AMem1+'StrA');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrA',AMem1+'dot',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpFalse1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
+
+  self.TPtrCComponent^.Component_SubInteger(AMem1+'i',AMem1+'NumOne',AMem1+'numLength2');
+  self.TPtrCComponent^.Component_CopyStr(VarNameNumVStr,AMem1+'NumOne',AMem1+'numLength2',OutStrAWhole);
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'numLength2');
+  self.TPtrCComponent^.Component_CopyStr(VarNameNumVStr,AMem1+'numLength2',AMem1+'numLength1',OutStrADeci);
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForEnd');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  //============================================================================
+
+  self.TPtrCComponent^.Component_SumInteger(AMem1+'i',AMem1+'NumOne',AMem1+'i');
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'iForBegin');
+
+  self.TPtrCComponent^.Component_Port('iForEnd');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'bool1',AMem1+'False',AMem1+'bool2');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool2',AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_MoveV2ToV1(OutStrAWhole,VarNameNumVStr);
+
+  self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
 
