@@ -280,6 +280,7 @@ type
   PtrCodeLog = ^CodeLog;
 
   TByteArr = Array of Byte;
+  TBoolArr = Array of Boolean;
   TNumArr = Array of Integer;
   TParamArr = Array of Number;
 
@@ -541,6 +542,8 @@ type
   private
     TCoreIndex:Integer;
     TCPropertyArr:CodePropertiesArr;
+    TCPropertyDoneBoolArr:TBoolArr;
+    TCPropertyOutBoundBoolArr:TBoolArr;
     TCLogs:CodeLog;
     procedure AddProperty(var ACodeProperties:CodeProperties);
   public
@@ -563,8 +566,12 @@ type
     function Cores_GetCoreIndexAt:Integer;
     function Cores_GetPropertyIndexAt:Integer;
     function Cores_RunProperty:Boolean;
+    function Cores_RunPropertyUntilOutBound:Boolean;
+    function Cores_RunPropertyUntilDone:Boolean;
     function Cores_isPropertyOutBound:Boolean;
     function Cores_isPropertyDone:Boolean;
+    function Cores_ArePropertiesOutBound:Boolean;
+    function Cores_ArePropertiesDone:Boolean;
     function Cores_ArrLength:Integer;
   end;
 
@@ -3342,6 +3349,7 @@ var
 
   Real1:Real;
   Num1:Integer;
+  bool1:Boolean;
 begin
   TCProperty:=CodeProperties.Create;
   TCBuild:=CodeBuild.Create(@TCProperty);
@@ -3355,12 +3363,15 @@ begin
   TCBuild.Build_Advance^.Component_SetBit('Num1','NumLength2','Num1');
   TCBuild.Build_Advance^.Component_ClearBit('Num1','NumLength2','Num1');
 
+  bool1:=False;
   TCCores.Cores_AddProperty(TCProperty);
-  While(TCCores.Cores_isPropertyDone=False)do begin
+  bool1:=TCCores.Cores_RunPropertyUntilDone;
+
+  {While(TCCores.Cores_ArePropertiesDone=False)do begin
     if(TCCores.Cores_ErrorLength>0)then Break;
     TCCores.Cores_RunProperty;
     TCCores.Cores_Continue;
-  end;
+  end;}
 
   Num1:=TCCores.Cores_GetPropertyVar_Integer(0,'Num1');
 
@@ -3522,7 +3533,7 @@ begin
   self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'JumpExit1');
 
   self.Component_SetInt(numIntArr,AMem1+'TArr1');
-  self.Component_isPositiveAd(AMem1+'TArr1',,ByteResult);
+  self.Component_isPositiveAd(AMem1+'TArr1',ByteResult);
   self.TPtrCComponent^.Component_AllocateMem('TArr1',nil);
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
@@ -3797,7 +3808,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('Str1','');
   self.TPtrCComponent^.Component_AllocateMem('Str2',' ');
-  self.TPtrCComponent^.Component_AllocateMem('num1',8);
+  self.TPtrCComponent^.Component_AllocateMem('num1',SizeOf(Byte));   //8
   self.TPtrCComponent^.Component_AllocateMem('num2',0);
   self.TPtrCComponent^.Component_AllocateMem('num3',1);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
@@ -3940,7 +3951,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_AllocateMem('num2',1);
-  self.TPtrCComponent^.Component_AllocateMem('num3',7);
+  self.TPtrCComponent^.Component_AllocateMem('num3',SizeOf(Byte)-1);     //7
   self.TPtrCComponent^.Component_AllocateMem('num4',0);
   self.TPtrCComponent^.Component_AllocateMem('num5',0);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
@@ -4277,7 +4288,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
-  self.TPtrCComponent^.Component_AllocateMem('num2',7);
+  self.TPtrCComponent^.Component_AllocateMem('num2',SizeOf(Byte)-1);    //7
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
 
   self.TPtrCComponent^.Component_AllocateMem('boolAnd1',0);
@@ -4582,8 +4593,8 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
   self.TPtrCComponent^.Component_AllocateMem('NegOne',-1);
-  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
-  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',SizeOf(Byte)-1);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',SizeOf(Byte));
 
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
@@ -5775,7 +5786,7 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
-  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',SizeOf(Integer)*2);
   self.TPtrCComponent^.Component_AllocateMem('NumLength',0);
 
   self.TPtrCComponent^.Component_SetVarMem(ResultBoolVarName,0);
@@ -5803,7 +5814,7 @@ begin
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
-  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',SizeOf(Integer)*2);
 
   self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'NumZero');
   self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'Num8');
@@ -5834,9 +5845,9 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('Num4',4);
-  self.TPtrCComponent^.Component_AllocateMem('Num3',3);
-  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('Num4',SizeOf(Integer));
+  self.TPtrCComponent^.Component_AllocateMem('Num3',SizeOf(Integer)-1);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',(SizeOf(Integer)*2)-1);
   self.TPtrCComponent^.Component_AllocateMem('NumCal',0);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
@@ -5906,7 +5917,7 @@ begin
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
-  self.TPtrCComponent^.Component_AllocateMem('Num8',8);
+  self.TPtrCComponent^.Component_AllocateMem('Num8',SizeOf(Integer)*2);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
 
   self.Component_IsBitPosVar(numResultBitPos,AMem1+'bool1');
@@ -5972,9 +5983,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('i',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('Num4',4);
-  self.TPtrCComponent^.Component_AllocateMem('Num3',3);
-  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('Num4',SizeOf(Integer));
+  self.TPtrCComponent^.Component_AllocateMem('Num3',SizeOf(Integer)-1);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',(SizeOf(Integer)*2)-1);
+  self.TPtrCComponent^.Component_AllocateMem('Num7B',SizeOf(Byte)-1);
   self.TPtrCComponent^.Component_AllocateMem('NumCal',0);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
@@ -6001,12 +6013,12 @@ begin
   self.TPtrCComponent^.Component_V1LTV2(IntBitAtBaseZero,AMem1+'NumZero',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'Num7');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'Num7B');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse4');
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
-  self.TPtrCComponent^.Component_V1GTV2(IntBitAtBaseZero,AMem1+'Num7',AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1GTV2(IntBitAtBaseZero,AMem1+'Num7B',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
 
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'NumBit',AMem1+'NumZero');
@@ -6086,7 +6098,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',SizeOf(Byte)-1);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
 
   self.TPtrCComponent^.Component_AllocateMem('NumByte',0);
@@ -6134,7 +6146,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',SizeOf(Byte)-1);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
 
   self.TPtrCComponent^.Component_AllocateMem('NumByte',0);
@@ -6193,7 +6205,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('Num7',7);
+  self.TPtrCComponent^.Component_AllocateMem('Num7',SizeOf(Byte)-1);
   self.TPtrCComponent^.Component_AllocateMem('numLength',0);
   self.TPtrCComponent^.Component_AllocateMem('bool2',0);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
@@ -7923,7 +7935,6 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
   self.TPtrCComponent^.Component_AllocateMem('NumTwo',2);
-  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
   self.TPtrCComponent^.Component_AllocateMem('NumFive',5);
   self.TPtrCComponent^.Component_AllocateMem('bool2',0);
   self.TPtrCComponent^.Component_AllocateMem('numLength',0);
@@ -8237,7 +8248,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',SizeOf(Integer));
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('numLength',0);
 
@@ -8283,7 +8294,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NegNumOne',-1);
-  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',SizeOf(Integer));
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('numLength',0);
 
@@ -8332,7 +8343,7 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
-  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',SizeOf(Integer));
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
 
   self.TPtrCComponent^.Component_MulInteger(ArrayLengthVarName,AMem1+'NumFour',AMem1+'num1');
@@ -8352,7 +8363,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',SizeOf(Integer));
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
 
   self.TPtrCComponent^.Component_AllocateMem('i',0);
@@ -8403,7 +8414,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
-  self.TPtrCComponent^.Component_AllocateMem('NumFour',4);
+  self.TPtrCComponent^.Component_AllocateMem('NumFour',SizeOf(Integer));
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
 
   self.TPtrCComponent^.Component_AllocateMem('i',0);
@@ -10283,6 +10294,146 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  self.TPtrCComponent^.Component_AllocateMem('True',1);
+  self.TPtrCComponent^.Component_AllocateMem('True2',2);
+  self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumTwo',2);
+  self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('numLength1',0);
+  self.TPtrCComponent^.Component_AllocateMem('nanStr','nan');
+  self.TPtrCComponent^.Component_AllocateMem('MinusStr','-');
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd1',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd2',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd3',0);
+  self.TPtrCComponent^.Component_AllocateMem('boolAnd4',0);
+
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True2',AMem1+'NumZero',AMem1+'True2');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
+
+  self.TPtrCComponent^.Component_AllocateMem('n1','');
+  self.TPtrCComponent^.Component_AllocateMem('n2','');
+  self.TPtrCComponent^.Component_AllocateMem('iNB',0);
+
+  self.TPtrCComponent^.Component_SetVarMem(VarNameResultStr,'nan');
+
+  self.Component_CleanNum(VarNameNum1Str,AMem1+'n1');
+  self.Component_CleanNum(VarNameNum2Str,AMem1+'n2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'n1',AMem1+'nanStr',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'JumpExit1');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'n2',AMem1+'nanStr',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'JumpExit1');
+
+  self.Component_isPositive_Str(AMem1+'n1',AMem1+'boolAnd1');
+  self.Component_isPositive_Str(AMem1+'n2',AMem1+'boolAnd2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd1',AMem1+'True',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd2',AMem1+'True',AMem1+'boolAnd4');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd3',AMem1+'boolAnd4',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
+
+  self.Component_Sum(AMem1+'n1',AMem1+'n2',VarNameResultStr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse1');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd1',AMem1+'False',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd2',AMem1+'True',AMem1+'boolAnd4');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd3',AMem1+'boolAnd4',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
+
+  self.TPtrCComponent^.Component_StrLength(AMem1+'n1',AMem1+'numLength1');
+  self.TPtrCComponent^.Component_CopyStr(AMem1+'n1',AMem1+'NumTwo',AMem1+'numLength1',AMem1+'n1');
+  self.Component_isNum1Bigger_Str(AMem1+'n1',AMem1+'n2',AMem1+'iNB');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'iNB',AMem1+'False',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse5');
+
+  self.Component_Sub(AMem1+'n1',AMem1+'n2',VarNameResultStr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse5');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'iNB',AMem1+'True',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse6');
+
+  self.Component_Sub(AMem1+'n1',AMem1+'n2',VarNameResultStr);
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'MinusStr',VarNameResultStr,VarNameResultStr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse6');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'iNB',AMem1+'True2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse7');
+
+  self.TPtrCComponent^.Component_SetVarMem(VarNameResultStr,'0');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse7');
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd1',AMem1+'True',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd2',AMem1+'False',AMem1+'boolAnd4');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd3',AMem1+'boolAnd4',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
+
+  self.TPtrCComponent^.Component_StrLength(AMem1+'n2',AMem1+'numLength1');
+  self.TPtrCComponent^.Component_CopyStr(AMem1+'n2',AMem1+'NumTwo',AMem1+'numLength1',AMem1+'n2');
+  self.Component_isNum1Bigger_Str(AMem1+'n1',AMem1+'n2',AMem1+'iNB');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'iNB',AMem1+'False',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse8');
+
+  self.Component_Sub(AMem1+'n1',AMem1+'n2',VarNameResultStr);
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'MinusStr',VarNameResultStr,VarNameResultStr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse8');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'iNB',AMem1+'True',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse9');
+
+  self.Component_Sub(AMem1+'n1',AMem1+'n2',VarNameResultStr);
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse9');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'iNB',AMem1+'True2',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse10');
+
+  self.TPtrCComponent^.Component_SetVarMem(VarNameResultStr,'0');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse10');
+
+  self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_Port('JumpFalse3');
+
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd1',AMem1+'False',AMem1+'boolAnd3');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'boolAnd2',AMem1+'False',AMem1+'boolAnd4');
+  self.TPtrCComponent^.Component_V1AndV2(AMem1+'boolAnd3',AMem1+'boolAnd4',AMem1+'bool1');
+  self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse4');
+
+  self.TPtrCComponent^.Component_StrLength(AMem1+'n1',AMem1+'numLength1');
+  self.TPtrCComponent^.Component_CopyStr(AMem1+'n1',AMem1+'NumTwo',AMem1+'numLength1',AMem1+'n1');
+
+  self.TPtrCComponent^.Component_StrLength(AMem1+'n2',AMem1+'numLength1');
+  self.TPtrCComponent^.Component_CopyStr(AMem1+'n2',AMem1+'NumTwo',AMem1+'numLength1',AMem1+'n2');
+
+  self.Component_Sum(AMem1+'n1',AMem1+'n2',VarNameResultStr);
+  self.TPtrCComponent^.Component_CombineV2ToV1(AMem1+'MinusStr',VarNameResultStr,VarNameResultStr);
+
+  self.TPtrCComponent^.Component_Port('JumpFalse4');
+
+  self.Component_CleanNum(VarNameResultStr,VarNameResultStr);
+
+  self.TPtrCComponent^.Component_Port('JumpExit1');
+
   self.TPtrCComponent^.Component_EndMem;
 
 end;
@@ -11512,12 +11663,20 @@ begin
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCLogs:=@self.TCLogs;
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].Property_CodeArray^.TCCodeProperties:=@self.TCPropertyArr[Length(self.TCPropertyArr)-1];
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].Property_CodeArray^.SetPtrCodeProperties;
+
+  SetLength(self.TCPropertyDoneBoolArr,Length(self.TCPropertyDoneBoolArr)+1);
+  self.TCPropertyDoneBoolArr[Length(self.TCPropertyDoneBoolArr)-1]:=False;
+
+  SetLength(self.TCPropertyOutBoundBoolArr,Length(self.TCPropertyOutBoundBoolArr)+1);
+  self.TCPropertyOutBoundBoolArr[Length(self.TCPropertyOutBoundBoolArr)-1]:=False;
 end;
 
 constructor CodeCores.Create;
 begin
   self.TCoreIndex:=-1;
   self.TCPropertyArr:=nil;
+  self.TCPropertyDoneBoolArr:=nil;
+  self.TCPropertyOutBoundBoolArr:=nil;
   self.TCLogs:=CodeLog.Create;
 end;
 
@@ -11525,6 +11684,8 @@ constructor CodeCores.Create(var ACodeCores: CodeCores);
 begin
   self.TCoreIndex:=-1;
   self.TCPropertyArr:=nil;
+  self.TCPropertyDoneBoolArr:=nil;
+  self.TCPropertyOutBoundBoolArr:=nil;
   self.TCLogs:=CodeLog.Create;
   self.ChangeTo(ACodeCores);
 end;
@@ -11537,6 +11698,8 @@ begin
   self.TCoreIndex:=-1;
   for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i].Free;
   SetLength(self.TCPropertyArr,0);
+  SetLength(self.TCPropertyDoneBoolArr,0);
+  SetLength(self.TCPropertyOutBoundBoolArr,0);
   self.TCLogs.Free;
 end;
 
@@ -11549,6 +11712,13 @@ begin
   SetLength(self.TCPropertyArr,Length(ACodeCores.TCPropertyArr));
   for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i]:=CodeProperties.Create(ACodeCores.TCPropertyArr[i]);
   self.TCLogs.ChangeTo(ACodeCores.TCLogs);
+
+  SetLength(self.TCPropertyDoneBoolArr,Length(ACodeCores.TCPropertyDoneBoolArr));
+  for i:=0 to (Length(self.TCPropertyDoneBoolArr)-1)do self.TCPropertyDoneBoolArr[i]:=ACodeCores.TCPropertyDoneBoolArr[i];
+
+  SetLength(self.TCPropertyOutBoundBoolArr,Length(ACodeCores.TCPropertyOutBoundBoolArr));
+  for i:=0 to (Length(self.TCPropertyOutBoundBoolArr)-1)do self.TCPropertyOutBoundBoolArr[i]:=ACodeCores.TCPropertyOutBoundBoolArr[i];
+
 end;
 
 procedure CodeCores.Cores_AddProperty(var ACodeProperties: CodeProperties;
@@ -11649,6 +11819,10 @@ begin
   Result:=self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines^[AIndex].Code_RunFuncData;
   self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_Continue;
   AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
+
+  if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyOutBoundBoolArr[self.TCoreIndex]:=True;
+  if(AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyDoneBoolArr[self.TCoreIndex]:=True;
+
   if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_ToPrevious;
 
   if(self.TCLogs.Error_ArrLength>0)then self.TCLogs.Error_AppendLastLog(' | At-Core: '+IntToStr(self.TCoreIndex));
@@ -11656,25 +11830,66 @@ begin
   Result:=True;
 end;
 
+function CodeCores.Cores_RunPropertyUntilOutBound: Boolean;
+begin
+  Result:=False;
+  While(self.Cores_ArePropertiesOutBound=False)do begin
+    if(self.Cores_ErrorLength>0)then Exit;
+    if(self.Cores_RunProperty=False)then Exit;
+    self.Cores_Continue;
+  end;
+  Result:=True;
+end;
+
+function CodeCores.Cores_RunPropertyUntilDone: Boolean;
+begin
+  Result:=False;
+  While(self.Cores_ArePropertiesDone=False)do begin
+    if(self.Cores_ErrorLength>0)then Exit;
+    if(self.Cores_RunProperty=False)then Exit;
+    self.Cores_Continue;
+  end;
+  Result:=True;
+end;
+
 function CodeCores.Cores_isPropertyOutBound: Boolean;
-var
-  AIndex:Integer;
 begin
   Result:=False;
   if(self.TCoreIndex<0)or(self.TCoreIndex>(self.Cores_ArrLength-1))then Exit;
-  AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
-  if(AIndex<0)then Result:=True else
-  if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then Result:=True;
+  Result:=self.TCPropertyOutBoundBoolArr[self.TCoreIndex];
 end;
 
 function CodeCores.Cores_isPropertyDone: Boolean;
-var
-  AIndex:Integer;
 begin
   Result:=False;
   if(self.TCoreIndex<0)or(self.TCoreIndex>(self.Cores_ArrLength-1))then Exit;
-  AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
-  if(AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then Result:=True;
+  Result:=self.TCPropertyDoneBoolArr[self.TCoreIndex];
+end;
+
+function CodeCores.Cores_ArePropertiesOutBound: Boolean;
+var
+  i:Integer;
+  nCount:Integer;
+begin
+  Result:=False;
+  nCount:=0;
+  for i:=0 to (Length(self.TCPropertyOutBoundBoolArr)-1)do
+    if(self.TCPropertyOutBoundBoolArr[i]=True)then nCount:=nCount+1;
+
+  if(nCount=Length(self.TCPropertyOutBoundBoolArr))then Result:=True;
+end;
+
+function CodeCores.Cores_ArePropertiesDone: Boolean;
+var
+  i:Integer;
+  nCount:Integer;
+begin
+  Result:=False;
+  nCount:=0;
+  for i:=0 to (Length(self.TCPropertyDoneBoolArr)-1)do
+    if(self.TCPropertyDoneBoolArr[i]=True)then nCount:=nCount+1;
+
+  if(nCount=Length(self.TCPropertyDoneBoolArr))then Result:=True;
 end;
 
 function CodeCores.Cores_ArrLength: Integer;
@@ -13437,7 +13652,7 @@ begin
     Exit;
   end;
   SetLength(Anum3,1);
-  Anum1[Anum2]:=Char(Anum3);
+  Anum1[Anum2]:=Char(Anum3[0]);
 
   ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(StrAIndex,Anum1);
 
@@ -14043,6 +14258,20 @@ begin
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
     Anum3:=self.GetEqual(AReal1,AReal2);
     ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='real')then begin
+    AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
+    AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetEqual(AReal1,AReal2);
+    ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode2='real')then begin
+    AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
+    AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetEqual(AReal1,AReal2);
+    ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
   end else begin
     Anum1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName1AIndex);
     Anum2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2AIndex);
@@ -14127,6 +14356,20 @@ begin
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
     Anum3:=self.GetNotEqual(AReal1,AReal2);
     ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode1='real')then begin
+    AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
+    AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
+  end else
+  if(AMode2='real')then begin
+    AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
+    AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(ResultVarAIndex,Anum3);
   end else begin
     Anum1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName1AIndex);
     Anum2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2AIndex);
@@ -14204,6 +14447,18 @@ begin
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end else
+  if(AMode1='real')then begin
+    AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
+    AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+  end else
+  if(AMode2='real')then begin
+    AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
+    AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
     Anum3:=self.GetGreaterThan(AReal1,AReal2);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
@@ -14283,6 +14538,18 @@ begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
     Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='real')then begin
+    AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
+    AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode2='real')then begin
+    AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
+    AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
@@ -14361,6 +14628,18 @@ begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
     Anum3:=self.GetLessThan(AReal1,AReal2);
+  end else
+  if(AMode1='real')then begin
+    AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
+    AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThan(AReal1,AReal2);
+  end else
+  if(AMode2='real')then begin
+    AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
+    AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
+    Anum3:=self.GetLessThan(AReal1,AReal2);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
@@ -14438,6 +14717,18 @@ begin
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode1='real')then begin
+    AReal1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName1AIndex);
+    AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2AIndex);
+    AReal2:=AInt2+0.0;
+    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+  end else
+  if(AMode2='real')then begin
+    AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
+    AReal2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2AIndex);
+    AReal1:=AInt1+0.0;
     Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName1AIndex);
@@ -15076,7 +15367,7 @@ begin
   AInt1:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarNameIntPos1AIndex);
   AInt2:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarNameIntPos2AIndex);
 
-  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarNameResultStrAIndex,Copy(AStr,AInt1,AInt2));
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarNameResultStrAIndex,Copy(AStr1,AInt1,AInt2));
 end;
 
 procedure CodeLine.StrToInt_Proc(AParamArr: TParamArr;
