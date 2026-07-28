@@ -427,13 +427,65 @@ type
     procedure Length_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure StrLength_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure JumpTo_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure JumpTo_Address_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure Goto_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure Goto_Address_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure Exit_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure MoveV2ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure MoveV2ToV1_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure MoveV2ToV1_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure MoveV2ToV1_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure MoveV2ToV1_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV1ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV2ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV3_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV3ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV4_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV4ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV5_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV5ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV6_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV6ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
+    procedure MoveV2ToGV7_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV7ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+
     procedure V1AndV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure V1OrV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure NotV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
@@ -620,13 +672,65 @@ type
     function Component_Length(const ArrayVarName,ResultVarName:String):Integer;
     function Component_StrLength(const StrVarName,ResultVarName:String):Integer;
     function Component_JumpTo(const JumpToPortName:String):Integer;
+    function Component_JumpTo(const JumpToPortAddress:Integer):Integer;
     function Component_Goto(const GotoPortName:String):Integer;
+    function Component_Goto(const GotoPortAddress:Integer):Integer;
     function Component_Exit:Integer;
     function Component_MoveV2ToV1(const VarName1,VarName2:String):Integer;
     function Component_MoveC2ToV1(const VarName:String;const AValue:Number):Integer;
     function Component_MoveC2ToV1(const VarName:String;const AValue:Integer):Integer;
     function Component_MoveC2ToV1(const VarName:String;const AValue:Real):Integer;
     function Component_MoveC2ToV1(const VarName:String;const AValue:String):Integer;
+
+    function Component_MoveV2ToGV1(const VarName2:String):Integer;
+    function Component_MoveGV1ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV1(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV1(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV1(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV1(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToGV2(const VarName2:String):Integer;
+    function Component_MoveGV2ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV2(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV2(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV2(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV2(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToGV3(const VarName2:String):Integer;
+    function Component_MoveGV3ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV3(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV3(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV3(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV3(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToGV4(const VarName2:String):Integer;
+    function Component_MoveGV4ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV4(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV4(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV4(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV4(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToGV5(const VarName2:String):Integer;
+    function Component_MoveGV5ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV5(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV5(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV5(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV5(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToGV6(const VarName2:String):Integer;
+    function Component_MoveGV6ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV6(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV6(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV6(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV6(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToGV7(const VarName2:String):Integer;
+    function Component_MoveGV7ToV1(const VarName1:String):Integer;
+    function Component_MoveC2ToGV7(const C2AValue:Number):Integer;
+    function Component_MoveC2ToGV7(const C2AValue:Integer):Integer;
+    function Component_MoveC2ToGV7(const C2AValue:Real):Integer;
+    function Component_MoveC2ToGV7(const C2AValue:String):Integer;
+
     function Component_V1AndV2(const VarName1,VarName2,ResultVarName:String):Integer;
     function Component_V1OrV2(const VarName1,VarName2,ResultVarName:String):Integer;
     function Component_NotV1(const VarName1,ResultVarName:String):Integer;
@@ -683,7 +787,7 @@ type
 
     //Funcs
 
-    function Component_isPositiveIntAdvance(const numIntArr,ByteResult:String):Integer;
+    function Component_isPositiveIntAdvance(const SetInt_Address,isPositiveAd_Address:Integer):Integer;
 
     //ArrMath
 
@@ -835,6 +939,7 @@ type
     class procedure BitPosSetArr(const num:TBitPos;var numArr:IntArr);
     class procedure BitPosAddSetArr(const num:TBitPos;var numArr:IntArr);
     class procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
+    class procedure SumIntCores(num1,num2:IntArr;var numResult:IntArr);
     class procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
     class procedure SumSubInt(num1,num2:IntArr;var numResult:IntArr);
     class procedure MulInt(num1,num2:IntArr;var numResult:IntArr);
@@ -3498,8 +3603,8 @@ begin
   self.TPtrCComponent:=APtrCodeComponentBasic;
 end;
 
-function CodeComponent.Component_isPositiveIntAdvance(const numIntArr,
-  ByteResult: String): Integer;
+function CodeComponent.Component_isPositiveIntAdvance(const SetInt_Address,
+  isPositiveAd_Address: Integer): Integer;
 var
   AMem1:String;
 begin
@@ -3520,6 +3625,15 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = numIntArr;
+  //Gv2 = ByteResult;
+
+  self.TPtrCComponent^.Component_AllocateMem('numIntArr',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numIntArr');
+
+  self.TPtrCComponent^.Component_AllocateMem('ByteResult',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'ByteResult');
+
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('numLength',0);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
@@ -3528,17 +3642,36 @@ begin
   self.TPtrCComponent^.Component_SetVarMem(ByteResult,3);
   self.TPtrCComponent^.Component_ArrayIndexGet(ByteResult,AMem1+'NumZero',ByteResult);
 
-  self.TPtrCComponent^.Component_Length(numIntArr,AMem1+'numLength');
+  self.TPtrCComponent^.Component_Length(AMem1+'numIntArr',AMem1+'numLength');
   self.TPtrCComponent^.Component_V1EqV2(AMem1+'numLength',AMem1+'NumZero',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1True(AMem1+'bool1',AMem1+'JumpExit1');
 
-  self.Component_SetInt(numIntArr,AMem1+'TArr1');
-  self.Component_isPositiveAd(AMem1+'TArr1',ByteResult);
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numIntArr');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'TArr1');
+  self.TPtrCComponent^.Component_Goto(SetInt_Address);
+
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numIntArr');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'TArr1');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'TArr1');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'ByteResult');
+  self.TPtrCComponent^.Component_Goto(isPositiveAd_Address);
+
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'TArr1');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'ByteResult');
+
+  //self.Component_SetInt(numIntArr,AMem1+'TArr1');
+  //self.Component_isPositiveAd(AMem1+'TArr1',ByteResult);
+
   self.TPtrCComponent^.Component_AllocateMem('TArr1',nil);
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numIntArr');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'ByteResult');
+
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3570,6 +3703,7 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexSet(ArrayVarName,AMem1+'Length2',ValueVarName);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3590,6 +3724,7 @@ begin
   self.TPtrCComponent^.Component_SetLength(ArrayVarName,AMem1+'Length1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3619,6 +3754,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3654,6 +3790,7 @@ begin
   self.TPtrCComponent^.Component_IfV1True_Goto(AMem1+'ConditionA',AMem1+'GotoMul1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3689,6 +3826,7 @@ begin
   self.TPtrCComponent^.Component_IfV1True_Goto(AMem1+'ConditionA',AMem1+'GotoMul1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3710,6 +3848,7 @@ begin
   self.TPtrCComponent^.Component_V1OrV2(ByteVarName,ResultVarName,ResultVarName);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3732,6 +3871,7 @@ begin
   self.TPtrCComponent^.Component_V1AndV2(ByteVarName,ResultVarName,ResultVarName);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3753,6 +3893,7 @@ begin
   self.TPtrCComponent^.Component_V1XORV2(ByteVarName,ResultVarName,ResultVarName);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3777,6 +3918,7 @@ begin
   self.TPtrCComponent^.Component_V1NotEqV2(ResultBoolVarName,AMem1+'NumZero',ResultBoolVarName);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3829,6 +3971,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3862,6 +4005,7 @@ begin
   self.TPtrCComponent^.Component_MulDivInteger(AMem1+'num1',AMem1+'LengthResult',ResultLengthVarName,AMem1+'isMulV');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -3910,6 +4054,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4004,6 +4149,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4068,6 +4214,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4213,6 +4360,7 @@ begin
   self.TPtrCComponent^.Component_Port('jForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4522,6 +4670,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse9');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4833,6 +4982,7 @@ begin
   self.TPtrCComponent^.Component_Port('lForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4903,6 +5053,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse4');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -4948,6 +5099,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5081,6 +5233,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5098,6 +5251,8 @@ begin
 
   Result:=self.Component_AlignNums(num1VarName,num2VarName);
   self.Component_isNum1Bigger(num1VarName,num2VarName,ResultByteVarName);
+
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5248,6 +5403,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse12');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5399,6 +5555,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse10');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5564,6 +5721,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse11');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5606,6 +5764,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5621,6 +5780,8 @@ begin
   }
 
   Result:=self.Component_SetInt(numVarName,numResultVarName);
+
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5770,6 +5931,7 @@ begin
   self.TPtrCComponent^.Component_Port('kForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5795,6 +5957,7 @@ begin
   self.TPtrCComponent^.Component_V1EqV2(AMem1+'NumLength',AMem1+'Num8',ResultBoolVarName);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5820,6 +5983,7 @@ begin
   self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'Num8');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5897,6 +6061,7 @@ begin
   self.TPtrCComponent^.Component_Port('jForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5929,6 +6094,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -5958,6 +6124,7 @@ begin
   self.Component_SetBitPos(ToNumResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6071,6 +6238,7 @@ begin
   self.TPtrCComponent^.Component_Port('jForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6118,6 +6286,7 @@ begin
   self.Component_SetBitPos(numResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6166,6 +6335,7 @@ begin
   self.Component_SetBitPos(numResultBitPos,AMem1+'NumByte',AMem1+'NumBit');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6284,6 +6454,7 @@ begin
   self.TPtrCComponent^.Component_Port('jForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6352,6 +6523,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6420,6 +6592,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6482,6 +6655,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6538,6 +6712,7 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexSet(numResultIntArr,AMem1+'numByte',AMem1+'ByteA');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6744,6 +6919,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse9');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -6983,6 +7159,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -7182,6 +7359,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -7535,6 +7713,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse17');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -7681,6 +7860,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -7855,6 +8035,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8100,6 +8281,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8233,6 +8415,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8279,6 +8462,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8332,6 +8516,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8350,6 +8535,7 @@ begin
   self.TPtrCComponent^.Component_SetLength(numResultVarNameArr,AMem1+'num1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8401,6 +8587,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8451,6 +8638,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8561,6 +8749,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8662,6 +8851,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8724,6 +8914,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -8768,6 +8959,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9063,6 +9255,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9221,6 +9414,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9355,6 +9549,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9537,6 +9732,7 @@ begin
   self.TPtrCComponent^.Component_Port('kForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9588,6 +9784,7 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9690,6 +9887,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9792,6 +9990,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9926,6 +10125,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -9956,6 +10156,7 @@ begin
   self.TPtrCComponent^.Component_StrLength(AMem1+'Str2',VarNameResultInt);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -10089,6 +10290,7 @@ begin
   self.Component_Reverse(VarNameResultStr,VarNameResultStr);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -10246,6 +10448,7 @@ begin
   self.Component_Reverse(VarNameResultStr,VarNameResultStr);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -10435,6 +10638,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -10515,6 +10719,7 @@ begin
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -10654,6 +10859,7 @@ begin
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -10717,6 +10923,7 @@ begin
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
   self.TPtrCComponent^.Component_EndMem;
+  self.TPtrCComponent^.Component_Exit;
 
 end;
 
@@ -11140,12 +11347,32 @@ begin
   Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
 end;
 
+function CodeComponentBasic.Component_JumpTo(const JumpToPortAddress: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(2));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(JumpToPortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.JumpTo_Address_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
 function CodeComponentBasic.Component_Goto(const GotoPortName: String): Integer;
 begin
   self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(22));
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(GotoPortName);
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Goto_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_Goto(const GotoPortAddress: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(22));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(GotoPortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Goto_Address_Proc);
   Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
 end;
 
@@ -11209,6 +11436,426 @@ begin
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName);
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(AValue);
   self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToV1_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV1(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV1ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV1ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV1(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV1_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV1(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV1_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV1(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV1_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV1(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV1_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV2(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV2_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV2ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV2ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV2(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV2_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV2(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV2_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV2(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV2_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV2(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV2_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV3(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV3_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV3ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV3ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV3(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV3_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV3(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV3_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV3(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV3_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV3(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV3_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV4(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV4_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV4ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV4ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV4(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV4_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV4(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV4_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV4(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV4_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV4(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV4_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV5(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV5_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV5ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV5ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV5(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV5_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV5(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV5_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV5(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV5_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV5(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV5_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV6(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV6_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV6ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV6ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV6(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV6_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV6(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV6_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV6(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV6_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV6(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV6_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveV2ToGV7(const VarName2: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV7_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveGV7ToV1(const VarName1: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveGV7ToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV7(const C2AValue: Number
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV7_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV7(const C2AValue: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV7_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV7(const C2AValue: Real
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV7_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
+function CodeComponentBasic.Component_MoveC2ToGV7(const C2AValue: String
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(50));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToGV7_String_Proc);
   Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
 end;
 
@@ -11815,8 +12462,10 @@ begin
   Result:=False;
   if(self.TCoreIndex<0)or(self.TCoreIndex>(self.Cores_ArrLength-1))then Exit;
   if(self.TCLogs.Error_ArrLength>0)then Exit;
+
   AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
   Result:=self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines^[AIndex].Code_RunFuncData;
+
   self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_Continue;
   AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
 
@@ -11826,8 +12475,6 @@ begin
   if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_ToPrevious;
 
   if(self.TCLogs.Error_ArrLength>0)then self.TCLogs.Error_AppendLastLog(' | At-Core: '+IntToStr(self.TCoreIndex));
-
-  Result:=True;
 end;
 
 function CodeCores.Cores_RunPropertyUntilOutBound: Boolean;
@@ -11835,7 +12482,11 @@ begin
   Result:=False;
   While(self.Cores_ArePropertiesOutBound=False)do begin
     if(self.Cores_ErrorLength>0)then Exit;
-    if(self.Cores_RunProperty=False)then Exit;
+    if(self.Cores_RunProperty=False)then begin
+      self.TCLogs.Warning_CreateLastLog('Warning: RunProperty returned False'+' | At-Core: '+IntToStr(self.TCoreIndex));
+      self.TCLogs.Warning_CreateLastLog('Warning: must be because CoreIndex is out of bound?'+' | At-Core: '+IntToStr(self.TCoreIndex));
+      self.TCLogs.Warning_CreateLastLog('Warning: must be because has Error messages?'+' | At-Core: '+IntToStr(self.TCoreIndex));
+    end;
     self.Cores_Continue;
   end;
   Result:=True;
@@ -13780,6 +14431,22 @@ begin
   ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToV);
 end;
 
+procedure CodeLine.JumpTo_Address_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  JumpToInt:Integer;
+begin
+  JumpToInt:=ArrMath.NumberToInt(AParamArr[0]);
+
+  if(JumpToInt<0)or(JumpToInt>(ATCCodeProperties^.Property_CodeArray^.Lines_ArrLength-1))then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: JumpTo Address is out of bound');
+    Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToInt);
+end;
+
 procedure CodeLine.Goto_Proc(AParamArr: TParamArr;
   var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
@@ -13800,6 +14467,22 @@ begin
   GotoV:=ATCCodeProperties^.Property_CodePorts^.Var_GetValueInt(GotoAIndex);
 
   ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoV);
+end;
+
+procedure CodeLine.Goto_Address_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  GotoInt:Integer;
+begin
+  GotoInt:=ArrMath.NumberToInt(AParamArr[0]);
+
+  if(GotoInt<0)or(GotoInt>(ATCCodeProperties^.Property_CodeArray^.Lines_ArrLength-1))then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Goto Address is out of bound');
+    Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoInt);
 end;
 
 procedure CodeLine.Exit_Proc(AParamArr: TParamArr;
@@ -13940,6 +14623,1322 @@ begin
   if(AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameStr+'" does not Exists');
     Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV1';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV1ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV1';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV1_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV1';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV1_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV1';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV1_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV1';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV1_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV1';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV2_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV2';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV2ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV2';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV2_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV2';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV2_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV2';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV2_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV2';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV2_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV2';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV3_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV3';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV3ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV3';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV3_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV3';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV3_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV3';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV3_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV3';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV3_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV3';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV4_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV4';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV4ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV4';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV4_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV4';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV4_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV4';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV4_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV4';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV4_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV4';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV5_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV5';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV5ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV5';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV5_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV5';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV5_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV5';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV5_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV5';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV5_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV5';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV6_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV6';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV6ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV6';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV6_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV6';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV6_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV6';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV6_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV6';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV6_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV6';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV7_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:='$GV7';
+  VarName2Str:=ArrMath.NumberToStr(AParamArr[0]);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName1Str);
+    VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    Exit;
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveGV7ToV1_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str,VarName2Str:String;
+  VarName1Index,VarName2Index:Integer;
+  Anum:Number;
+  AStr:String;
+  AInt:Integer;
+  AReal:Real;
+  AMode:String;
+begin
+  Anum:=nil;
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+
+  VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
+  VarName2Str:='$GV7';
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    Exit;
+  end;
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarName2Str);
+    VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarName2Str);
+  end;
+
+  AMode:=ATCCodeProperties^.Property_CodeVariable^.Var_GetVarDataType(VarName2Index);
+
+  if(AMode='number')then Anum:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValue(VarName2Index) else
+  if(AMode='string')then AStr:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueStr(VarName2Index) else
+  if(AMode='integer')then AInt:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt(VarName2Index) else
+  if(AMode='real')then AReal:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueReal(VarName2Index);
+
+  if(AMode='number')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(VarName1Index,Anum) else
+  if(AMode='string')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(VarName1Index,AStr) else
+  if(AMode='integer')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(VarName1Index,AInt) else
+  if(AMode='real')then ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(VarName1Index,AReal);
+
+  SetLength(Anum,0);
+  AStr:='';
+  AInt:=0;
+  AReal:=0.0;
+  AMode:='';
+end;
+
+procedure CodeLine.MoveV2ToGV7_Number_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Number;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV7';
+  AValue:=StrMath.AssignNum(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValue(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV7_Integer_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Integer;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV7';
+  AValue:=ArrMath.NumberToInt(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueInt(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV7_Real_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:Real;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV7';
+  AValue:=ArrMath.NumberToReal(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Var_SetValueReal(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToGV7_String_Proc(AParamArr: TParamArr;
+  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameStr:String;
+  AValue:String;
+  AIndex:Integer;
+begin
+  VarNameStr:='$GV7';
+  AValue:=ArrMath.NumberToStr(AParamArr[0]);
+
+  AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
+
+  if(AIndex=-1)then begin
+    ATCCodeProperties^.Property_CodeVariable^.Var_AddVariable(VarNameStr);
+    AIndex:=ATCCodeProperties^.Property_CodeVariable^.Var_GetValueInt_Index(VarNameStr);
   end;
 
   ATCCodeProperties^.Property_CodeVariable^.Var_SetValueStr(AIndex,AValue);
@@ -17549,6 +19548,24 @@ begin
     self.SetBit(numResult[self.RR(i/8)],i-(self.RR(i/8)*8));
   end;
   //End...
+end;
+
+class procedure ArrMath.SumIntCores(num1, num2: IntArr; var numResult: IntArr);
+var
+  TCProperty:CodeProperties;
+  TCBuild:CodeBuild;
+  TCCores:CodeCores;
+begin
+  TCProperty:=CodeProperties.Create;
+  TCBuild:=CodeBuild.Create(@TCProperty);
+  TCCores:=CodeCores.Create;
+
+
+
+
+  TCCores.Free;
+  TCBuild.Free;
+  TCProperty.Free;
 end;
 
 class procedure ArrMath.SubInt(num1, num2: IntArr; var numResult: IntArr; out
