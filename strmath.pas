@@ -810,14 +810,14 @@ type
     function Component_ShiftPace(const unNumInteger_Address,RR_Address,SetLengthInc_Address,IsBitSet_Address,SetBit_Address:Integer):Integer;
     function Component_isPositiveAd(const IsBitSet_Address,Shift_Address,isIntZero_Address:Integer):Integer;
     function Component_isPositive(const isPositiveAd_Address:Integer):Integer;
-    function Component_isNum1Bigger(const num1VarName,num2VarName,ResultByteVarName:String):Integer;
-    function Component_isNum1BiggerAlign(const num1VarName,num2VarName,ResultByteVarName:String):Integer;
-    function Component_isIntNumber(const DigitStrVarName,ResultBoolVarName:String):Integer;
-    function Component_GetIntDigit(const DigitByteVarName,ResultStrVarName:String):Integer;
-    function Component_InitZeroToNine(const isNegBoolVarName,DigitByteVarName,numVarName:String):Integer;
-    function Component_AlignNums(const num1VarName,num2VarName:String):Integer;
-    function Component_AssignIntNum(const numVarName,numResultVarName:String):Integer;
-    function Component_CutSome(const numVarName,numResultVarName:String):Integer;
+    function Component_isNum1Bigger(const IsBitSet_Address:Integer):Integer;
+    function Component_isNum1BiggerAlign(const AlignNums_Address,isNum1Bigger_Address:Integer):Integer;
+    function Component_isIntNumber:Integer;
+    function Component_GetIntDigit:Integer;
+    function Component_InitZeroToNine(const SetBit_Address,Shift_Address:Integer):Integer;
+    function Component_AlignNums:Integer;
+    function Component_AssignIntNum(const SetInt_Address:Integer):Integer;
+    function Component_CutSome(const SetLengthInc_Address,SetLengthToLength_Address:Integer):Integer;
 
     function Component_IsBitPosVar(const numVarName,ResultBoolVarName:String):Integer;
     function Component_CreateBitPosVar(const numResultVarName:String):Integer;
@@ -5552,8 +5552,8 @@ begin
 
 end;
 
-function CodeComponent.Component_isNum1Bigger(const num1VarName, num2VarName,
-  ResultByteVarName: String): Integer;
+function CodeComponent.Component_isNum1Bigger(const IsBitSet_Address: Integer
+  ): Integer;
 var
   AMem1:String;
 begin
@@ -5580,6 +5580,19 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = num1VarName;
+  //GV2 = num2VarName;
+  //GV3 = ResultByteVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('num1VarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'num1VarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('num2VarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'num2VarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('ResultByteVarName',0);
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ResultByteVarName');
+
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('True2',2);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
@@ -5604,7 +5617,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('boolAnd2',0);
 
   self.TPtrCComponent^.Component_AllocateMem('i',0);
-  self.TPtrCComponent^.Component_Length(num1VarName,AMem1+'i');
+  self.TPtrCComponent^.Component_Length(AMem1+'num1VarName',AMem1+'i');
   self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num2',AMem1+'i');
 
   self.TPtrCComponent^.Component_Port('iForBegin');
@@ -5624,10 +5637,24 @@ begin
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool2',AMem1+'False');
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(num1VarName,AMem1+'i',AMem1+'ByteA');
-  self.TPtrCComponent^.Component_ArrayIndexGet(num2VarName,AMem1+'i',AMem1+'ByteB');
-  self.Component_IsBitSet(AMem1+'ByteA',AMem1+'j',AMem1+'ByteA');
-  self.Component_IsBitSet(AMem1+'ByteB',AMem1+'j',AMem1+'ByteB');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'num1VarName',AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'num2VarName',AMem1+'i',AMem1+'ByteB');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'j');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(IsBitSet_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'j');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteB');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'j');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteB');
+  self.TPtrCComponent^.Component_Goto(IsBitSet_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteB');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'j');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteB');
 
   self.TPtrCComponent^.Component_IfV1False(AMem1+'ByteA',AMem1+'JumpFalse1');
 
@@ -5651,14 +5678,14 @@ begin
 
   self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd1',AMem1+'JumpFalse3');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultByteVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultByteVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit1');
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
   self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd2',AMem1+'JumpFalse4');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultByteVarName,AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultByteVarName',AMem1+'False');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpExit1');
 
   self.TPtrCComponent^.Component_Port('JumpFalse4');
@@ -5677,17 +5704,21 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultByteVarName,AMem1+'True2');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultByteVarName',AMem1+'True2');
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'num2VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ResultByteVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_isNum1BiggerAlign(const num1VarName,
-  num2VarName, ResultByteVarName: String): Integer;
+function CodeComponent.Component_isNum1BiggerAlign(const AlignNums_Address,
+  isNum1Bigger_Address: Integer): Integer;
 begin
 
   {
@@ -5698,15 +5729,45 @@ begin
   end;
   }
 
-  Result:=self.Component_AlignNums(num1VarName,num2VarName);
-  self.Component_isNum1Bigger(num1VarName,num2VarName,ResultByteVarName);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = num1VarName;
+  //GV2 = num2VarName;
+  //GV3 = ResultByteVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('num1VarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'num1VarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('num2VarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'num2VarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('ResultByteVarName',0);
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ResultByteVarName');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'num2VarName');
+  self.TPtrCComponent^.Component_Goto(AlignNums_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'num2VarName');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'num2VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ResultByteVarName');
+  self.TPtrCComponent^.Component_Goto(isNum1Bigger_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'num2VarName');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ResultByteVarName');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'num2VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ResultByteVarName');
+
+  self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_isIntNumber(const DigitStrVarName,
-  ResultBoolVarName: String): Integer;
+function CodeComponent.Component_isIntNumber: Integer;
 var
   AMem1:String;
 begin
@@ -5732,6 +5793,15 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = DigitStrVarName;
+  //GV2 = ResultBoolVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('DigitStrVarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'DigitStrVarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('ResultBoolVarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'ResultBoolVarName');
+
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
@@ -5744,8 +5814,8 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'False');
-  self.TPtrCComponent^.Component_StrLength(DigitStrVarName,AMem1+'StrLength');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'False');
+  self.TPtrCComponent^.Component_StrLength(AMem1+'DigitStrVarName',AMem1+'StrLength');
 
   self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrLength',AMem1+'False',AMem1+'num1');
   self.TPtrCComponent^.Component_V1GTV2(AMem1+'StrLength',AMem1+'True',AMem1+'num2');
@@ -5763,101 +5833,103 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','0');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse3');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','1');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse4');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse4');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','2');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse5');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse5');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','3');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse6');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse6');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','4');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse7');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse7');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','5');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse8');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse8');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','6');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse9');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse9');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','7');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse10');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse10');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','8');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse11');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse12');
 
   self.TPtrCComponent^.Component_Port('JumpFalse11');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','9');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',DigitStrVarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'StrDigit',AMem1+'DigitStrVarName',AMem1+'num1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'num1',AMem1+'JumpFalse12');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultBoolVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultBoolVarName',AMem1+'True');
 
   self.TPtrCComponent^.Component_Port('JumpFalse12');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'DigitStrVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_GetIntDigit(const DigitByteVarName,
-  ResultStrVarName: String): Integer;
+function CodeComponent.Component_GetIntDigit: Integer;
 var
   AMem1:String;
 begin
@@ -5881,6 +5953,15 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = DigitByteVarName;
+  //GV2 = ResultStrVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('DigitByteVarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'DigitByteVarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('ResultStrVarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'ResultStrVarName');
+
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','');
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
@@ -5891,16 +5972,16 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
-  self.TPtrCComponent^.Component_SetLength(DigitByteVarName,AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'DigitByteVarName',AMem1+'True');
 
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','0');
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
@@ -5908,10 +5989,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','1');
   self.TPtrCComponent^.Component_AllocateMem('num1',1);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
@@ -5919,10 +6000,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','2');
   self.TPtrCComponent^.Component_AllocateMem('num1',2);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
@@ -5930,10 +6011,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','3');
   self.TPtrCComponent^.Component_AllocateMem('num1',3);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse4');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse4');
@@ -5941,10 +6022,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','4');
   self.TPtrCComponent^.Component_AllocateMem('num1',4);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse5');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse5');
@@ -5952,10 +6033,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','5');
   self.TPtrCComponent^.Component_AllocateMem('num1',5);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse6');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse6');
@@ -5963,10 +6044,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','6');
   self.TPtrCComponent^.Component_AllocateMem('num1',6);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse7');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse7');
@@ -5974,10 +6055,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','7');
   self.TPtrCComponent^.Component_AllocateMem('num1',7);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse8');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse8');
@@ -5985,10 +6066,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','8');
   self.TPtrCComponent^.Component_AllocateMem('num1',8);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse9');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse10');
 
   self.TPtrCComponent^.Component_Port('JumpFalse9');
@@ -5996,20 +6077,23 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('StrDigit','9');
   self.TPtrCComponent^.Component_AllocateMem('num1',9);
   self.TPtrCComponent^.Component_SetLength(AMem1+'num1',AMem1+'True');
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'num1',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse10');
 
-  self.TPtrCComponent^.Component_MoveV2ToV1(ResultStrVarName,AMem1+'StrDigit');
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'ResultStrVarName',AMem1+'StrDigit');
 
   self.TPtrCComponent^.Component_Port('JumpFalse10');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'DigitByteVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'ResultStrVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_InitZeroToNine(const isNegBoolVarName,
-  DigitByteVarName, numVarName: String): Integer;
+function CodeComponent.Component_InitZeroToNine(const SetBit_Address,
+  Shift_Address: Integer): Integer;
 var
   AMem1:String;
 begin
@@ -6051,6 +6135,19 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = isNegBoolVarName;
+  //GV2 = DigitByteVarName;
+  //GV3 = numVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('isNegBoolVarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'isNegBoolVarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('DigitByteVarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'DigitByteVarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('numVarName',0);
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'numVarName');
+
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
@@ -6061,121 +6158,241 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'True',AMem1+'NumZero',AMem1+'True');
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'False',AMem1+'NumZero',AMem1+'False');
 
-  self.TPtrCComponent^.Component_SetLength(numVarName,AMem1+'NumOne');
-  self.TPtrCComponent^.Component_ArrayIndexSet(numVarName,AMem1+'NumZero',AMem1+'False');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'numVarName',AMem1+'NumOne');
+  self.TPtrCComponent^.Component_ArrayIndexSet(AMem1+'numVarName',AMem1+'NumZero',AMem1+'False');
 
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
 
-  self.TPtrCComponent^.Component_ArrayIndexGet(numVarName,AMem1+'NumZero',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'numVarName',AMem1+'NumZero',AMem1+'ByteA');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',1);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumZero',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',2);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumOne',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',3);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse3');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumZero',AMem1+'ByteA');
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumOne',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',4);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse4');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumTwo',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse4');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',5);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse5');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumZero',AMem1+'ByteA');
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumTwo',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse5');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',6);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse6');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumOne',AMem1+'ByteA');
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumTwo',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse6');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',7);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse7');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumZero',AMem1+'ByteA');
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumOne',AMem1+'ByteA');
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumTwo',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumOne');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumTwo');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse7');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',8);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse8');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumThree',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumThree');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumThree');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse9');
 
   self.TPtrCComponent^.Component_Port('JumpFalse8');
 
   self.TPtrCComponent^.Component_AllocateMem('DigitByte',9);
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',DigitByteVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'DigitByte',AMem1+'DigitByteVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse9');
 
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumZero',AMem1+'ByteA');
-  self.Component_SetBit(AMem1+'ByteA',AMem1+'NumThree',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumZero');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'NumThree');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetBit_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'NumThree');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'ByteA');
 
   self.TPtrCComponent^.Component_Port('JumpFalse9');
 
-  self.TPtrCComponent^.Component_ArrayIndexSet(numVarName,AMem1+'NumZero',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(AMem1+'numVarName',AMem1+'NumZero',AMem1+'ByteA');
 
-  self.TPtrCComponent^.Component_V1EqV2(AMem1+'False',isNegBoolVarName,AMem1+'bool1');
+  self.TPtrCComponent^.Component_V1EqV2(AMem1+'False',AMem1+'isNegBoolVarName',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse10');
 
-  self.Component_Shift(AMem1+'False',AMem1+'True',numVarName);
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'True');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'numVarName');
+  self.TPtrCComponent^.Component_Goto(Shift_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'False');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'True');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'numVarName');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse11');
 
   self.TPtrCComponent^.Component_Port('JumpFalse10');
 
-  self.Component_Shift(AMem1+'False',AMem1+'False',numVarName);
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'False');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'numVarName');
+  self.TPtrCComponent^.Component_Goto(Shift_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'False');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'False');
+  self.TPtrCComponent^.Component_MoveGV3ToV1(AMem1+'numVarName');
 
   self.TPtrCComponent^.Component_Port('JumpFalse11');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'isNegBoolVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'DigitByteVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV3(AMem1+'numVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_AlignNums(const num1VarName,
-  num2VarName: String): Integer;
+function CodeComponent.Component_AlignNums: Integer;
 var
   AMem1:String;
 begin
@@ -6190,17 +6407,26 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = num1VarName;
+  //GV2 = num2VarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('num1VarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'num1VarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('num2VarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'num2VarName');
+
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
   self.TPtrCComponent^.Component_AllocateMem('num2',0);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
 
-  self.TPtrCComponent^.Component_Length(num1VarName,AMem1+'num1');
-  self.TPtrCComponent^.Component_Length(num2VarName,AMem1+'num2');
+  self.TPtrCComponent^.Component_Length(AMem1+'num1VarName',AMem1+'num1');
+  self.TPtrCComponent^.Component_Length(AMem1+'num2VarName',AMem1+'num2');
 
   self.TPtrCComponent^.Component_V1GTV2(AMem1+'num1',AMem1+'num2',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse1');
 
-  self.TPtrCComponent^.Component_SetLength(num2VarName,AMem1+'num1');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'num2VarName',AMem1+'num1');
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
@@ -6208,17 +6434,20 @@ begin
   self.TPtrCComponent^.Component_V1GTV2(AMem1+'num2',AMem1+'num1',AMem1+'bool1');
   self.TPtrCComponent^.Component_IfV1False(AMem1+'bool1',AMem1+'JumpFalse2');
 
-  self.TPtrCComponent^.Component_SetLength(num1VarName,AMem1+'num2');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'num1VarName',AMem1+'num2');
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'num1VarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'num2VarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_AssignIntNum(const numVarName,
-  numResultVarName: String): Integer;
+function CodeComponent.Component_AssignIntNum(const SetInt_Address: Integer
+  ): Integer;
 begin
 
   {
@@ -6228,14 +6457,33 @@ begin
   end;
   }
 
-  Result:=self.Component_SetInt(numVarName,numResultVarName);
+  Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = numVarName;
+  //GV2 = numResultVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('numVarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numVarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('numResultVarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'numResultVarName');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'numResultVarName');
+  self.TPtrCComponent^.Component_Goto(SetInt_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numVarName');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'numResultVarName');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'numResultVarName');
+
+  self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
 
 end;
 
-function CodeComponent.Component_CutSome(const numVarName,
-  numResultVarName: String): Integer;
+function CodeComponent.Component_CutSome(const SetLengthInc_Address,
+  SetLengthToLength_Address: Integer): Integer;
 var
   AMem1:String;
 begin
@@ -6267,6 +6515,15 @@ begin
 
   Result:=self.TPtrCComponent^.Component_StartMem(AMem1);
 
+  //GV1 = numVarName;
+  //GV2 = numResultVarName;
+
+  self.TPtrCComponent^.Component_AllocateMem('numVarName',0);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numVarName');
+
+  self.TPtrCComponent^.Component_AllocateMem('numResultVarName',0);
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'numResultVarName');
+
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('True2',2);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
@@ -6288,10 +6545,10 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('boolAnd4',0);
 
   self.TPtrCComponent^.Component_AllocateMem('num',0);
-  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'num',numVarName);
+  self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'num',AMem1+'numVarName');
 
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'False');
-  self.TPtrCComponent^.Component_SetLength(numResultVarName,AMem1+'NumZero');
+  self.TPtrCComponent^.Component_SetLength(AMem1+'numResultVarName',AMem1+'NumZero');
 
   self.TPtrCComponent^.Component_Length(AMem1+'num',AMem1+'i');
   self.TPtrCComponent^.Component_SumSubInteger(AMem1+'i',AMem1+'num2',AMem1+'i');
@@ -6313,14 +6570,24 @@ begin
   self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd3',AMem1+'JumpFalse1');
 
   self.TPtrCComponent^.Component_MoveV2ToV1(AMem1+'bool1',AMem1+'True');
-  self.Component_SetLengthInc(numResultVarName,AMem1+'ByteA');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numResultVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetLengthInc_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numResultVarName');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'ByteA');
+
   self.TPtrCComponent^.Component_JumpTo(AMem1+'JumpFalse2');
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
   self.TPtrCComponent^.Component_IfV1False(AMem1+'boolAnd4',AMem1+'JumpFalse2');
 
-  self.Component_SetLengthInc(numResultVarName,AMem1+'ByteA');
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numResultVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'ByteA');
+  self.TPtrCComponent^.Component_Goto(SetLengthInc_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'numResultVarName');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'ByteA');
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
@@ -6331,7 +6598,12 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.Component_SetLengthToLength(AMem1+'num',numResultVarName);
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'num');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'numResultVarName');
+  self.TPtrCComponent^.Component_Goto(SetLengthToLength_Address);
+  self.TPtrCComponent^.Component_MoveGV1ToV1(AMem1+'num');
+  self.TPtrCComponent^.Component_MoveGV2ToV1(AMem1+'numResultVarName');
+
   self.TPtrCComponent^.Component_AllocateMem('i',0);
 
   self.TPtrCComponent^.Component_AllocateMem('Length1',0);
@@ -6346,7 +6618,7 @@ begin
   //============================================================================
 
   self.TPtrCComponent^.Component_SubInteger(AMem1+'Length1',AMem1+'i',AMem1+'num1');
-  self.TPtrCComponent^.Component_ArrayIndexGet(numResultVarName,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'numResultVarName',AMem1+'i',AMem1+'ByteA');
   self.TPtrCComponent^.Component_ArrayIndexSet(AMem1+'num',AMem1+'num1',AMem1+'ByteA');
 
   //============================================================================
@@ -6370,7 +6642,7 @@ begin
   //============================================================================
 
   self.TPtrCComponent^.Component_ArrayIndexGet(AMem1+'num',AMem1+'i',AMem1+'ByteA');
-  self.TPtrCComponent^.Component_ArrayIndexSet(numResultVarName,AMem1+'i',AMem1+'ByteA');
+  self.TPtrCComponent^.Component_ArrayIndexSet(AMem1+'numResultVarName',AMem1+'i',AMem1+'ByteA');
 
   //============================================================================
 
@@ -6378,6 +6650,9 @@ begin
   self.TPtrCComponent^.Component_JumpTo(AMem1+'kForBegin');
 
   self.TPtrCComponent^.Component_Port('kForEnd');
+
+  self.TPtrCComponent^.Component_MoveV2ToGV1(AMem1+'numVarName');
+  self.TPtrCComponent^.Component_MoveV2ToGV2(AMem1+'numResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
