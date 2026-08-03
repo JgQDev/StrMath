@@ -22288,10 +22288,14 @@ begin
     if(nCount1=TCCores.Cores_ArrLength)then break;
   end;
 
+  SetLength(TArr1,0);
   for i:=0 to (TCCores.Cores_ArrLength-1)do begin
-    SetLength(numResult,Length(numResult)+1);
-    numResult[Length(numResult)-1]:=TCCores.Cores_GetPropertyVar_Number(i,'NumResult');
+    SetLength(TArr1,Length(TArr1)+1);
+    TArr1[Length(TArr1)-1]:=TCCores.Cores_GetPropertyVar_Number(i,'NumResult');
   end;
+
+  SetLength(numResult,Length(TArr1));
+  for i:=0 to (Length(numResult)-1)do numResult[i]:==TArr1[i][0];
 
   TCCores.Free;
   TCBuild.Free;
