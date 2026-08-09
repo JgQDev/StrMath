@@ -262,9 +262,6 @@ function xPower(const Base,Power:String;out AAnswer:String;DeciCountBaseOne:Inte
 
 function xMod(const num1,num2:String):String;
 
-
-procedure Test01;
-
 implementation
 
 const
@@ -274,8 +271,6 @@ const
 type
 
   TPtrNumber = ^Number;
-  TPtrInteger = ^Integer;
-  TPtrString = ^String;
   PtrCodeProperties = ^CodeProperties;
   PtrCodeLog = ^CodeLog;
 
@@ -284,10 +279,8 @@ type
   TNumArr = Array of Integer;
   TParamArr = Array of Number;
 
-  TProcNor = procedure(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;
-    var ATCCodeProperties:PtrCodeProperties);
-  TProcObj = procedure(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;
-    var ATCCodeProperties:PtrCodeProperties) of object;
+  TProcNor = procedure(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+  TProcObj = procedure(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties) of object;
 
   TBitPos = Record
     ByteAtBaseZero:Integer;
@@ -308,10 +301,12 @@ type
     procedure Error_AppendLastLog(const ALog:String);
     function Error_LogToString:String;
     function Error_ArrLength:Integer;
+    procedure Error_EraseLog;
     procedure Warning_CreateLastLog(const ALog:String);
     procedure Warning_AppendLastLog(const ALog:String);
     function Warning_LogToString:String;
     function Warning_ArrLength:Integer;
+    procedure Warning_EraseLog;
   end;
 
   { CodePoint }
@@ -326,6 +321,7 @@ type
     constructor Create(var ACodePoint:CodePoint);
     destructor Destroy; override;
     procedure ChangeTo(var ACodePoint:CodePoint);
+    procedure Point_ResetAll;
     procedure Point_Continue;
     procedure Point_ToPrevious;
     procedure Point_SetPoint(const APoint:Integer);
@@ -354,6 +350,7 @@ type
     constructor Create(var ACodeVariable:CodeVariable);
     destructor Destroy; override;
     procedure changeTo(var ACodeVariable:CodeVariable);
+    procedure Var_ResetAll;
     procedure Var_GetVarNameParts(const AVarNamePart:String;out ANumArr:TNumArr);
     procedure Var_DeleteVarNames(const ANumArr:TNumArr);
     procedure Var_SetVarDataType(const AIndex:Integer;const AMode:String);
@@ -414,8 +411,6 @@ type
     TFuncDataIsNor:Byte;        // 0 = False, 1 = True, 2 =  nil
     TFuncDataNor:TProcNor;
     TFuncDataObj:TProcObj;
-    TCMemCapNum:^Integer;
-    TCMemCapStr:^String;
     TCCodeProperties:^CodeProperties;
     function isVarNameValid(const VarName:String):Boolean;
     function GetAnd(num1,num2:Number):Number;
@@ -433,126 +428,127 @@ type
     function GetLessThanOrEqualTo(const num1,num2:Real):Number;
 
     //procedure(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DebugPoint_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DebugPointIf_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DebugPointIf_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DebugPointIf_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DebugPointIf_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SumSubInteger_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MulDivInteger_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SumInteger_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SubInteger_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MulInteger_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DivInteger_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SumSubReal_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MulDivReal_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SumReal_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SubReal_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MulReal_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure DivReal_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure ArrayIndexGet_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure ArrayIndexSet_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure StrIndexGet_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure StrIndexSet_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SetLength_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure Length_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure StrLength_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure JumpTo_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure JumpTo_Address_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure Goto_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure Goto_Address_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure Exit_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToV1_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToV1_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToV1_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToV1_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure DebugPoint_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DebugPointCoreAt_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DebugPointIf_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DebugPointIf_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DebugPointIf_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DebugPointIf_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SumSubInteger_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MulDivInteger_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SumInteger_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SubInteger_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MulInteger_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DivInteger_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SumSubReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MulDivReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SumReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SubReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MulReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure DivReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure ArrayIndexGet_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure ArrayIndexSet_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure StrIndexGet_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure StrIndexSet_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SetLength_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure Length_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure StrLength_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure JumpTo_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure JumpTo_Address_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure Goto_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure Goto_Address_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure Exit_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToV1_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToV1_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToV1_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToV1_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV1ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV1_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV1_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV1_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV1_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV1ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV1_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV2ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV2_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV2_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV2_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV2_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV2ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV2_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV3_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV3ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV3_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV3_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV3_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV3_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV3ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV3_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV4_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV4ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV4_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV4_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV4_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV4_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV4ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV4_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV5_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV5ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV5_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV5_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV5_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV5_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV5ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV5_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV6_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV6ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV6_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV6_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV6_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV6_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV6ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV6_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure MoveV2ToGV7_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveGV7ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV7_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV7_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV7_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure MoveV2ToGV7_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveGV7ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToGV7_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
-    procedure V1AndV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1OrV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure NotV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1XORV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1SHLV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1SHRV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1EqV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1NotEqV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1GTV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1GTEqV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1LTV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure V1LTEqV2_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure CombineV2ToV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IfV1_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IfV1True_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IfV1False_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IfV1_Goto_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IfV1True_Goto_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IfV1False_Goto_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure AllocateMem_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure AllocateMem_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure AllocateMem_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure AllocateMem_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure BinStr_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure StartMem_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure EndMem_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure Port_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SetVarMem_Number_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SetVarMem_Integer_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SetVarMem_Real_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SetVarMem_String_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure Round_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure CopyStr_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure StrToInt_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure IntToStr_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
-    procedure SetValueMode_Proc(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1AndV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1OrV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure NotV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1XORV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1SHLV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1SHRV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1EqV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1NotEqV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1GTV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1GTEqV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1LTV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure V1LTEqV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure CombineV2ToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IfV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IfV1True_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IfV1False_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IfV1_Goto_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IfV1True_Goto_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IfV1False_Goto_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure AllocateMem_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure AllocateMem_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure AllocateMem_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure AllocateMem_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure BinStr_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure StartMem_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure EndMem_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure Port_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SetVarMem_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SetVarMem_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SetVarMem_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SetVarMem_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure Round_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure CopyStr_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure StrToInt_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IntToStr_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure SetValueMode_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
   public
     constructor Create;
     constructor Create(var ACodeLine:CodeLine);
@@ -581,8 +577,6 @@ type
   CodeArray = class(TObject)
   private
     TCodeLn:TClnArr;
-    TCMemCapNum:^Integer;
-    TCMemCapStr:^String;
     TCCodeProperties:^CodeProperties;
     procedure SetPtrCodeProperties;
   public
@@ -606,7 +600,6 @@ type
     TVarArr:CodeVariableArray;
     TCodeArr:CodeArray;
     TCMemCapNum:Integer;
-    TCMemCapStr:String;
     TCLogs:PtrCodeLog;
   public
     Property_CodePoint:^CodePoint;
@@ -629,7 +622,7 @@ type
   private
     TCoreIndex:Integer;
     TCPropertyArr:CodePropertiesArr;
-    TCPropertyIndexDoneArr:TBoolArr;
+    TCPropertyIndexDoneArr:TByteArr;
     TCPropertyDoneBoolArr:TBoolArr;
     TCPropertyOutBoundBoolArr:TBoolArr;
     TCLogs:CodeLog;
@@ -694,6 +687,7 @@ type
     function UnComponent_CreateVariable(const VarName:String;const AValue:Real):Integer;
     function UnComponent_CreateVariable(const VarName:String;const AValue:String):Integer;
     function Component_DebugPoint:Integer;
+    function Component_DebugPointCoreAt(const CoreIndex:Integer):Integer;
     function Component_DebugPointIf(const num1VarName:String;const AValue:Number):Integer;
     function Component_DebugPointIf(const num1VarName:String;const AValue:Integer):Integer;
     function Component_DebugPointIf(const num1VarName:String;const AValue:Real):Integer;
@@ -941,12 +935,10 @@ type
   public
     class function StrToNumber(const AStr:String):Number;
     class function NumberToStr(const Anum:Number):String;
-    class function BoolToNumber(const bool1:Boolean):Number;
-    class function NumberToBool(num:Number):Boolean;
     class function IntToNumber(const Int1:Integer):Number;
-    class function NumberToInt(num:Number):Integer;
+    class function NumberToInt(const num:Number):Integer;
     class function RealToNumber(const Real1:Real):Number;
-    class function NumberToReal(num:Number):Real;
+    class function NumberToReal(const num:Number):Real;
     class function RR(const x:Real):Integer;
     class function unNum(const x:Integer):Integer;
     class function unNum(const x:Real):Real;
@@ -3494,49 +3486,6 @@ begin
   Result:=StringMath.xModX(num1,num2);
 end;
 
-procedure Test01;
-var
-  TCProperty:CodeProperties;
-  TCBuild:CodeBuild;
-  TCCores:CodeCores;
-
-  Real1:Real;
-  Num1,Num2:Integer;
-  bool1:Boolean;
-begin
-  TCProperty:=CodeProperties.Create;
-  TCBuild:=CodeBuild.Create(@TCProperty);
-  TCCores:=CodeCores.Create;
-
-  TCBuild.Build_Basic^.UnComponent_CreateVariable('Num1',5);
-  TCBuild.Build_Basic^.UnComponent_CreateVariable('Num2',5);
-  TCBuild.Build_Basic^.UnComponent_CreateVariable('Num3',0);
-  TCBuild.Build_Basic^.UnComponent_CreateVariable('Num4',0);
-
-  TCBuild.Build_Basic^.Component_MoveV2ToGV1('Num1');
-  TCBuild.Build_Basic^.Component_MoveV2ToGV2('Num3');
-  TCBuild.Build_Advance^.Component_RR;
-  TCBuild.Build_Basic^.Component_MoveGV1ToV1('Num1');
-  TCBuild.Build_Basic^.Component_MoveGV2ToV1('Num3');
-
-  bool1:=False;
-  TCCores.Cores_AddProperty(TCProperty);
-  bool1:=TCCores.Cores_RunPropertyUntilOutBound;
-
-  {While(TCCores.Cores_ArePropertiesDone=False)do begin
-    if(TCCores.Cores_ErrorLength>0)then Break;
-    TCCores.Cores_RunProperty;
-    TCCores.Cores_Continue;
-  end;}
-
-  Num1:=TCCores.Cores_GetPropertyVar_Integer(0,'Num3');
-  //Num2:=TCCores.Cores_GetPropertyVar_Integer(0,'Num4');
-
-  TCCores.Free;
-  TCBuild.Free;
-  TCProperty.Free;
-end;
-
 { CodeVariableArray }
 
 constructor CodeVariableArray.Create;
@@ -3564,11 +3513,12 @@ var
   i:Integer;
 begin
   inherited Destroy;
-  for i:=0 to (Length(self.TCodeVar)-1)do self.TCodeVar[i].Free;
-  SetLength(self.TCodeVar,0);
 
   self.Vars:=nil;
   self.Vars_AtLast:=nil;
+
+  for i:=0 to (Length(self.TCodeVar)-1)do self.TCodeVar[i].Free;
+  SetLength(self.TCodeVar,0);
 end;
 
 procedure CodeVariableArray.ChangeTo(var ACodeVariableArray: CodeVariableArray);
@@ -3672,6 +3622,11 @@ begin
   Result:=Length(self.TLogError);
 end;
 
+procedure CodeLog.Error_EraseLog;
+begin
+  SetLength(self.TLogError,0);
+end;
+
 procedure CodeLog.Warning_CreateLastLog(const ALog: String);
 begin
   SetLength(self.TLogWarning,Length(self.TLogWarning)+1);
@@ -3698,6 +3653,11 @@ end;
 function CodeLog.Warning_ArrLength: Integer;
 begin
   Result:=Length(self.TLogWarning);
+end;
+
+procedure CodeLog.Warning_EraseLog;
+begin
+  SetLength(self.TLogWarning,0);
 end;
 
 { CodeComponent }
@@ -8199,8 +8159,6 @@ begin
   self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
-
-  self.TPtrCComponent^.Component_DebugPoint;
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -13919,6 +13877,16 @@ begin
   Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
 end;
 
+function CodeComponentBasic.Component_DebugPointCoreAt(const CoreIndex: Integer
+  ): Integer;
+begin
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(ArrMath.IntToNumber(43));
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(CoreIndex);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.DebugPointCoreAt_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+end;
+
 function CodeComponentBasic.Component_DebugPointIf(const num1VarName: String;
   const AValue: Number): Integer;
 begin
@@ -15139,6 +15107,7 @@ var
   i:Integer;
 begin
   for i:=0 to (Length(self.TCPropertyArr)-1)do begin
+    self.TCPropertyArr[i].TCMemCapNum:=self.TCoreIndex;
     self.TCPropertyArr[i].Property_CodeArray^.TCCodeProperties:=@self.TCPropertyArr[i];
     self.TCPropertyArr[i].Property_CodeArray^.SetPtrCodeProperties;
   end;
@@ -15153,7 +15122,7 @@ begin
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCLogs:=@self.TCLogs;
 
   SetLength(self.TCPropertyIndexDoneArr,Length(self.TCPropertyIndexDoneArr)+1);
-  self.TCPropertyIndexDoneArr[Length(self.TCPropertyIndexDoneArr)-1]:=False;
+  self.TCPropertyIndexDoneArr[Length(self.TCPropertyIndexDoneArr)-1]:=0;
 
   SetLength(self.TCPropertyDoneBoolArr,Length(self.TCPropertyDoneBoolArr)+1);
   self.TCPropertyDoneBoolArr[Length(self.TCPropertyDoneBoolArr)-1]:=False;
@@ -15242,8 +15211,8 @@ begin
   SetLength(self.TCPropertyIndexDoneArr,0);
   SetLength(self.TCPropertyDoneBoolArr,0);
   SetLength(self.TCPropertyOutBoundBoolArr,0);
-  self.TCLogs.Free;
-  self.TCLogs:=CodeLog.Create;
+  self.TCLogs.Error_EraseLog;
+  self.TCLogs.Warning_EraseLog;
 end;
 
 procedure CodeCores.Cores_ResetIndex;
@@ -15257,7 +15226,7 @@ var
 begin
   self.TCoreIndex:=-1;
   for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i].Property_ResetAll;
-  for i:=0 to (Length(self.TCPropertyIndexDoneArr)-1)do self.TCPropertyIndexDoneArr[i]:=False;
+  for i:=0 to (Length(self.TCPropertyIndexDoneArr)-1)do self.TCPropertyIndexDoneArr[i]:=0;
   for i:=0 to (Length(self.TCPropertyOutBoundBoolArr)-1)do self.TCPropertyOutBoundBoolArr[i]:=False;
   for i:=0 to (Length(self.TCPropertyDoneBoolArr)-1)do self.TCPropertyDoneBoolArr[i]:=False;
 end;
@@ -15273,7 +15242,7 @@ function CodeCores.Cores_GetPropertyVar_Number(const CoreIndexAt: Integer;
 begin
   Result:=nil;
   if(CoreIndexAt<0)or(CoreIndexAt>(self.Cores_ArrLength-1))then Exit;
-  Result:=self.TCPropertyArr[CoreIndexAt].Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName);
+  Result:=StrMath.AssignNum(self.TCPropertyArr[CoreIndexAt].Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName));
 end;
 
 function CodeCores.Cores_GetPropertyVar_Integer(const CoreIndexAt: Integer;
@@ -15341,17 +15310,13 @@ begin
 
   AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
 
-  if((AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-2))or
-  ((self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-2)<0))and
-  (self.TCPropertyIndexDoneArr[self.TCoreIndex]=False)then self.TCPropertyIndexDoneArr[self.TCoreIndex]:=True;
-
-  //////////Code-Here.....
-
   if(((AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))and
   (self.TCPropertyOutBoundBoolArr[self.TCoreIndex]=True))=False)and
-  (self.TCPropertyIndexDoneArr[self.TCoreIndex]=True)then
+  (self.TCPropertyIndexDoneArr[self.TCoreIndex]<2)then begin
     Result:=self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines^[AIndex].Code_RunFuncData;
-  else
+    if(self.TCPropertyIndexDoneArr[self.TCoreIndex]=1)and
+    (AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyIndexDoneArr[self.TCoreIndex]:=2;
+  end else
     Result:=True;
 
   self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_Continue;
@@ -15361,6 +15326,10 @@ begin
   if(AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyDoneBoolArr[self.TCoreIndex]:=True;
 
   if(AIndex>(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-1))then self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_ToPrevious;
+
+  if((AIndex=(self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-2))or
+  ((self.TCPropertyArr[self.TCoreIndex].Property_CodeArray^.Lines_ArrLength-2)<0))and
+  (self.TCPropertyIndexDoneArr[self.TCoreIndex]=0)then self.TCPropertyIndexDoneArr[self.TCoreIndex]:=1;
 
   if(self.TCLogs.Error_ArrLength>0)then self.TCLogs.Error_AppendLastLog(' | At-Core: '+IntToStr(self.TCoreIndex));
 end;
@@ -15482,6 +15451,12 @@ begin
   for i:=0 to (Length(self.TStartMemArr)-1)do self.TStartMemArr[i]:=ACodePoint.TStartMemArr[i];
 end;
 
+procedure CodePoint.Point_ResetAll;
+begin
+  SetLength(self.TPointArr,0);
+  SetLength(self.TStartMemArr,0);
+end;
+
 procedure CodePoint.Point_Continue;
 begin
   if(Length(self.TPointArr)>0)then self.TPointArr[Length(self.TPointArr)-1]:=self.TPointArr[Length(self.TPointArr)-1]+1;
@@ -15591,8 +15566,11 @@ begin
 end;
 
 destructor CodeVariable.Destroy;
+var
+  i:Integer;
 begin
   inherited Destroy;
+  for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
   SetLength(self.TVarArr,0);
   SetLength(self.TVarMode,0);
   SetLength(self.TVarName,0);
@@ -15604,13 +15582,23 @@ var
 begin
   for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
   SetLength(self.TVarArr,Length(ACodeVariable.TVarArr));
-  for i:=0 to (Length(self.TVarArr)-1)do self.TVarArr[i]:=ACodeVariable.TVarArr[i];
+  for i:=0 to (Length(self.TVarArr)-1)do self.TVarArr[i]:=StrMath.AssignNum(ACodeVariable.TVarArr[i]);
 
   SetLength(self.TVarMode,Length(ACodeVariable.TVarMode));
   for i:=0 to (Length(self.TVarMode)-1)do self.TVarMode[i]:=ACodeVariable.TVarMode[i];
 
   SetLength(self.TVarName,Length(ACodeVariable.TVarName));
   for i:=0 to (Length(self.TVarName)-1)do self.TVarName[i]:=ACodeVariable.TVarName[i];
+end;
+
+procedure CodeVariable.Var_ResetAll;
+var
+  i:Integer;
+begin
+  for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
+  SetLength(self.TVarArr,0);
+  SetLength(self.TVarMode,0);
+  SetLength(self.TVarName,0);
 end;
 
 procedure CodeVariable.Var_GetVarNameParts(const AVarNamePart: String; out
@@ -15979,7 +15967,6 @@ begin
   self.TCodeArr:=CodeArray.Create;
 
   self.TCMemCapNum:=0;
-  self.TCMemCapStr:='#0_';
 
   self.Property_CodePoint:=@self.TCPoint;
   self.Property_CodePorts:=@self.TPortArr;
@@ -15987,8 +15974,6 @@ begin
   self.Property_CodeVariable:=@self.TVarArr;
   self.Property_CodeArray:=@self.TCodeArr;
 
-  self.TCodeArr.TCMemCapNum:=@self.TCMemCapNum;
-  self.TCodeArr.TCMemCapStr:=@self.TCMemCapStr;
   self.TCodeArr.TCCodeProperties:=@self;
   self.TCLogs:=nil;
 end;
@@ -16002,7 +15987,6 @@ begin
   self.TCodeArr:=CodeArray.Create;
 
   self.TCMemCapNum:=0;
-  self.TCMemCapStr:='#0_';
 
   self.Property_CodePoint:=@self.TCPoint;
   self.Property_CodePorts:=@self.TPortArr;
@@ -16010,8 +15994,6 @@ begin
   self.Property_CodeVariable:=@self.TVarArr;
   self.Property_CodeArray:=@self.TCodeArr;
 
-  self.TCodeArr.TCMemCapNum:=@self.TCMemCapNum;
-  self.TCodeArr.TCMemCapStr:=@self.TCMemCapStr;
   self.TCodeArr.TCCodeProperties:=@self;
   self.TCLogs:=nil;
 
@@ -16021,14 +16003,6 @@ end;
 destructor CodeProperties.Destroy;
 begin
   inherited Destroy;
-  self.TCPoint.Free;
-  self.TPortArr.Free;
-  self.TParaArr.Free;
-  self.TVarArr.Free;
-  self.TCodeArr.Free;
-
-  self.TCMemCapNum:=0;
-  self.TCMemCapStr:='';
 
   self.TCLogs:=nil;
 
@@ -16037,6 +16011,14 @@ begin
   self.Property_CodeParams:=nil;
   self.Property_CodeVariable:=nil;
   self.Property_CodeArray:=nil;
+
+  self.TCPoint.Free;
+  self.TPortArr.Free;
+  self.TParaArr.Free;
+  self.TVarArr.Free;
+  self.TCodeArr.Free;
+
+  self.TCMemCapNum:=0;
 end;
 
 procedure CodeProperties.ChangeTo(var ACodeProperties: CodeProperties);
@@ -16056,25 +16038,22 @@ procedure CodeProperties.Property_ResetAll;
 begin
   self.TVarArr.Vars_DeleteAllExceptFirst;
 
-  self.TCPoint.Free;
-  self.TParaArr.Free;
-
-  self.TCPoint:=CodePoint.Create;
-  self.TParaArr:=CodeVariable.Create;
+  self.TCPoint.Point_ResetAll;
+  self.TParaArr.Var_ResetAll;
 
   self.TCPoint.Point_AddLast;
   self.TCPoint.Point_StartMem_AddLast;
 
   self.TCMemCapNum:=0;
-  self.TCMemCapStr:='#0_';
 
   self.Property_CodePoint:=@self.TCPoint;
+  self.Property_CodePorts:=@self.TPortArr;
   self.Property_CodeParams:=@self.TParaArr;
+  self.Property_CodeVariable:=@self.TVarArr;
+  self.Property_CodeArray:=@self.TCodeArr;
 
-  //self.TCodeArr.TCMemCapNum:=@self.TCMemCapNum;
-  //self.TCodeArr.TCMemCapStr:=@self.TCMemCapStr;
-  //self.TCodeArr.TCCodeProperties:=@self;
-  //self.TCodeArr.SetPtrCodeProperties;
+  self.TCodeArr.TCCodeProperties:=@self;
+  self.TCodeArr.SetPtrCodeProperties;
 end;
 
 { CodeBuild }
@@ -16112,11 +16091,11 @@ destructor CodeBuild.Destroy;
 begin
   inherited Destroy;
 
-  self.TCodeComponentBasic.Free;
-  self.TCodeComponent.Free;
-
   self.Build_Basic:=nil;
   self.Build_Advance:=nil;
+
+  self.TCodeComponentBasic.Free;
+  self.TCodeComponent.Free;
 end;
 
 procedure CodeBuild.changeTo(var ACodeBuild: CodeBuild);
@@ -16137,8 +16116,6 @@ end;
 constructor CodeArray.Create;
 begin
   self.TCodeLn:=nil;
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
 
   self.Lines:=@self.TCodeLn;
@@ -16148,8 +16125,6 @@ end;
 constructor CodeArray.Create(var ACodeArray: CodeArray);
 begin
   self.TCodeLn:=nil;
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
 
   self.Lines:=@self.TCodeLn;
@@ -16163,14 +16138,13 @@ var
   i:Integer;
 begin
   inherited Destroy;
-  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
-  SetLength(self.TCodeLn,0);
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
 
   self.Lines:=nil;
   self.Lines_AtLast:=nil;
+
+  for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
+  SetLength(self.TCodeLn,0);
 end;
 
 procedure CodeArray.ChangeTo(var ACodeArray: CodeArray);
@@ -16180,9 +16154,6 @@ begin
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
   SetLength(self.TCodeLn,Length(ACodeArray.TCodeLn));
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i]:=CodeLine.Create(ACodeArray.TCodeLn[i]);
-  self.TCMemCapNum:=ACodeArray.TCMemCapNum;
-  self.TCMemCapStr:=ACodeArray.TCMemCapStr;
-  //self.TCCodeProperties:=ACodeArray.TCCodeProperties;
 
   self.Lines_AtLast:=@self.TCodeLn[Length(self.TCodeLn)-1];
 end;
@@ -16191,8 +16162,6 @@ procedure CodeArray.Lines_CreateLast;
 begin
   SetLength(self.TCodeLn,Length(self.TCodeLn)+1);
   self.TCodeLn[Length(self.TCodeLn)-1]:=CodeLine.Create;
-  self.TCodeLn[Length(self.TCodeLn)-1].TCMemCapNum:=self.TCMemCapNum;
-  self.TCodeLn[Length(self.TCodeLn)-1].TCMemCapStr:=self.TCMemCapStr;
   self.TCodeLn[Length(self.TCodeLn)-1].TCCodeProperties:=self.TCCodeProperties;
 
   self.Lines_AtLast:=@self.TCodeLn[Length(self.TCodeLn)-1];
@@ -16250,175 +16219,263 @@ function CodeLine.GetAnd(num1, num2: Number): Number;
 var
   TBPosMin,TBPosMax:TBitPos;
   bool1,bool2:Boolean;
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(Length(num1)=0)and(Length(num2)=0)then Exit;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then begin
+    Result:=StrMath.AssignNum(ByteA);
+    SetLength(ByteA,0);
+    Exit;
+  end;
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
-  SetLength(Result,Length(num1));
+  SetLength(ByteA,Length(num1));
 
   bool1:=False;
   bool2:=False;
   ArrMath.SetBitPosZero(TBPosMin);
   ArrMath.SetBitPosZero(TBPosMax);
-  ArrMath.GetLastBit(TBPosMax,Result);
-  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(Result)-1,7);
+  ArrMath.GetLastBit(TBPosMax,ByteA);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(ByteA)-1,7);
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
     bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
   bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetOr(num1, num2: Number): Number;
 var
   TBPosMin,TBPosMax:TBitPos;
   bool1,bool2:Boolean;
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(Length(num1)=0)and(Length(num2)=0)then Exit;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then begin
+    Result:=StrMath.AssignNum(ByteA);
+    SetLength(ByteA,0);
+    Exit;
+  end;
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
-  SetLength(Result,Length(num1));
+  SetLength(ByteA,Length(num1));
 
   bool1:=False;
   bool2:=False;
   ArrMath.SetBitPosZero(TBPosMin);
   ArrMath.SetBitPosZero(TBPosMax);
-  ArrMath.GetLastBit(TBPosMax,Result);
-  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(Result)-1,7);
+  ArrMath.GetLastBit(TBPosMax,ByteA);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(ByteA)-1,7);
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
     bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
   bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+  if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetNot(const num1: Number): Number;
 var
   TBPosMin,TBPosMax:TBitPos;
   bool1:Boolean;
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(Length(num1)=0)then Exit;
-  SetLength(Result,Length(num1));
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(Length(num1)=0)then begin
+    Result:=StrMath.AssignNum(ByteA);
+    SetLength(ByteA,0);
+    Exit;
+  end;
+  SetLength(ByteA,Length(num1));
 
   bool1:=False;
   ArrMath.SetBitPosZero(TBPosMin);
   ArrMath.SetBitPosZero(TBPosMax);
-  ArrMath.GetLastBit(TBPosMax,Result);
-  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(Result)-1,7);
+  ArrMath.GetLastBit(TBPosMax,ByteA);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(ByteA)-1,7);
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
-    if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+    if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
-  if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,Result);
+  if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetXOR(const num1, num2: Number): Number;
+var
+  N1,N2,N3,N4:Number;
 begin
-  Result:=self.GetOr(self.GetAnd(num1,self.GetNot(num2)),self.GetAnd(self.GetNot(num1),num2));
+  N1:=nil;
+  N2:=nil;
+  N3:=nil;
+  N4:=nil;
+  Result:=nil;
+  N1:=StrMath.AssignNum(self.GetNot(num1));
+  N2:=StrMath.AssignNum(self.GetAnd(N1,num2));
+  N3:=StrMath.AssignNum(self.GetNot(num2));
+  N4:=StrMath.AssignNum(self.GetAnd(num1,N3));
+  Result:=StrMath.AssignNum(self.GetOr(N4,N2));
+  SetLength(N1,0);
+  SetLength(N2,0);
+  SetLength(N3,0);
+  SetLength(N4,0);
 end;
 
 function CodeLine.GetEqual(num1, num2: Number): Number;
 var
   i:Integer;
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(Length(num1)=0)and(Length(num2)=0)then Exit;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then begin
+    Result:=StrMath.AssignNum(ByteA);
+    SetLength(ByteA,0);
+    Exit;
+  end;
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
 
-  for i:=0 to (Length(num1)-1)do if(num1[i]<>num2[i])then Exit;
-  Result[Length(Result)-1]:=1;
+  for i:=0 to (Length(num1)-1)do if(num1[i]<>num2[i])then begin
+    Result:=StrMath.AssignNum(ByteA);
+    SetLength(ByteA,0);
+    Exit;
+  end;
+  ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetEqual(const num1, num2: Real): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(num1=num2)then Result[Length(Result)-1]:=1;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(num1=num2)then ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetNotEqual(const num1, num2: Number): Number;
 begin
-  Result:=self.GetEqual(num1,num2);
+  Result:=StrMath.AssignNum(self.GetEqual(num1,num2));
   if(Result[0]=1)then Result[0]:=0 else Result[0]:=1;
 end;
 
 function CodeLine.GetNotEqual(const num1, num2: Real): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(num1<>num2)then Result[Length(Result)-1]:=1;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(num1<>num2)then ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetIf(const num1: Number): Number;
 var
   i:Integer;
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);Result[Length(Result)-1]:=0;
-  if(Length(num1)=0)then Exit;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
+  if(Length(num1)=0)then begin
+    Result:=StrMath.AssignNum(ByteA);
+    SetLength(ByteA,0);
+    Exit;
+  end;
 
   for i:=0 to (Length(num1)-1)do
     if(num1[i]>0)then begin
-      Result[Length(Result)-1]:=1;
-      Exit;
+      ByteA[Length(ByteA)-1]:=1;
+      Break;
     end;
 
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetGreaterThan(const num1, num2: Real): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);
-  Result[Length(Result)-1]:=0;
-  if(num1>num2)then Result[Length(Result)-1]:=1;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);
+  ByteA[Length(ByteA)-1]:=0;
+  if(num1>num2)then ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetGreaterThanOrEqualTo(const num1, num2: Real
   ): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);
-  Result[Length(Result)-1]:=0;
-  if(num1>=num2)then Result[Length(Result)-1]:=1;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);
+  ByteA[Length(ByteA)-1]:=0;
+  if(num1>=num2)then ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetLessThan(const num1, num2: Real): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);
-  Result[Length(Result)-1]:=0;
-  if(num1<num2)then Result[Length(Result)-1]:=1;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);
+  ByteA[Length(ByteA)-1]:=0;
+  if(num1<num2)then ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 function CodeLine.GetLessThanOrEqualTo(const num1, num2: Real
   ): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,Length(Result)+1);
-  Result[Length(Result)-1]:=0;
-  if(num1<=num2)then Result[Length(Result)-1]:=1;
+  ByteA:=nil;
+  SetLength(ByteA,Length(ByteA)+1);
+  ByteA[Length(ByteA)-1]:=0;
+  if(num1<=num2)then ByteA[Length(ByteA)-1]:=1;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 procedure CodeLine.DebugPoint_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1:Integer;
@@ -16427,8 +16484,23 @@ begin
   num1:=num1+1;
 end;
 
+procedure CodeLine.DebugPointCoreAt_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  numValue:Integer;
+  num1:Integer;
+begin
+  numValue:=ArrMath.NumberToInt(AParamArr[0]);
+  num1:=0;
+  if(ATCCodeProperties^.TCMemCapNum=numValue)then begin
+    num1:=num1+1;
+    num1:=num1+1;
+    num1:=num1+1;
+  end;
+  num1:=0;
+end;
+
 procedure CodeLine.DebugPointIf_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str:String;
@@ -16450,18 +16522,17 @@ begin
 
   num1V:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(num1AIndex);
 
+  num1:=0;
   if(self.GetEqual(num1V,numValue)[0]=1)then begin
-
-    num1:=1;
     num1:=num1+1;
     num1:=num1+1;
-
+    num1:=num1+1;
   end;
+  num1:=0;
 
 end;
 
 procedure CodeLine.DebugPointIf_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str:String;
@@ -16483,18 +16554,17 @@ begin
 
   num1V:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(num1AIndex);
 
+  num1:=0;
   if(num1V=numValue)then begin
-
-    num1:=1;
     num1:=num1+1;
     num1:=num1+1;
-
+    num1:=num1+1;
   end;
+  num1:=0;
 
 end;
 
 procedure CodeLine.DebugPointIf_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str:String;
@@ -16516,18 +16586,17 @@ begin
 
   num1V:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(num1AIndex);
 
+  num1:=0;
   if(num1V=numValue)then begin
-
-    num1:=1;
     num1:=num1+1;
     num1:=num1+1;
-
+    num1:=num1+1;
   end;
+  num1:=0;
 
 end;
 
 procedure CodeLine.DebugPointIf_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str:String;
@@ -16549,18 +16618,17 @@ begin
 
   num1V:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueStr(num1AIndex);
 
+  num1:=0;
   if(num1V=numValue)then begin
-
-    num1:=1;
     num1:=num1+1;
     num1:=num1+1;
-
+    num1:=num1+1;
   end;
+  num1:=0;
 
 end;
 
 procedure CodeLine.SumSubInteger_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16594,7 +16662,6 @@ begin
 end;
 
 procedure CodeLine.MulDivInteger_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr,isMulStr:String;
@@ -16637,7 +16704,6 @@ begin
 end;
 
 procedure CodeLine.SumInteger_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16671,7 +16737,6 @@ begin
 end;
 
 procedure CodeLine.SubInteger_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16705,7 +16770,6 @@ begin
 end;
 
 procedure CodeLine.MulInteger_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16739,7 +16803,6 @@ begin
 end;
 
 procedure CodeLine.DivInteger_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16773,7 +16836,6 @@ begin
 end;
 
 procedure CodeLine.SumSubReal_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16843,7 +16905,6 @@ begin
 end;
 
 procedure CodeLine.MulDivReal_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr,isMulStr:String;
@@ -16923,7 +16984,6 @@ begin
 end;
 
 procedure CodeLine.SumReal_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -16993,7 +17053,6 @@ begin
 end;
 
 procedure CodeLine.SubReal_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -17063,7 +17122,6 @@ begin
 end;
 
 procedure CodeLine.MulReal_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -17133,7 +17191,6 @@ begin
 end;
 
 procedure CodeLine.DivReal_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   num1Str,num2Str,ResultStr:String;
@@ -17203,7 +17260,6 @@ begin
 end;
 
 procedure CodeLine.ArrayIndexGet_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   ArrayStr,IndexStr,ResultVarStr:String;
@@ -17249,7 +17305,6 @@ begin
 end;
 
 procedure CodeLine.ArrayIndexSet_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   ArrayStr,IndexStr,ValueVarStr:String;
@@ -17295,7 +17350,6 @@ begin
 end;
 
 procedure CodeLine.StrIndexGet_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   StrStr,IndexStr,ResultVarStr:String;
@@ -17342,7 +17396,6 @@ begin
 end;
 
 procedure CodeLine.StrIndexSet_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   StrStr,IndexStr,ValueVarStr:String;
@@ -17393,7 +17446,6 @@ begin
 end;
 
 procedure CodeLine.SetLength_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   ArrayVarStr,ArrayLengthVarStr:String;
@@ -17426,7 +17478,6 @@ begin
 end;
 
 procedure CodeLine.Length_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   ArrayVarStr,ResultStr:String;
@@ -17459,7 +17510,6 @@ begin
 end;
 
 procedure CodeLine.StrLength_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   StrVarStr,ResultStr:String;
@@ -17492,7 +17542,6 @@ begin
 end;
 
 procedure CodeLine.JumpTo_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   JumpToStr:String;
@@ -17514,7 +17563,6 @@ begin
 end;
 
 procedure CodeLine.JumpTo_Address_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   JumpToInt:Integer;
@@ -17530,7 +17578,6 @@ begin
 end;
 
 procedure CodeLine.Goto_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   GotoStr:String;
@@ -17552,7 +17599,6 @@ begin
 end;
 
 procedure CodeLine.Goto_Address_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   GotoInt:Integer;
@@ -17568,14 +17614,12 @@ begin
 end;
 
 procedure CodeLine.Exit_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 begin
   ATCCodeProperties^.Property_CodePoint^.Point_DeleteLast;
 end;
 
 procedure CodeLine.MoveV2ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -17627,7 +17671,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToV1_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17648,7 +17691,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToV1_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17669,7 +17711,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToV1_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17690,7 +17731,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToV1_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17711,7 +17751,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -17763,7 +17802,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV1ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -17815,7 +17853,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV1_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17836,7 +17873,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV1_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17857,7 +17893,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV1_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17878,7 +17913,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV1_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -17899,7 +17933,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -17951,7 +17984,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV2ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18003,7 +18035,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV2_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18024,7 +18055,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV2_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18045,7 +18075,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV2_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18066,7 +18095,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV2_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18087,7 +18115,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV3_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18139,7 +18166,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV3ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18191,7 +18217,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV3_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18212,7 +18237,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV3_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18233,7 +18257,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV3_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18254,7 +18277,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV3_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18275,7 +18297,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV4_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18327,7 +18348,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV4ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18379,7 +18399,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV4_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18400,7 +18419,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV4_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18421,7 +18439,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV4_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18442,7 +18459,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV4_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18463,7 +18479,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV5_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18515,7 +18530,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV5ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18567,7 +18581,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV5_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18588,7 +18601,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV5_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18609,7 +18621,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV5_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18630,7 +18641,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV5_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18651,7 +18661,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV6_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18703,7 +18712,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV6ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18755,7 +18763,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV6_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18776,7 +18783,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV6_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18797,7 +18803,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV6_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18818,7 +18823,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV6_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18839,7 +18843,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV7_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18891,7 +18894,6 @@ begin
 end;
 
 procedure CodeLine.MoveGV7ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str:String;
@@ -18943,7 +18945,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV7_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18964,7 +18965,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV7_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -18985,7 +18985,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV7_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -19006,7 +19005,6 @@ begin
 end;
 
 procedure CodeLine.MoveV2ToGV7_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -19027,7 +19025,6 @@ begin
 end;
 
 procedure CodeLine.V1AndV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19070,7 +19067,6 @@ begin
 end;
 
 procedure CodeLine.V1OrV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19113,7 +19109,6 @@ begin
 end;
 
 procedure CodeLine.NotV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,ResultVarStr:String;
@@ -19147,7 +19142,6 @@ begin
 end;
 
 procedure CodeLine.V1XORV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19190,7 +19184,6 @@ begin
 end;
 
 procedure CodeLine.V1SHLV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19229,7 +19222,6 @@ begin
 end;
 
 procedure CodeLine.V1SHRV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19268,7 +19260,6 @@ begin
 end;
 
 procedure CodeLine.V1EqV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19366,7 +19357,6 @@ begin
 end;
 
 procedure CodeLine.V1NotEqV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19464,7 +19454,6 @@ begin
 end;
 
 procedure CodeLine.V1GTV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19554,7 +19543,6 @@ begin
 end;
 
 procedure CodeLine.V1GTEqV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19644,7 +19632,6 @@ begin
 end;
 
 procedure CodeLine.V1LTV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19734,7 +19721,6 @@ begin
 end;
 
 procedure CodeLine.V1LTEqV2_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19824,7 +19810,6 @@ begin
 end;
 
 procedure CodeLine.CombineV2ToV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,VarName2Str,ResultVarStr:String;
@@ -19881,7 +19866,6 @@ begin
 end;
 
 procedure CodeLine.IfV1_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,JumpToTrueStr,JumpToFalseStr:String;
@@ -19923,7 +19907,6 @@ begin
 end;
 
 procedure CodeLine.IfV1True_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,JumpToTrueStr:String;
@@ -19957,7 +19940,6 @@ begin
 end;
 
 procedure CodeLine.IfV1False_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,JumpToFalseStr:String;
@@ -19991,7 +19973,6 @@ begin
 end;
 
 procedure CodeLine.IfV1_Goto_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,GotoTrueStr,GotoFalseStr:String;
@@ -20033,7 +20014,6 @@ begin
 end;
 
 procedure CodeLine.IfV1True_Goto_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,GotoTrueStr:String;
@@ -20067,7 +20047,6 @@ begin
 end;
 
 procedure CodeLine.IfV1False_Goto_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarName1Str,GotoFalseStr:String;
@@ -20101,7 +20080,6 @@ begin
 end;
 
 procedure CodeLine.AllocateMem_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20128,7 +20106,6 @@ begin
 end;
 
 procedure CodeLine.AllocateMem_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20155,7 +20132,6 @@ begin
 end;
 
 procedure CodeLine.AllocateMem_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20182,7 +20158,6 @@ begin
 end;
 
 procedure CodeLine.AllocateMem_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20209,7 +20184,6 @@ begin
 end;
 
 procedure CodeLine.BinStr_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr,CountVarStr,ResultStrStr:String;
@@ -20264,7 +20238,6 @@ begin
 end;
 
 procedure CodeLine.StartMem_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 begin
   ATCCodeProperties^.Property_CodePoint^.Point_StartMem_AddLast(ArrMath.NumberToInt(AParamArr[0]));
@@ -20272,7 +20245,6 @@ begin
 end;
 
 procedure CodeLine.EndMem_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 begin
   ATCCodeProperties^.Property_CodePoint^.Point_StartMem_DeleteLast;
@@ -20280,14 +20252,12 @@ begin
 end;
 
 procedure CodeLine.Port_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 begin
   ATCCodeProperties^.TCLogs^.Warning_CreateLastLog('Nothing: We are at Port');
 end;
 
 procedure CodeLine.SetVarMem_Number_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20308,7 +20278,6 @@ begin
 end;
 
 procedure CodeLine.SetVarMem_Integer_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20329,7 +20298,6 @@ begin
 end;
 
 procedure CodeLine.SetVarMem_Real_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20350,7 +20318,6 @@ begin
 end;
 
 procedure CodeLine.SetVarMem_String_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr:String;
@@ -20371,7 +20338,6 @@ begin
 end;
 
 procedure CodeLine.Round_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameRealStr,ResultIntVarNameStr:String;
@@ -20410,7 +20376,6 @@ begin
 end;
 
 procedure CodeLine.CopyStr_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStrStr,VarNameIntPos1Str,VarNameIntPos2Str,VarNameResultStrStr:String;
@@ -20453,7 +20418,6 @@ begin
 end;
 
 procedure CodeLine.StrToInt_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStrStr,VarNameResultIntStr:String;
@@ -20481,7 +20445,6 @@ begin
 end;
 
 procedure CodeLine.IntToStr_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameIntStr,VarNameResultStrStr:String;
@@ -20509,7 +20472,6 @@ begin
 end;
 
 procedure CodeLine.SetValueMode_Proc(AParamArr: TParamArr;
-  var ATCMemCapNum: TPtrInteger; var ATCMemCapStr: TPtrString;
   var ATCCodeProperties: PtrCodeProperties);
 var
   VarNameStr,VarModeStr:String;
@@ -20559,8 +20521,6 @@ begin
   self.TFuncDataIsNor:=2;
   self.TFuncDataNor:=nil;
   self.TFuncDataObj:=nil;
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
 end;
 
@@ -20571,8 +20531,6 @@ begin
   self.TFuncDataIsNor:=2;
   self.TFuncDataNor:=nil;
   self.TFuncDataObj:=nil;
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
   self.ChangeTo(ACodeLine);
 end;
@@ -20584,8 +20542,6 @@ begin
   self.TFuncDataIsNor:=2;
   self.TFuncDataNor:=nil;
   self.TFuncDataObj:=nil;
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
 end;
 
@@ -20600,8 +20556,6 @@ begin
   self.TFuncDataIsNor:=2;
   self.TFuncDataNor:=nil;
   self.TFuncDataObj:=nil;
-  self.TCMemCapNum:=nil;
-  self.TCMemCapStr:=nil;
   self.TCCodeProperties:=nil;
 end;
 
@@ -20619,8 +20573,6 @@ begin
   self.TFuncDataIsNor:=ACodeLine.TFuncDataIsNor;
   self.TFuncDataNor:=ACodeLine.TFuncDataNor;
   self.TFuncDataObj:=ACodeLine.TFuncDataObj;
-  self.TCMemCapNum:=ACodeLine.TCMemCapNum;
-  self.TCMemCapStr:=ACodeLine.TCMemCapStr;
   self.TCCodeProperties:=ACodeLine.TCCodeProperties;
 end;
 
@@ -20674,7 +20626,7 @@ function CodeLine.Code_GetParamData(const AIndexBaseZero: Integer): Number;
 begin
   Result:=nil;
   if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
-  Result:=AssignNum(self.TParaArr[AIndexBaseZero]);
+  Result:=StrMath.AssignNum(self.TParaArr[AIndexBaseZero]);
 end;
 
 function CodeLine.Code_GetParamDataInt(const AIndexBaseZero: Integer): Integer;
@@ -20702,11 +20654,11 @@ function CodeLine.Code_RunFuncData: Boolean;
 begin
   Result:=False;
   if(self.TFuncDataIsNor=0)then begin
-    self.TFuncDataObj(self.TParaArr,self.TCMemCapNum,self.TCMemCapStr,self.TCCodeProperties);
+    self.TFuncDataObj(self.TParaArr,self.TCCodeProperties);
     Result:=True;
   end else
   if(self.TFuncDataIsNor=1)then begin
-    self.TFuncDataNor(self.TParaArr,self.TCMemCapNum,self.TCMemCapStr,self.TCCodeProperties);
+    self.TFuncDataNor(self.TParaArr,self.TCCodeProperties);
     Result:=True;
   end;
 end;
@@ -21783,7 +21735,7 @@ begin
   ADeciDigitCountBaseOne),StrMath.SumSubReal(num,InitReal('1.0'),
   ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False);
 
-  n3:=AssignNum(n1);
+  n3:=StrMath.AssignNum(n1);
   n4:=StrMath.MulDivReal(n1,n1,ADeciDigitCountBaseOne,True);
   n2:=InitReal('1.0');
   numResult:=InitReal('0.0');
@@ -21808,7 +21760,7 @@ begin
   n2:=nil;
   n3:=nil;
   Str1:='';
-  n1:=AssignNum(num);
+  n1:=StrMath.AssignNum(num);
   n2:=InitReal('0');
   while(ConditionReal(IntReal(RoundRealR(n1)),'<>',InitReal('1'))=True)do begin
     n1:=StrMath.MulDivReal(n1,InitReal('2'),ADeciDigitCountBaseOne,False);
@@ -21848,7 +21800,7 @@ begin
   if(Length(num)=0)then Exit else
   if(ConditionReal(num,'<',InitReal('0.0'))=True)then Exit else
   if(ConditionReal(num,'=',InitReal('0.0'))=True)then begin
-    numResult:=AssignNum(num);
+    numResult:=StrMath.AssignNum(num);
     Exit;
   end;
   numResult:=InitReal('1.0');
@@ -22080,16 +22032,16 @@ begin
   n2:=nil;
   n3:=nil;
   if(StrMath.isInt(RealStr(Apower))=False)then Exit;
-  n1:=AssignNum(Abase);
-  n2:=AssignNum(Apower);
+  n1:=StrMath.AssignNum(Abase);
+  n2:=StrMath.AssignNum(Apower);
   While(ConditionReal(Abase,'<=',Apower)=True)do begin
     n3:=StrMath.MulDivReal(n2,InitReal('2'),ADeciDigitCountBaseOne,False);
     if(ConditionReal(n3,'=',InitReal('0.0'))=True)then Exit else
     if(StrMath.isInt(RealStr(n3))=False)then Exit;
     n1:=self.RealXPowerInt(n1,InitReal('2'),ADeciDigitCountBaseOne);
-    n2:=AssignNum(n3);
-    Abase:=AssignNum(n1);
-    Apower:=AssignNum(n2);
+    n2:=StrMath.AssignNum(n3);
+    Abase:=StrMath.AssignNum(n1);
+    Apower:=StrMath.AssignNum(n2);
   end;
   //End...
 end;
@@ -22121,62 +22073,76 @@ end;
 class function ArrMath.StrToNumber(const AStr: String): Number;
 var
   i:Integer;
+  ByteA:Number;
 begin
   Result:=nil;
+  ByteA:=nil;
   for i:=1 to Length(AStr)do begin
-    SetLength(Result,Length(Result)+1);
-    Result[Length(Result)-1]:=Byte(AStr[i]);
+    SetLength(ByteA,Length(ByteA)+1);
+    ByteA[Length(ByteA)-1]:=Byte(AStr[i]);
   end;
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
 class function ArrMath.NumberToStr(const Anum: Number): String;
 var
   i:Integer;
+  ByteA:Number;
 begin
   Result:='';
-  for i:=0 to (Length(Anum)-1)do Result:=Result+Char(Anum[i]);
-end;
-
-class function ArrMath.BoolToNumber(const bool1: Boolean): Number;
-begin
-  Result:=nil;
-  SetLength(Result,SizeOf(bool1));
-  Move(bool1,Result[0],SizeOf(bool1));
-end;
-
-class function ArrMath.NumberToBool(num: Number): Boolean;
-begin
-  Result:=False;
-  if(Length(num)<SizeOf(Boolean))then SetLength(num,SizeOf(Boolean));
-  Move(num[0],Result,SizeOf(Boolean));
+  ByteA:=nil;
+  ByteA:=StrMath.AssignNum(Anum);
+  for i:=0 to (Length(ByteA)-1)do Result:=Result+Char(ByteA[i]);
+  SetLength(ByteA,0);
 end;
 
 class function ArrMath.IntToNumber(const Int1: Integer): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,SizeOf(Int1));
-  Move(Int1,Result[0],SizeOf(Int1));
+  ByteA:=nil;
+  SetLength(ByteA,SizeOf(Int1));
+  Move(Int1,ByteA[0],SizeOf(Int1));
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
-class function ArrMath.NumberToInt(num: Number): Integer;
+class function ArrMath.NumberToInt(const num: Number): Integer;
+var
+  ByteA:Number;
 begin
   Result:=0;
-  if(Length(num)<SizeOf(Integer))then SetLength(num,SizeOf(Integer));
-  Move(num[0],Result,SizeOf(Integer));
+  ByteA:=nil;
+  ByteA:=StrMath.AssignNum(num);
+  if(Length(ByteA)<SizeOf(Integer))then SetLength(ByteA,SizeOf(Integer));
+  Move(ByteA[0],Result,SizeOf(Integer));
+  SetLength(ByteA,0);
 end;
 
 class function ArrMath.RealToNumber(const Real1: Real): Number;
+var
+  ByteA:Number;
 begin
   Result:=nil;
-  SetLength(Result,SizeOf(Real1));
-  Move(Real1,Result[0],SizeOf(Real1));
+  ByteA:=nil;
+  SetLength(ByteA,SizeOf(Real1));
+  Move(Real1,ByteA[0],SizeOf(Real1));
+  Result:=StrMath.AssignNum(ByteA);
+  SetLength(ByteA,0);
 end;
 
-class function ArrMath.NumberToReal(num: Number): Real;
+class function ArrMath.NumberToReal(const num: Number): Real;
+var
+  ByteA:Number;
 begin
   Result:=0;
-  if(Length(num)<SizeOf(Real))then SetLength(num,SizeOf(Real));
-  Move(num[0],Result,SizeOf(Real));
+  ByteA:=nil;
+  ByteA:=StrMath.AssignNum(num);
+  if(Length(ByteA)<SizeOf(Real))then SetLength(ByteA,SizeOf(Real));
+  Move(ByteA[0],Result,SizeOf(Real));
+  SetLength(ByteA,0);
 end;
 
 class function ArrMath.RR(const x: Real): Integer;
@@ -22756,9 +22722,11 @@ begin
       SetLength(TArr1,Length(TArr1)+1);
       SetLength(TArr2,Length(TArr2)+1);
 
-      self.SetInt(TCCores.Cores_GetPropertyVar_Number(i,'NumResult'),TArr1[Length(TArr1)-1]);
+      TArr1[Length(TArr1)-1]:=StrMath.AssignNum(TCCores.Cores_GetPropertyVar_Number(i,'NumResult'));
       SetLength(TArr2[Length(TArr2)-1],1);
       if(Length(TArr1[Length(TArr1)-1])>1)then TArr2[Length(TArr2)-1][0]:=TArr1[Length(TArr1)-1][1];
+
+      SetLength(TArr1[Length(TArr1)-1],1);
     end;
     TCCores.Cores_DeleteProperties;
 
@@ -22768,12 +22736,12 @@ begin
 
     SetLength(TArr2,Length(TArr2)+1);
     SetLength(TArr2[Length(TArr2)-1],1);
-    for i:=(Length(TArr2)-1) downto 1 do TArr2[i]:=TArr2[i-1];
+    for i:=(Length(TArr2)-1) downto 1 do TArr2[i]:=StrMath.AssignNum(TArr2[i-1]);
     TArr2[0][0]:=0;
 
     for i:=0 to (Length(TArr1)-1)do begin
-      n1:=TArr1[i];
-      n2:=TArr2[i];
+      n1:=StrMath.AssignNum(TArr1[i]);
+      n2:=StrMath.AssignNum(TArr2[i]);
 
       TCBuild.Build_Basic^.UnComponent_AppendVariable('Num1',n1);
       TCBuild.Build_Basic^.UnComponent_AppendVariable('Num2',n2);
@@ -23329,7 +23297,7 @@ begin
     end;
   end else begin
     TArr1:=InitInt('-1');
-    TArr2:=AssignNum(Base);
+    TArr2:=StrMath.AssignNum(Base);
     While(StrMath.ConditionInt(TArr1,'>=',Power)=True)do begin
       TArr2:=StrMath.MulDivInt(TArr2,Base);
       TArr1:=StrMath.SumSubInt(TArr1,InitInt('-1'));
