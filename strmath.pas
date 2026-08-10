@@ -371,14 +371,14 @@ type
     procedure Var_SetValueStr(const AIndex:Integer;AValue:String);
     function Var_GetVar(const AVarName:String):TPtrNumber;
     function Var_GetVar(const AIndex:Integer):TPtrNumber;
-    function Var_GetValue(const AVarName:String):Number;
-    function Var_GetValueInt(const AVarName:String):Integer;
-    function Var_GetValueReal(const AVarName:String):Real;
-    function Var_GetValueStr(const AVarName:String):String;
-    function Var_GetValue(const AIndex:Integer):Number;
-    function Var_GetValueInt(const AIndex:Integer):Integer;
-    function Var_GetValueReal(const AIndex:Integer):Real;
-    function Var_GetValueStr(const AIndex:Integer):String;
+    procedure Var_GetValue(const AVarName:String;var ValueResult:Number);
+    procedure Var_GetValueInt(const AVarName:String;var ValueResult:Integer);
+    procedure Var_GetValueReal(const AVarName:String;var ValueResult:Real);
+    procedure Var_GetValueStr(const AVarName:String;var ValueResult:String);
+    procedure Var_GetValue(const AIndex:Integer;var ValueResult:Number);
+    procedure Var_GetValueInt(const AIndex:Integer;var ValueResult:Integer);
+    procedure Var_GetValueReal(const AIndex:Integer;var ValueResult:Real);
+    procedure Var_GetValueStr(const AIndex:Integer;var ValueResult:String);
     function Var_GetValueInt_Index(const AVarName:String):Integer;
   end;
 
@@ -413,19 +413,19 @@ type
     TFuncDataObj:TProcObj;
     TCCodeProperties:^CodeProperties;
     function isVarNameValid(const VarName:String):Boolean;
-    function GetAnd(num1,num2:Number):Number;
-    function GetOr(num1,num2:Number):Number;
-    function GetNot(const num1:Number):Number;
-    function GetXOR(const num1,num2:Number):Number;
-    function GetEqual(num1,num2:Number):Number;
-    function GetEqual(const num1,num2:Real):Number;
-    function GetNotEqual(const num1,num2:Number):Number;
-    function GetNotEqual(const num1,num2:Real):Number;
-    function GetIf(const num1:Number):Number;
-    function GetGreaterThan(const num1,num2:Real):Number;
-    function GetGreaterThanOrEqualTo(const num1,num2:Real):Number;
-    function GetLessThan(const num1,num2:Real):Number;
-    function GetLessThanOrEqualTo(const num1,num2:Real):Number;
+    procedure GetAnd(num1,num2:Number;var numResult:Number);
+    procedure GetOr(num1,num2:Number;var numResult:Number);
+    procedure GetNot(const num1:Number;var numResult:Number);
+    procedure GetXOR(const num1,num2:Number;var numResult:Number);
+    procedure GetEqual(num1,num2:Number;var numResult:Number);
+    procedure GetEqual(const num1,num2:Real;var numResult:Number);
+    procedure GetNotEqual(const num1,num2:Number;var numResult:Number);
+    procedure GetNotEqual(const num1,num2:Real;var numResult:Number);
+    procedure GetIf(const num1:Number;var numResult:Number);
+    procedure GetGreaterThan(const num1,num2:Real;var numResult:Number);
+    procedure GetGreaterThanOrEqualTo(const num1,num2:Real;var numResult:Number);
+    procedure GetLessThan(const num1,num2:Real;var numResult:Number);
+    procedure GetLessThanOrEqualTo(const num1,num2:Real;var numResult:Number);
 
     //procedure(AParamArr:TParamArr;var ATCMemCapNum:TPtrInteger;var ATCMemCapStr:TPtrString;var ATCCodeProperties:PtrCodeProperties);
     procedure DebugPoint_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
@@ -933,12 +933,12 @@ type
 
   ArrMath = class(TObject)
   public
-    class function StrToNumber(const AStr:String):Number;
-    class function NumberToStr(const Anum:Number):String;
-    class function IntToNumber(const Int1:Integer):Number;
-    class function NumberToInt(const num:Number):Integer;
-    class function RealToNumber(const Real1:Real):Number;
-    class function NumberToReal(const num:Number):Real;
+    class procedure StrToNumber(AStr:String;var ValueResult:Number);
+    class procedure NumberToStr(Anum:Number;var ValueResult:String);
+    class procedure IntToNumber(Int1:Integer;var ValueResult:Number);
+    class procedure NumberToInt(num:Number;var ValueResult:Integer);
+    class procedure RealToNumber(Real1:Real;var ValueResult:Number);
+    class procedure NumberToReal(num:Number;var ValueResult:Real);
     class function RR(const x:Real):Integer;
     class function unNum(const x:Integer):Integer;
     class function unNum(const x:Real):Real;
@@ -3526,6 +3526,7 @@ var
   i:Integer;
 begin
   for i:=0 to (Length(self.TCodeVar)-1)do self.TCodeVar[i].Free;
+  SetLength(self.TCodeVar,0);
   SetLength(self.TCodeVar,Length(ACodeVariableArray.TCodeVar));
   for i:=0 to (Length(self.TCodeVar)-1)do self.TCodeVar[i]:=CodeVariable.Create(ACodeVariableArray.TCodeVar[i]);
 
@@ -3546,21 +3547,24 @@ procedure CodeVariableArray.Vars_DeleteLast;
 begin
   if(Length(self.TCodeVar)=1)then Exit;
 
+  self.Vars_AtLast:=@self.TCodeVar[Length(self.TCodeVar)-2];
+
   self.TCodeVar[Length(self.TCodeVar)-1].Free;
   SetLength(self.TCodeVar,Length(self.TCodeVar)-1);
-
-  self.Vars_AtLast:=@self.TCodeVar[Length(self.TCodeVar)-1];
 end;
 
 procedure CodeVariableArray.Vars_DeleteAllExceptFirst;
 var
   i:Integer;
 begin
-  for i:=1 to (Length(self.TCodeVar)-1)do self.TCodeVar[i].Free;
-  SetLength(self.TCodeVar,1);
+  if(Length(self.TCodeVar)=1)then Exit;
+  if(Length(self.TCodeVar)=0)then Exit;
 
   self.Vars:=@self.TCodeVar;
-  self.Vars_AtLast:=@self.TCodeVar[Length(self.TCodeVar)-1];
+  self.Vars_AtLast:=@self.TCodeVar[0];
+
+  for i:=1 to (Length(self.TCodeVar)-1)do self.TCodeVar[i].Free;
+  SetLength(self.TCodeVar,1);
 end;
 
 function CodeVariableArray.Vars_ArrLength: Integer;
@@ -3587,9 +3591,11 @@ procedure CodeLog.ChangeTo(var ACodeLog: CodeLog);
 var
   i:Integer;
 begin
+  SetLength(self.TLogError,0);
   SetLength(self.TLogError,Length(ACodeLog.TLogError));
   for i:=0 to (Length(self.TLogError)-1)do self.TLogError[i]:=ACodeLog.TLogError[i];
 
+  SetLength(self.TLogWarning,0);
   SetLength(self.TLogWarning,Length(ACodeLog.TLogWarning));
   for i:=0 to (Length(self.TLogWarning)-1)do self.TLogWarning[i]:=ACodeLog.TLogWarning[i];
 end;
@@ -15172,16 +15178,20 @@ var
 begin
   self.TCoreIndex:=ACodeCores.TCoreIndex;
   for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i].Free;
+  SetLength(self.TCPropertyArr,0);
   SetLength(self.TCPropertyArr,Length(ACodeCores.TCPropertyArr));
   for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i]:=CodeProperties.Create(ACodeCores.TCPropertyArr[i]);
   self.TCLogs.ChangeTo(ACodeCores.TCLogs);
 
+  SetLength(self.TCPropertyIndexDoneArr,0);
   SetLength(self.TCPropertyIndexDoneArr,Length(ACodeCores.TCPropertyIndexDoneArr));
   for i:=0 to (Length(self.TCPropertyIndexDoneArr)-1)do self.TCPropertyIndexDoneArr[i]:=ACodeCores.TCPropertyIndexDoneArr[i];
 
+  SetLength(self.TCPropertyDoneBoolArr,0);
   SetLength(self.TCPropertyDoneBoolArr,Length(ACodeCores.TCPropertyDoneBoolArr));
   for i:=0 to (Length(self.TCPropertyDoneBoolArr)-1)do self.TCPropertyDoneBoolArr[i]:=ACodeCores.TCPropertyDoneBoolArr[i];
 
+  SetLength(self.TCPropertyOutBoundBoolArr,0);
   SetLength(self.TCPropertyOutBoundBoolArr,Length(ACodeCores.TCPropertyOutBoundBoolArr));
   for i:=0 to (Length(self.TCPropertyOutBoundBoolArr)-1)do self.TCPropertyOutBoundBoolArr[i]:=ACodeCores.TCPropertyOutBoundBoolArr[i];
 
@@ -15444,9 +15454,11 @@ procedure CodePoint.ChangeTo(var ACodePoint: CodePoint);
 var
   i:Integer;
 begin
+  SetLength(self.TPointArr,0);
   SetLength(self.TPointArr,Length(ACodePoint.TPointArr));
   for i:=0 to (Length(self.TPointArr)-1)do self.TPointArr[i]:=ACodePoint.TPointArr[i];
 
+  SetLength(self.TStartMemArr,0);
   SetLength(self.TStartMemArr,Length(ACodePoint.TStartMemArr));
   for i:=0 to (Length(self.TStartMemArr)-1)do self.TStartMemArr[i]:=ACodePoint.TStartMemArr[i];
 end;
@@ -15581,12 +15593,16 @@ var
   i:Integer;
 begin
   for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
+  SetLength(self.TVarArr,0);
+
   SetLength(self.TVarArr,Length(ACodeVariable.TVarArr));
   for i:=0 to (Length(self.TVarArr)-1)do self.TVarArr[i]:=StrMath.AssignNum(ACodeVariable.TVarArr[i]);
 
+  SetLength(self.TVarMode,0);
   SetLength(self.TVarMode,Length(ACodeVariable.TVarMode));
   for i:=0 to (Length(self.TVarMode)-1)do self.TVarMode[i]:=ACodeVariable.TVarMode[i];
 
+  SetLength(self.TVarName,0);
   SetLength(self.TVarName,Length(ACodeVariable.TVarName));
   for i:=0 to (Length(self.TVarName)-1)do self.TVarName[i]:=ACodeVariable.TVarName[i];
 end;
@@ -15645,6 +15661,7 @@ begin
     end;
   end;
   for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
+  SetLength(self.TVarArr,0);
   SetLength(self.TVarArr,Length(TArr1));
   SetLength(self.TVarMode,Length(TArr3));
   SetLength(self.TVarName,Length(TArr2));
@@ -15879,72 +15896,80 @@ begin
   Result:=@self.TVarArr[AIndex];
 end;
 
-function CodeVariable.Var_GetValue(const AVarName: String): Number;
+procedure CodeVariable.Var_GetValue(const AVarName: String;
+  var ValueResult: Number);
 var
   AIndex:Integer;
 begin
-  Result:=nil;
+  SetLength(ValueResult,0);
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=StrMath.AssignNum(self.TVarArr[AIndex]);
+    ValueResult:=StrMath.AssignNum(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValueInt(const AVarName: String): Integer;
+procedure CodeVariable.Var_GetValueInt(const AVarName: String;
+  var ValueResult: Integer);
 var
   AIndex:Integer;
 begin
-  Result:=0;
+  ValueResult:=0;
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=ArrMath.NumberToInt(self.TVarArr[AIndex]);
+    ValueResult:=ArrMath.NumberToInt(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValueReal(const AVarName: String): Real;
+procedure CodeVariable.Var_GetValueReal(const AVarName: String;
+  var ValueResult: Real);
 var
   AIndex:Integer;
 begin
-  Result:=0;
+  ValueResult:=0;
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=ArrMath.NumberToReal(self.TVarArr[AIndex]);
+    ValueResult:=ArrMath.NumberToReal(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValueStr(const AVarName: String): String;
+procedure CodeVariable.Var_GetValueStr(const AVarName: String;
+  var ValueResult: String);
 var
   AIndex:Integer;
 begin
-  Result:='';
+  ValueResult:='';
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    Result:=ArrMath.NumberToStr(self.TVarArr[AIndex]);
+    ValueResult:=ArrMath.NumberToStr(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValue(const AIndex: Integer): Number;
+procedure CodeVariable.Var_GetValue(const AIndex: Integer;
+  var ValueResult: Number);
 begin
-  Result:=nil;
+  SetLength(ValueResult,0);
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=StrMath.AssignNum(self.TVarArr[AIndex]);
+  ValueResult:=StrMath.AssignNum(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValueInt(const AIndex: Integer): Integer;
+procedure CodeVariable.Var_GetValueInt(const AIndex: Integer;
+  var ValueResult: Integer);
 begin
-  Result:=0;
+  ValueResult:=0;
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=ArrMath.NumberToInt(self.TVarArr[AIndex]);
+  ValueResult:=ArrMath.NumberToInt(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValueReal(const AIndex: Integer): Real;
+procedure CodeVariable.Var_GetValueReal(const AIndex: Integer;
+  var ValueResult: Real);
 begin
-  Result:=0;
+  ValueResult:=0;
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=ArrMath.NumberToReal(self.TVarArr[AIndex]);
+  ValueResult:=ArrMath.NumberToReal(self.TVarArr[AIndex]);
 end;
 
-function CodeVariable.Var_GetValueStr(const AIndex: Integer): String;
+procedure CodeVariable.Var_GetValueStr(const AIndex: Integer;
+  var ValueResult: String);
 begin
-  Result:='';
+  ValueResult:='';
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  Result:=ArrMath.NumberToStr(self.TVarArr[AIndex]);
+  ValueResult:=ArrMath.NumberToStr(self.TVarArr[AIndex]);
 end;
 
 function CodeVariable.Var_GetValueInt_Index(const AVarName: String): Integer;
@@ -16094,8 +16119,8 @@ begin
   self.Build_Basic:=nil;
   self.Build_Advance:=nil;
 
-  self.TCodeComponentBasic.Free;
   self.TCodeComponent.Free;
+  self.TCodeComponentBasic.Free;
 end;
 
 procedure CodeBuild.changeTo(var ACodeBuild: CodeBuild);
@@ -16152,6 +16177,7 @@ var
   i:Integer;
 begin
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
+  SetLength(self.TCodeLn,0);
   SetLength(self.TCodeLn,Length(ACodeArray.TCodeLn));
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i]:=CodeLine.Create(ACodeArray.TCodeLn[i]);
 
@@ -16215,113 +16241,89 @@ begin
   Result:=True;
 end;
 
-function CodeLine.GetAnd(num1, num2: Number): Number;
+procedure CodeLine.GetAnd(num1, num2: Number; var numResult: Number);
 var
   TBPosMin,TBPosMax:TBitPos;
   bool1,bool2:Boolean;
-  ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(Length(num1)=0)and(Length(num2)=0)then begin
-    Result:=StrMath.AssignNum(ByteA);
-    SetLength(ByteA,0);
-    Exit;
-  end;
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then Exit;
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
-  SetLength(ByteA,Length(num1));
+  SetLength(numResult,Length(num1));
 
   bool1:=False;
   bool2:=False;
   ArrMath.SetBitPosZero(TBPosMin);
   ArrMath.SetBitPosZero(TBPosMax);
-  ArrMath.GetLastBit(TBPosMax,ByteA);
-  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(ByteA)-1,7);
+  ArrMath.GetLastBit(TBPosMax,numResult);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(numResult)-1,7);
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
     bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
+    if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,numResult);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
   bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  if(bool1=True)and(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,numResult);
 end;
 
-function CodeLine.GetOr(num1, num2: Number): Number;
+procedure CodeLine.GetOr(num1, num2: Number; var numResult: Number);
 var
   TBPosMin,TBPosMax:TBitPos;
   bool1,bool2:Boolean;
-  ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(Length(num1)=0)and(Length(num2)=0)then begin
-    Result:=StrMath.AssignNum(ByteA);
-    SetLength(ByteA,0);
-    Exit;
-  end;
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then Exit;
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
-  SetLength(ByteA,Length(num1));
+  SetLength(numResult,Length(num1));
 
   bool1:=False;
   bool2:=False;
   ArrMath.SetBitPosZero(TBPosMin);
   ArrMath.SetBitPosZero(TBPosMax);
-  ArrMath.GetLastBit(TBPosMax,ByteA);
-  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(ByteA)-1,7);
+  ArrMath.GetLastBit(TBPosMax,numResult);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(numResult)-1,7);
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
     bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-    if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
+    if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,numResult);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
   bool2:=ArrMath.IsBitPosSet(TBPosMin,num2);
-  if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  if(bool1=True)or(bool2=True)then ArrMath.BitPosAddSetArr(TBPosMin,numResult);
 end;
 
-function CodeLine.GetNot(const num1: Number): Number;
+procedure CodeLine.GetNot(const num1: Number; var numResult: Number);
 var
   TBPosMin,TBPosMax:TBitPos;
   bool1:Boolean;
-  ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(Length(num1)=0)then begin
-    Result:=StrMath.AssignNum(ByteA);
-    SetLength(ByteA,0);
-    Exit;
-  end;
-  SetLength(ByteA,Length(num1));
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)then Exit;
+  SetLength(numResult,Length(num1));
 
   bool1:=False;
   ArrMath.SetBitPosZero(TBPosMin);
   ArrMath.SetBitPosZero(TBPosMax);
-  ArrMath.GetLastBit(TBPosMax,ByteA);
-  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(ByteA)-1,7);
+  ArrMath.GetLastBit(TBPosMax,numResult);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then ArrMath.SetBitPos(TBPosMax,Length(numResult)-1,7);
   while(ArrMath.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
     bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
-    if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
+    if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,numResult);
     ArrMath.IncBitPos(TBPosMin);
   end;
   bool1:=ArrMath.IsBitPosSet(TBPosMin,num1);
-  if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,ByteA);
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  if(bool1=False)then ArrMath.BitPosAddSetArr(TBPosMin,numResult);
 end;
 
-function CodeLine.GetXOR(const num1, num2: Number): Number;
+procedure CodeLine.GetXOR(const num1, num2: Number; var numResult: Number);
 var
   N1,N2,N3,N4:Number;
 begin
@@ -16329,150 +16331,103 @@ begin
   N2:=nil;
   N3:=nil;
   N4:=nil;
-  Result:=nil;
-  N1:=StrMath.AssignNum(self.GetNot(num1));
-  N2:=StrMath.AssignNum(self.GetAnd(N1,num2));
-  N3:=StrMath.AssignNum(self.GetNot(num2));
-  N4:=StrMath.AssignNum(self.GetAnd(num1,N3));
-  Result:=StrMath.AssignNum(self.GetOr(N4,N2));
+  SetLength(numResult,0);
+  self.GetNot(num1,N1);
+  self.GetAnd(N1,num2,N2);
+  self.GetNot(num2,N3);
+  self.GetAnd(num1,N3,N4);
+  self.GetOr(N4,N2,numResult);
   SetLength(N1,0);
   SetLength(N2,0);
   SetLength(N3,0);
   SetLength(N4,0);
 end;
 
-function CodeLine.GetEqual(num1, num2: Number): Number;
+procedure CodeLine.GetEqual(num1, num2: Number; var numResult: Number);
 var
   i:Integer;
-  ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(Length(num1)=0)and(Length(num2)=0)then begin
-    Result:=StrMath.AssignNum(ByteA);
-    SetLength(ByteA,0);
-    Exit;
-  end;
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then Exit;
   if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
   if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
 
-  for i:=0 to (Length(num1)-1)do if(num1[i]<>num2[i])then begin
-    Result:=StrMath.AssignNum(ByteA);
-    SetLength(ByteA,0);
-    Exit;
-  end;
-  ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  for i:=0 to (Length(num1)-1)do if(num1[i]<>num2[i])then Exit;
+
+  numResult[Length(numResult)-1]:=1;
 end;
 
-function CodeLine.GetEqual(const num1, num2: Real): Number;
-var
-  ByteA:Number;
+procedure CodeLine.GetEqual(const num1, num2: Real; var numResult: Number);
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(num1=num2)then ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(num1=num2)then numResult[Length(numResult)-1]:=1;
 end;
 
-function CodeLine.GetNotEqual(const num1, num2: Number): Number;
+procedure CodeLine.GetNotEqual(const num1, num2: Number; var numResult: Number);
 begin
-  Result:=StrMath.AssignNum(self.GetEqual(num1,num2));
-  if(Result[0]=1)then Result[0]:=0 else Result[0]:=1;
+  SetLength(numResult,0);
+  self.GetEqual(num1,num2,numResult);
+  if(numResult[0]=1)then numResult[0]:=0 else numResult[0]:=1;
 end;
 
-function CodeLine.GetNotEqual(const num1, num2: Real): Number;
-var
-  ByteA:Number;
+procedure CodeLine.GetNotEqual(const num1, num2: Real; var numResult: Number);
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(num1<>num2)then ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(num1<>num2)then numResult[Length(numResult)-1]:=1;
 end;
 
-function CodeLine.GetIf(const num1: Number): Number;
+procedure CodeLine.GetIf(const num1: Number; var numResult: Number);
 var
   i:Integer;
-  ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);ByteA[Length(ByteA)-1]:=0;
-  if(Length(num1)=0)then begin
-    Result:=StrMath.AssignNum(ByteA);
-    SetLength(ByteA,0);
-    Exit;
-  end;
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)then Exit;
 
   for i:=0 to (Length(num1)-1)do
     if(num1[i]>0)then begin
-      ByteA[Length(ByteA)-1]:=1;
-      Break;
+      numResult[Length(numResult)-1]:=1;
+      Exit;
     end;
 
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
 end;
 
-function CodeLine.GetGreaterThan(const num1, num2: Real): Number;
-var
-  ByteA:Number;
+procedure CodeLine.GetGreaterThan(const num1, num2: Real; var numResult: Number
+  );
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);
-  ByteA[Length(ByteA)-1]:=0;
-  if(num1>num2)then ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);
+  numResult[Length(numResult)-1]:=0;
+  if(num1>num2)then numResult[Length(numResult)-1]:=1;
 end;
 
-function CodeLine.GetGreaterThanOrEqualTo(const num1, num2: Real
-  ): Number;
-var
-  ByteA:Number;
+procedure CodeLine.GetGreaterThanOrEqualTo(const num1, num2: Real;
+  var numResult: Number);
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);
-  ByteA[Length(ByteA)-1]:=0;
-  if(num1>=num2)then ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);
+  numResult[Length(numResult)-1]:=0;
+  if(num1>=num2)then numResult[Length(numResult)-1]:=1;
 end;
 
-function CodeLine.GetLessThan(const num1, num2: Real): Number;
-var
-  ByteA:Number;
+procedure CodeLine.GetLessThan(const num1, num2: Real; var numResult: Number);
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);
-  ByteA[Length(ByteA)-1]:=0;
-  if(num1<num2)then ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);
+  numResult[Length(numResult)-1]:=0;
+  if(num1<num2)then numResult[Length(numResult)-1]:=1;
 end;
 
-function CodeLine.GetLessThanOrEqualTo(const num1, num2: Real
-  ): Number;
-var
-  ByteA:Number;
+procedure CodeLine.GetLessThanOrEqualTo(const num1, num2: Real;
+  var numResult: Number);
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,Length(ByteA)+1);
-  ByteA[Length(ByteA)-1]:=0;
-  if(num1<=num2)then ByteA[Length(ByteA)-1]:=1;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);
+  numResult[Length(numResult)-1]:=0;
+  if(num1<=num2)then numResult[Length(numResult)-1]:=1;
 end;
 
 procedure CodeLine.DebugPoint_Proc(AParamArr: TParamArr;
@@ -16509,7 +16464,13 @@ var
   numValue:Number;
 
   num1:Integer;
+
+  IfNum:Number;
 begin
+  num1V:=nil;
+  numValue:=nil;
+  IfNum:=nil;
+
   num1Str:=ArrMath.NumberToStr(AParamArr[0]);
   numValue:=StrMath.AssignNum(AParamArr[1]);
 
@@ -16517,19 +16478,26 @@ begin
 
   if(num1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+num1Str+'" does not Exists');
+    SetLength(num1V,0);
+    SetLength(numValue,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
   num1V:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(num1AIndex);
 
   num1:=0;
-  if(self.GetEqual(num1V,numValue)[0]=1)then begin
+  self.GetEqual(num1V,numValue,IfNum);
+  if(IfNum[0]=1)then begin
     num1:=num1+1;
     num1:=num1+1;
     num1:=num1+1;
   end;
   num1:=0;
 
+  SetLength(num1V,0);
+  SetLength(numValue,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.DebugPointIf_Integer_Proc(AParamArr: TParamArr;
@@ -17281,14 +17249,20 @@ begin
 
   if(ArrayAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ArrayStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(IndexAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+IndexStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -17327,14 +17301,20 @@ begin
 
   if(ArrayAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ArrayStr+'" does not Exists');
+    Anum1:=nil;
+    SetLength(Anum3,0);
     Exit;
   end else
   if(IndexAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+IndexStr+'" does not Exists');
+    Anum1:=nil;
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ValueVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ValueVarStr+'" does not Exists');
+    Anum1:=nil;
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -17418,14 +17398,17 @@ begin
 
   if(StrAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+StrStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(IndexAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+IndexStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ValueVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ValueVarStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -17435,6 +17418,7 @@ begin
 
   if(Anum2<1)or(Anum2>Length(Anum1))then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: func StrIndexSet() Index is out of bound');
+    SetLength(Anum3,0);
     Exit;
   end;
   SetLength(Anum3,1);
@@ -17463,10 +17447,12 @@ begin
 
   if(ArrayAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ArrayVarStr+'" does not Exists');
+    PtrNum:=nil;
     Exit;
   end else
   if(ArrayLengthVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ArrayLengthVarStr+'" does not Exists');
+    PtrNum:=nil;
     Exit;
   end;
 
@@ -17495,10 +17481,12 @@ begin
 
   if(ArrayVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ArrayVarStr+'" does not Exists');
+    PtrNum:=nil;
     Exit;
   end else
   if(ResultAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultStr+'" does not Exists');
+    PtrNum:=nil;
     Exit;
   end;
 
@@ -17644,10 +17632,12 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end else
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -17677,6 +17667,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
@@ -17684,10 +17676,13 @@ begin
 
   if(AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameStr+'" does not Exists');
+    SetLength(AValue,0);
     Exit;
   end;
 
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToV1_Integer_Proc(AParamArr: TParamArr;
@@ -17779,6 +17774,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -17826,6 +17822,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -17859,6 +17856,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV1';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -17870,6 +17869,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV1_Integer_Proc(AParamArr: TParamArr;
@@ -17961,6 +17962,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -18008,6 +18010,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -18041,6 +18044,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV2';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -18052,6 +18057,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV2_Integer_Proc(AParamArr: TParamArr;
@@ -18143,6 +18150,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -18190,6 +18198,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -18223,6 +18232,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV3';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -18234,6 +18245,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV3_Integer_Proc(AParamArr: TParamArr;
@@ -18325,6 +18338,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -18372,6 +18386,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -18405,6 +18420,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV4';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -18416,6 +18433,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV4_Integer_Proc(AParamArr: TParamArr;
@@ -18507,6 +18526,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -18554,6 +18574,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -18587,6 +18608,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV5';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -18598,6 +18621,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV5_Integer_Proc(AParamArr: TParamArr;
@@ -18689,6 +18714,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -18736,6 +18762,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -18769,6 +18796,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV6';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -18780,6 +18809,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV6_Integer_Proc(AParamArr: TParamArr;
@@ -18871,6 +18902,7 @@ begin
   end;
   if(VarName2Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
 
@@ -18918,6 +18950,7 @@ begin
 
   if(VarName1Index=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
     Exit;
   end;
   if(VarName2Index=-1)then begin
@@ -18951,6 +18984,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:='$GV7';
   AValue:=StrMath.AssignNum(AParamArr[0]);
 
@@ -18962,6 +18997,8 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.MoveV2ToGV7_Integer_Proc(AParamArr: TParamArr;
@@ -19045,20 +19082,29 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   Anum2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2AIndex);
-  Anum3:=self.GetAnd(Anum1,Anum2);
+  self.GetAnd(Anum1,Anum2,Anum3);
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
@@ -19087,20 +19133,29 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   Anum2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2AIndex);
-  Anum3:=self.GetOr(Anum1,Anum2);
+  self.GetOr(Anum1,Anum2,Anum3);
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
@@ -19126,15 +19181,19 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
-  Anum3:=self.GetNot(Anum1);
+  self.GetNot(Anum1,Anum3);
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
@@ -19162,20 +19221,29 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   Anum2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2AIndex);
-  Anum3:=self.GetXOR(Anum1,Anum2);
+  self.GetXOR(Anum1,Anum2,Anum3);
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
@@ -19289,14 +19357,23 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19308,46 +19385,46 @@ begin
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetEqual(AReal1,AReal2);
+    self.GetEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='real')and(AMode2='integer')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetEqual(AReal1,AReal2);
+    self.GetEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='integer')and(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetEqual(AReal1,AReal2);
+    self.GetEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
-    Anum3:=self.GetEqual(AReal1,AReal2);
+    self.GetEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetEqual(AReal1,AReal2);
+    self.GetEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetEqual(AReal1,AReal2);
+    self.GetEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else begin
     Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
     Anum2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2AIndex);
-    Anum3:=self.GetEqual(Anum1,Anum2);
+    self.GetEqual(Anum1,Anum2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end;
 
@@ -19386,14 +19463,23 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19405,46 +19491,46 @@ begin
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    self.GetNotEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='real')and(AMode2='integer')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    self.GetNotEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='integer')and(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    self.GetNotEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
-    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    self.GetNotEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode1='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    self.GetNotEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else
   if(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetNotEqual(AReal1,AReal2);
+    self.GetNotEqual(AReal1,AReal2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end else begin
     Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
     Anum2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2AIndex);
-    Anum3:=self.GetNotEqual(Anum1,Anum2);
+    self.GetNotEqual(Anum1,Anum2,Anum3);
     ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
   end;
 
@@ -19481,14 +19567,17 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19500,42 +19589,42 @@ begin
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='integer')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='integer')and(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end else
   if(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThan(AReal1,AReal2);
+    self.GetGreaterThan(AReal1,AReal2,Anum3);
   end;
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
@@ -19570,14 +19659,17 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19589,42 +19681,42 @@ begin
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='integer')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='integer')and(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetGreaterThanOrEqualTo(AReal1,AReal2);
+    self.GetGreaterThanOrEqualTo(AReal1,AReal2,Anum3);
   end;
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
@@ -19659,14 +19751,17 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19678,42 +19773,42 @@ begin
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='integer')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='integer')and(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end else
   if(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThan(AReal1,AReal2);
+    self.GetLessThan(AReal1,AReal2,Anum3);
   end;
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
@@ -19748,14 +19843,17 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19767,42 +19865,42 @@ begin
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='integer')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='integer')and(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')and(AMode2='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode1='real')then begin
     AReal1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end else
   if(AMode2='real')then begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AReal2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarName2AIndex);
     AReal1:=AInt1+0.0;
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end else begin
     AInt1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName1AIndex);
     AInt2:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarName2AIndex);
     AReal1:=AInt1+0.0;
     AReal2:=AInt2+0.0;
-    Anum3:=self.GetLessThanOrEqualTo(AReal1,AReal2);
+    self.GetLessThanOrEqualTo(AReal1,AReal2,Anum3);
   end;
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
@@ -19832,14 +19930,23 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(VarName2AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end else
   if(ResultVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
+    SetLength(Anum3,0);
     Exit;
   end;
 
@@ -19872,8 +19979,10 @@ var
   VarName1AIndex,JumpToTrueAIndex,JumpToFalseAIndex:Integer;
   JumpToTrueNum,JumpToFalseNum:Integer;
   Anum1:Number;
+  IfNum:Number;
 begin
   Anum1:=nil;
+  IfNum:=nil;
 
   VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
   JumpToTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
@@ -19885,14 +19994,20 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(JumpToTrueAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+JumpToTrueStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(JumpToFalseAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+JumpToFalseStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
@@ -19900,10 +20015,12 @@ begin
   JumpToTrueNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(JumpToTrueAIndex);
   JumpToFalseNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(JumpToFalseAIndex);
 
-  if(self.GetIf(Anum1)[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToTrueNum)
+  self.GetIf(Anum1,IfNum);
+  if(IfNum[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToTrueNum)
   else ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToFalseNum);
 
   SetLength(Anum1,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.IfV1True_Proc(AParamArr: TParamArr;
@@ -19913,8 +20030,10 @@ var
   VarName1AIndex,JumpToTrueAIndex:Integer;
   JumpToTrueNum:Integer;
   Anum1:Number;
+  IfNum:Number;
 begin
   Anum1:=nil;
+  IfNum:=nil;
 
   VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
   JumpToTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
@@ -19924,19 +20043,25 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(JumpToTrueAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+JumpToTrueStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   JumpToTrueNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(JumpToTrueAIndex);
 
-  if(self.GetIf(Anum1)[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToTrueNum);
+  self.GetIf(Anum1,IfNum);
+  if(IfNum[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToTrueNum);
 
   SetLength(Anum1,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.IfV1False_Proc(AParamArr: TParamArr;
@@ -19946,8 +20071,10 @@ var
   VarName1AIndex,JumpToFalseAIndex:Integer;
   JumpToFalseNum:Integer;
   Anum1:Number;
+  IfNum:Number;
 begin
   Anum1:=nil;
+  IfNum:=nil;
 
   VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
   JumpToFalseStr:=ArrMath.NumberToStr(AParamArr[1]);
@@ -19957,19 +20084,25 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(JumpToFalseAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+JumpToFalseStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   JumpToFalseNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(JumpToFalseAIndex);
 
-  if(self.GetIf(Anum1)[0]=0)then ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToFalseNum);
+  self.GetIf(Anum1,IfNum);
+  if(IfNum[0]=0)then ATCCodeProperties^.Property_CodePoint^.Point_SetPoint(JumpToFalseNum);
 
   SetLength(Anum1,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.IfV1_Goto_Proc(AParamArr: TParamArr;
@@ -19979,8 +20112,10 @@ var
   VarName1AIndex,GotoTrueAIndex,GotoFalseAIndex:Integer;
   GotoTrueNum,GotoFalseNum:Integer;
   Anum1:Number;
+  IfNum:Number;
 begin
   Anum1:=nil;
+  IfNum:=nil;
 
   VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
   GotoTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
@@ -19992,14 +20127,20 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(GotoTrueAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+GotoTrueStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(GotoFalseAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+GotoFalseStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
@@ -20007,10 +20148,12 @@ begin
   GotoTrueNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(GotoTrueAIndex);
   GotoFalseNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(GotoFalseAIndex);
 
-  if(self.GetIf(Anum1)[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoTrueNum)
+  self.GetIf(Anum1,IfNum);
+  if(IfNum[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoTrueNum)
   else ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoFalseNum);
 
   SetLength(Anum1,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.IfV1True_Goto_Proc(AParamArr: TParamArr;
@@ -20020,8 +20163,10 @@ var
   VarName1AIndex,GotoTrueAIndex:Integer;
   GotoTrueNum:Integer;
   Anum1:Number;
+  IfNum:Number;
 begin
   Anum1:=nil;
+  IfNum:=nil;
 
   VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
   GotoTrueStr:=ArrMath.NumberToStr(AParamArr[1]);
@@ -20031,19 +20176,25 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(GotoTrueAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+GotoTrueStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   GotoTrueNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(GotoTrueAIndex);
 
-  if(self.GetIf(Anum1)[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoTrueNum);
+  self.GetIf(Anum1,IfNum);
+  if(IfNum[0]=1)then ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoTrueNum);
 
   SetLength(Anum1,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.IfV1False_Goto_Proc(AParamArr: TParamArr;
@@ -20053,8 +20204,10 @@ var
   VarName1AIndex,GotoFalseAIndex:Integer;
   GotoFalseNum:Integer;
   Anum1:Number;
+  IfNum:Number;
 begin
   Anum1:=nil;
+  IfNum:=nil;
 
   VarName1Str:=ArrMath.NumberToStr(AParamArr[0]);
   GotoFalseStr:=ArrMath.NumberToStr(AParamArr[1]);
@@ -20064,19 +20217,25 @@ begin
 
   if(VarName1AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end else
   if(GotoFalseAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+GotoFalseStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(IfNum,0);
     Exit;
   end;
 
   Anum1:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName1AIndex);
   GotoFalseNum:=ATCCodeProperties^.Property_CodePorts^.Vars^[ATCCodeProperties^.Property_CodePoint^.Point_StartMem_GetPoint].Var_GetValueInt(GotoFalseAIndex);
 
-  if(self.GetIf(Anum1)[0]=0)then ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoFalseNum);
+  self.GetIf(Anum1,IfNum);
+  if(IfNum[0]=0)then ATCCodeProperties^.Property_CodePoint^.Point_AddLast(GotoFalseNum);
 
   SetLength(Anum1,0);
+  SetLength(IfNum,0);
 end;
 
 procedure CodeLine.AllocateMem_Number_Proc(AParamArr: TParamArr;
@@ -20086,11 +20245,14 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
   if(self.isVarNameValid(VarNameStr)=False)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var Name"'+VarNameStr+'" is invalid');
+    SetLength(AValue,0);
     Exit;
   end;
 
@@ -20103,6 +20265,8 @@ begin
 
   if(AIndex<>-1)then ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(AIndex,AValue)
   else ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_AddVariable(VarNameStr,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.AllocateMem_Integer_Proc(AParamArr: TParamArr;
@@ -20205,14 +20369,20 @@ begin
 
   if(VarNameAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
     Exit;
   end else
   if(CountVarAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+CountVarStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
     Exit;
   end else
   if(ResultStrAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+ResultStrStr+'" does not Exists');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
     Exit;
   end;
 
@@ -20221,10 +20391,14 @@ begin
 
   if(Length(Anum1)=0)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameStr+'" value, is nil');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
     Exit;
   end else
   if(Length(Anum2)=0)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+CountVarStr+'" value, is nil');
+    SetLength(Anum1,0);
+    SetLength(Anum2,0);
     Exit;
   end;
 
@@ -20264,6 +20438,8 @@ var
   AValue:Number;
   AIndex:Integer;
 begin
+  AValue:=nil;
+
   VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   AValue:=StrMath.AssignNum(AParamArr[1]);
 
@@ -20271,10 +20447,13 @@ begin
 
   if(AIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameStr+'" does not Exists');
+    SetLength(AValue,0);
     Exit;
   end;
 
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(AIndex,AValue);
+
+  SetLength(AValue,0);
 end;
 
 procedure CodeLine.SetVarMem_Integer_Proc(AParamArr: TParamArr;
@@ -20482,6 +20661,8 @@ var
   AReal1:Real;
   AStr1:String;
 begin
+  Anum1:=nil;
+
   VarNameStr:=ArrMath.NumberToStr(AParamArr[0]);
   VarModeStr:=ArrMath.NumberToStr(AParamArr[1]);
 
@@ -20489,6 +20670,7 @@ begin
 
   if(VarNameAIndex=-1)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameStr+'" does not Exists');
+    SetLength(Anum1,0);
     Exit;
   end;
 
@@ -20512,6 +20694,7 @@ begin
     ATCCodeProperties^.TCLogs^.Warning_CreateLastLog('Warning: Var "'+VarNameStr+'" will set to default');
   end;
 
+  SetLength(Anum1,0);
 end;
 
 constructor CodeLine.Create;
@@ -20566,6 +20749,8 @@ begin
   self.TCodeArr:=StrMath.AssignNum(ACodeLine.TCodeArr);
 
   for i:=0 to (Length(self.TParaArr)-1)do SetLength(self.TParaArr[i],0);
+  SetLength(self.TParaArr,0);
+
   SetLength(self.TParaArr,Length(ACodeLine.TParaArr));
   for i:=0 to (Length(self.TParaArr)-1)do
     self.TParaArr[i]:=StrMath.AssignNum(ACodeLine.TParaArr[i]);
@@ -22070,79 +22255,53 @@ end;
 
 { ArrMath }
 
-class function ArrMath.StrToNumber(const AStr: String): Number;
+class procedure ArrMath.StrToNumber(AStr: String; var ValueResult: Number);
 var
   i:Integer;
-  ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
+  SetLength(ValueResult,0);
   for i:=1 to Length(AStr)do begin
-    SetLength(ByteA,Length(ByteA)+1);
-    ByteA[Length(ByteA)-1]:=Byte(AStr[i]);
+    SetLength(ValueResult,Length(ValueResult)+1);
+    ValueResult[Length(ValueResult)-1]:=Byte(AStr[i]);
   end;
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
 end;
 
-class function ArrMath.NumberToStr(const Anum: Number): String;
+class procedure ArrMath.NumberToStr(Anum: Number; var ValueResult: String);
 var
   i:Integer;
-  ByteA:Number;
 begin
-  Result:='';
-  ByteA:=nil;
-  ByteA:=StrMath.AssignNum(Anum);
-  for i:=0 to (Length(ByteA)-1)do Result:=Result+Char(ByteA[i]);
-  SetLength(ByteA,0);
+  ValueResult:='';
+  for i:=0 to (Length(Anum)-1)do ValueResult:=ValueResult+Char(Anum[i]);
 end;
 
-class function ArrMath.IntToNumber(const Int1: Integer): Number;
+class procedure ArrMath.IntToNumber(Int1: Integer; var ValueResult: Number);
+begin
+  SetLength(ValueResult,0);
+  SetLength(ValueResult,SizeOf(Int1));
+  Move(Int1,ValueResult[0],SizeOf(Int1));
+end;
+
+class procedure ArrMath.NumberToInt(num: Number; var ValueResult: Integer);
+begin
+  ValueResult:=0;
+  if(Length(num)<SizeOf(Integer))then SetLength(num,SizeOf(Integer));
+  Move(num[0],ValueResult,SizeOf(Integer));
+end;
+
+class procedure ArrMath.RealToNumber(Real1: Real; var ValueResult: Number);
+begin
+  SetLength(ValueResult,0);
+  SetLength(ValueResult,SizeOf(Real1));
+  Move(Real1,ValueResult[0],SizeOf(Real1));
+end;
+
+class procedure ArrMath.NumberToReal(num: Number; var ValueResult: Real);
 var
   ByteA:Number;
 begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,SizeOf(Int1));
-  Move(Int1,ByteA[0],SizeOf(Int1));
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
-end;
-
-class function ArrMath.NumberToInt(const num: Number): Integer;
-var
-  ByteA:Number;
-begin
-  Result:=0;
-  ByteA:=nil;
-  ByteA:=StrMath.AssignNum(num);
-  if(Length(ByteA)<SizeOf(Integer))then SetLength(ByteA,SizeOf(Integer));
-  Move(ByteA[0],Result,SizeOf(Integer));
-  SetLength(ByteA,0);
-end;
-
-class function ArrMath.RealToNumber(const Real1: Real): Number;
-var
-  ByteA:Number;
-begin
-  Result:=nil;
-  ByteA:=nil;
-  SetLength(ByteA,SizeOf(Real1));
-  Move(Real1,ByteA[0],SizeOf(Real1));
-  Result:=StrMath.AssignNum(ByteA);
-  SetLength(ByteA,0);
-end;
-
-class function ArrMath.NumberToReal(const num: Number): Real;
-var
-  ByteA:Number;
-begin
-  Result:=0;
-  ByteA:=nil;
-  ByteA:=StrMath.AssignNum(num);
-  if(Length(ByteA)<SizeOf(Real))then SetLength(ByteA,SizeOf(Real));
-  Move(ByteA[0],Result,SizeOf(Real));
-  SetLength(ByteA,0);
+  ValueResult:=0;
+  if(Length(num)<SizeOf(Real))then SetLength(num,SizeOf(Real));
+  Move(num[0],ValueResult,SizeOf(Real));
 end;
 
 class function ArrMath.RR(const x: Real): Integer;
@@ -22767,11 +22926,21 @@ begin
   SetLength(numResult,Length(TArr1));
   for i:=0 to (Length(numResult)-1)do numResult[i]:=TArr1[i][0];
 
+  if(bool1=True)and(bool2=True)then Result:=True;
+
+  SetLength(n1,0);
+  SetLength(n2,0);
+  SetLength(n3,0);
+
+  for i:=0 to (Length(TArr1)-1)do SetLength(TArr1[i],0);
+  SetLength(TArr1,0);
+
+  for i:=0 to (Length(TArr2)-1)do SetLength(TArr2[i],0);
+  SetLength(TArr2,0);
+
   TCCores.Free;
   TCBuild.Free;
   TCProperty.Free;
-
-  if(bool1=True)and(bool2=True)then Result:=True;
 end;
 
 class procedure ArrMath.SubInt(num1, num2: IntArr; var numResult: IntArr; out
@@ -22969,11 +23138,21 @@ begin
   SetLength(numResult,Length(TArr1));
   for i:=0 to (Length(numResult)-1)do numResult[i]:=TArr1[i][0];
 
+  if(bool1=True)and(bool2=True)then Result:=True;
+
+  SetLength(n1,0);
+  SetLength(n2,0);
+  SetLength(n3,0);
+
+  for i:=0 to (Length(TArr1)-1)do SetLength(TArr1[i],0);
+  SetLength(TArr1,0);
+
+  for i:=0 to (Length(TArr2)-1)do SetLength(TArr2[i],0);
+  SetLength(TArr2,0);
+
   TCCores.Free;
   TCBuild.Free;
   TCProperty.Free;
-
-  if(bool1=True)and(bool2=True)then Result:=True;
 end;
 
 class procedure ArrMath.SumSubInt(num1, num2: IntArr; var numResult: IntArr);
