@@ -341,7 +341,6 @@ type
   CodeVariable = class(TObject)
   private
     TVarArr:Array of Number;
-    TVarMode:TByteArr;
     TVarName:Array of String;
     function isVarNameExist(const AVarName:String;out AIndex:Integer):Boolean;
     function isVarNamePart(const AVarName,AVarNamePart:String):Boolean;
@@ -353,8 +352,6 @@ type
     procedure Var_ResetAll;
     procedure Var_GetVarNameParts(const AVarNamePart:String;out ANumArr:TNumArr);
     procedure Var_DeleteVarNames(const ANumArr:TNumArr);
-    procedure Var_SetVarDataType(const AIndex:Integer;const AMode:String);
-    function Var_GetVarDataType(const AIndex:Integer):String;
     function Var_AddVariable(const AVarName:String):Boolean;
     function Var_AddVariable(const AVarName:String;const AValue:Number):Boolean;
     function Var_AddVariableInt(const AVarName:String;AValue:Integer):Boolean;
@@ -554,6 +551,8 @@ type
     procedure CopyStr_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
     procedure StrToInt_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
     procedure IntToStr_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure IntToReal_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure RealToInt_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
   public
     constructor Create;
     constructor Create(var ACodeLine:CodeLine);
@@ -815,6 +814,8 @@ type
     function Component_CopyStr(const VarNameStr,VarNameIntPos1,VarNameIntPos2,VarNameResultStr:String):Integer;
     function Component_StrToInt(const VarNameStr,VarNameResultInt:String):Integer;
     function Component_IntToStr(const VarNameInt,VarNameResultStr:String):Integer;
+    function Component_IntToReal(const VarNameInt,VarNameResultReal:String):Integer;
+    function Component_RealToInt(const VarNameReal,VarNameResultInt:String):Integer;
   end;
 
   PtrCodeComponentBasic = ^CodeComponentBasic;
@@ -941,6 +942,7 @@ type
 
   ArrMath = class(TObject)
   public
+    class procedure NumberToNumber(num:Number;var ValueResult:Number);
     class procedure StrToNumber(AStr:String;var ValueResult:Number);
     class procedure NumberToStr(Anum:Number;var ValueResult:String);
     class procedure IntToNumber(Int1:Integer;var ValueResult:Number);
@@ -1186,7 +1188,7 @@ end;
 function AssignNum(const num: Number): Number;
 begin
   Result:=nil;
-  ArrMath.AssignIntNum(num,Result);
+  ArrMath.NumberToNumber(num,Result);
 end;
 
 { Arr-Math }
@@ -1244,11 +1246,11 @@ begin
   TArr1:=nil;
   TArr2:=nil;
   if(ConditionInt(fromNum,'<=',ToNum)=True)then begin
-    ArrMath.AssignIntNum(fromNum,TArr1);
-    ArrMath.AssignIntNum(ToNum,TArr2);
+    ArrMath.NumberToNumber(fromNum,TArr1);
+    ArrMath.NumberToNumber(ToNum,TArr2);
   end else begin
-    ArrMath.AssignIntNum(ToNum,TArr1);
-    ArrMath.AssignIntNum(fromNum,TArr2);
+    ArrMath.NumberToNumber(ToNum,TArr1);
+    ArrMath.NumberToNumber(fromNum,TArr2);
   end;
   if(ConditionInt(varNum,'<',TArr1)=True)or(ConditionInt(varNum,'>',TArr2)=True)then Exit;
   if(ConditionInt(PaceNum,'<',InitInt('0'))=True)then PaceNum:=MulDivInt(PaceNum,InitInt('-1'));
@@ -1341,14 +1343,14 @@ end;
 function unNumInt(const num: IntArr): IntArr;
 begin
   Result:=nil;
-  ArrMath.AssignIntNum(num,Result);
+  ArrMath.NumberToNumber(num,Result);
   if(ConditionInt(Result,'<',InitInt('0'))=True)then
     Result:=MulDivInt(Result,InitInt('-1'));
 end;
 
 procedure unNumInt(const num: IntArr; var AAnswer: IntArr);
 begin
-  ArrMath.AssignIntNum(num,AAnswer);
+  ArrMath.NumberToNumber(num,AAnswer);
   if(ConditionInt(AAnswer,'<',InitInt('0'))=True)then
     AAnswer:=MulDivInt(AAnswer,InitInt('-1'));
 end;
@@ -1464,42 +1466,42 @@ begin
   TArr5:=nil;
   TArr6:=nil;
   if(ConditionReal(fromNum,'<=',ToNum)=True)then begin
-    ArrMath.AssignIntNum(fromNum,TArr1);
-    ArrMath.AssignIntNum(ToNum,TArr2);
+    ArrMath.NumberToNumber(fromNum,TArr1);
+    ArrMath.NumberToNumber(ToNum,TArr2);
 
     if(ConditionReal(fromNum,'<',InitReal('0'))=True)then
       TArr4:=MulDivReal(fromNum,InitReal('-1'))
     else
-      ArrMath.AssignIntNum(fromNum,TArr4);
+      ArrMath.NumberToNumber(fromNum,TArr4);
 
     if(ConditionReal(ToNum,'<',InitReal('0'))=True)then
       TArr5:=MulDivReal(ToNum,InitReal('-1'))
     else
-      ArrMath.AssignIntNum(ToNum,TArr5);
+      ArrMath.NumberToNumber(ToNum,TArr5);
   end else begin
-    ArrMath.AssignIntNum(ToNum,TArr1);
-    ArrMath.AssignIntNum(fromNum,TArr2);
+    ArrMath.NumberToNumber(ToNum,TArr1);
+    ArrMath.NumberToNumber(fromNum,TArr2);
 
     if(ConditionReal(ToNum,'<',InitReal('0'))=True)then
       TArr4:=MulDivReal(ToNum,InitReal('-1'))
     else
-      ArrMath.AssignIntNum(ToNum,TArr4);
+      ArrMath.NumberToNumber(ToNum,TArr4);
 
     if(ConditionReal(fromNum,'<',InitReal('0'))=True)then
       TArr5:=MulDivReal(fromNum,InitReal('-1'))
     else
-      ArrMath.AssignIntNum(fromNum,TArr5);
+      ArrMath.NumberToNumber(fromNum,TArr5);
   end;
 
   if(ConditionReal(PaceNum,'<',InitReal('0'))=True)then
     TArr3:=MulDivReal(PaceNum,InitReal('-1'))
   else
-    ArrMath.AssignIntNum(PaceNum,TArr3);
+    ArrMath.NumberToNumber(PaceNum,TArr3);
 
   TArr6:=MulDivReal(TArr4,InitReal('-1'));
   TArr6:=SumSubReal(TArr5,TArr6);
   TArr6:=MulDivReal(MulDivReal(TArr3,TArr6),SumSubReal(TArr6,TArr3),False);
-  if(Length(TArr6)<>0)then ArrMath.AssignIntNum(TArr6,TArr3);
+  if(Length(TArr6)<>0)then ArrMath.NumberToNumber(TArr6,TArr3);
 
   if(ConditionReal(varNum,'<',TArr1)=True)or(ConditionReal(varNum,'>',TArr2)=True)then Exit;
   if(ConditionReal(PaceNum,'<',InitReal('0'))=True)then PaceNum:=MulDivReal(TArr3,InitReal('-1'));
@@ -1578,7 +1580,7 @@ function CutRealDeciCountBaseOne(const num: RealArr; const CutAt: Integer
   ): RealArr;
 begin
   Result:=nil;
-  ArrMath.AssignIntNum(num,Result);
+  ArrMath.NumberToNumber(num,Result);
   RealMath.RealCutDeciCountBaseOne(Result,CutAt);
 end;
 
@@ -1586,7 +1588,7 @@ function CutRealDeciCountBaseOneR(const num: RealArr; const CutAt: Integer
   ): RealArr;
 begin
   Result:=nil;
-  ArrMath.AssignIntNum(num,Result);
+  ArrMath.NumberToNumber(num,Result);
   RealMath.RealCutDeciCountBaseOneR(Result,CutAt);
 end;
 
@@ -1779,7 +1781,7 @@ end;
 function unNumReal(const num: RealArr): RealArr;
 begin
   Result:=nil;
-  ArrMath.AssignIntNum(num,Result);
+  ArrMath.NumberToNumber(num,Result);
   if(ConditionReal(Result,'<',InitReal('0'))=True)then
     Result:=MulDivReal(Result,InitReal('-1'));
 end;
@@ -1787,7 +1789,7 @@ end;
 procedure unNumReal(const num: RealArr; var AAnswer: RealArr);
 begin
   SetLength(AAnswer,0);
-  ArrMath.AssignIntNum(num,AAnswer);
+  ArrMath.NumberToNumber(num,AAnswer);
   if(ConditionReal(AAnswer,'<',InitReal('0'))=True)then
     AAnswer:=MulDivReal(AAnswer,InitReal('-1'));
 end;
@@ -3538,6 +3540,9 @@ procedure CodeVariableArray.ChangeTo(var ACodeVariableArray: CodeVariableArray);
 var
   i:Integer;
 begin
+  self.Vars:=nil;
+  self.Vars_AtLast:=nil;
+
   for i:=0 to (Length(self.TCodeVar)-1)do self.TCodeVar[i].Free;
   SetLength(self.TCodeVar,0);
   SetLength(self.TCodeVar,Length(ACodeVariableArray.TCodeVar));
@@ -3772,7 +3777,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numIntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ByteResult');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -3814,7 +3818,6 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexSet('ArrayVarName','Length2','ValueVarName');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('ArrayVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('ValueVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -3844,7 +3847,6 @@ begin
   self.TPtrCComponent^.Component_SetLength('ArrayVarName','Length1');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('ArrayVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('ArrayLengthVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -3872,17 +3874,18 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
+  self.TPtrCComponent^.Component_AllocateMem('IntRealnum1',0.0);
 
   self.TPtrCComponent^.Component_Round('RealVarName','ResultIntVarName');
 
-  self.TPtrCComponent^.Component_V1GTV2('ResultIntVarName','RealVarName','bool1');
+  self.TPtrCComponent^.Component_IntToReal('ResultIntVarName','IntRealnum1');
+  self.TPtrCComponent^.Component_V1GTV2_Real('IntRealnum1','RealVarName','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_SubInteger('ResultIntVarName','NumOne','ResultIntVarName');
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('RealVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultIntVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -3924,10 +3927,9 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('ConditionA',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
 
-  self.TPtrCComponent^.Component_V1LTV2('numVarName','NumZero','ConditionA');
+  self.TPtrCComponent^.Component_V1LTV2_Int('numVarName','NumZero','ConditionA');
   self.TPtrCComponent^.Component_IfV1True_Goto('ConditionA','GotoMul1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -3967,12 +3969,11 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpMul1');
   self.TPtrCComponent^.Component_AllocateMem('ConditionA',0);
-  self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZero',0.0);
 
-  self.TPtrCComponent^.Component_V1LTV2('numVarName','NumZero','ConditionA');
+  self.TPtrCComponent^.Component_V1LTV2_Real('numVarName','NumZero','ConditionA');
   self.TPtrCComponent^.Component_IfV1True_Goto('ConditionA','GotoMul1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4010,8 +4011,6 @@ begin
   self.TPtrCComponent^.Component_SubInteger('NumOne','NumOne','NumOne');
   self.TPtrCComponent^.Component_ArrayIndexGet('ResultVarName','NumOne','ResultVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('ByteVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('PosBaseZeroVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4050,8 +4049,6 @@ begin
   self.TPtrCComponent^.Component_SubInteger('NumOne','NumOne','NumOne');
   self.TPtrCComponent^.Component_ArrayIndexGet('ResultVarName','NumOne','ResultVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('ByteVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('PosBaseZeroVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4089,8 +4086,6 @@ begin
   self.TPtrCComponent^.Component_SubInteger('NumOne','NumOne','NumOne');
   self.TPtrCComponent^.Component_ArrayIndexGet('ResultVarName','NumOne','ResultVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('ByteVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('PosBaseZeroVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4128,8 +4123,6 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_V1NotEqV2('ResultBoolVarName','NumZero','ResultBoolVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('ByteVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('PosBaseZeroVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4178,7 +4171,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','LengthResult','num2');
   self.TPtrCComponent^.Component_IfV1True('num2','iForEnd');
 
   self.TPtrCComponent^.Component_ArrayIndexGet('numVarName','i','ByteA');
@@ -4191,7 +4184,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultStrBitsVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4234,7 +4226,6 @@ begin
 
   self.TPtrCComponent^.Component_MulDivInteger('num1','LengthResult','ResultLengthVarName','isMulV');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultLengthVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4281,7 +4272,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','LengthResult','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   self.TPtrCComponent^.Component_ArrayIndexGet('numVarName','i','ByteA');
@@ -4292,7 +4283,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4353,7 +4343,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','LengthResult','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   //============================================================================
@@ -4361,7 +4351,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('j',0);
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('j','num3','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('j','num3','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','jForEnd');
 
   //============================================================================
@@ -4412,7 +4402,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4464,7 +4453,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','LengthResult','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   //============================================================================
@@ -4486,7 +4475,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('boolResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4557,7 +4545,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','LengthResult','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','LengthResult','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   //============================================================================
@@ -4600,7 +4588,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','num1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','jForEnd');
 
   //============================================================================
@@ -4659,8 +4647,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('isLeftBoolVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -4783,7 +4769,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   //============================================================================
@@ -4809,7 +4795,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('j','num2','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('j','num2','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','jForEnd');
 
   //============================================================================
@@ -4824,7 +4810,7 @@ begin
   self.TPtrCComponent^.Component_MoveGV2ToV1('j');
   self.TPtrCComponent^.Component_MoveGV3toV1('boolAnd2');
 
-  self.TPtrCComponent^.Component_V1LTV2('j','num2','boolAnd1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('j','num2','boolAnd1');
   self.TPtrCComponent^.Component_V1EqV2('boolAnd2','True','boolAnd2');
   self.TPtrCComponent^.Component_V1AndV2('boolAnd1','boolAnd2','boolAnd3');
 
@@ -4943,7 +4929,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','kForEnd');
 
   //============================================================================
@@ -4952,7 +4938,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('lForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('j','num2','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('j','num2','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','lForEnd');
 
   //============================================================================
@@ -4967,7 +4953,7 @@ begin
   self.TPtrCComponent^.Component_MoveGV2ToV1('j');
   self.TPtrCComponent^.Component_MoveGV3ToV1('boolAnd2');
 
-  self.TPtrCComponent^.Component_V1GTV2('j','NumZero','boolAnd1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('j','NumZero','boolAnd1');
   self.TPtrCComponent^.Component_V1EqV2('boolAnd2','True','boolAnd2');
   self.TPtrCComponent^.Component_V1AndV2('boolAnd1','boolAnd2','boolAnd3');
 
@@ -5009,7 +4995,7 @@ begin
 
   self.TPtrCComponent^.Component_V1EqV2('boolAnd2','True','boolAnd2');
 
-  self.TPtrCComponent^.Component_V1LTEqV2('boolAnd1','numLength','boolAnd1');
+  self.TPtrCComponent^.Component_V1LTEqV2_Int('boolAnd1','numLength','boolAnd1');
   self.TPtrCComponent^.Component_V1AndV2('boolAnd1','boolAnd2','boolAnd3');
 
   self.TPtrCComponent^.Component_IfV1False('boolAnd3','JumpFalse7');
@@ -5077,7 +5063,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('oForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','oForEnd');
 
   //============================================================================
@@ -5094,8 +5080,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse9');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('isLeftBoolVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('isSetBoolVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -5180,6 +5164,7 @@ begin
 
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZeroReal',0.0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
   self.TPtrCComponent^.Component_AllocateMem('NumOne',1);
   self.TPtrCComponent^.Component_AllocateMem('NegOne',-1);
@@ -5200,6 +5185,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('numLength',0);
   self.TPtrCComponent^.Component_AllocateMem('TArrLength',0);
   self.TPtrCComponent^.Component_AllocateMem('nCountrInt',0);
+  self.TPtrCComponent^.Component_AllocateMem('nCountrReal',0.0);
   self.TPtrCComponent^.Component_AllocateMem('Andbool1',0);
   self.TPtrCComponent^.Component_AllocateMem('Andbool2',0);
   self.TPtrCComponent^.Component_AllocateMem('ByteA',0);
@@ -5210,7 +5196,7 @@ begin
   self.TPtrCComponent^.Component_MulInteger('numLength','Num8','numLength');
   self.TPtrCComponent^.Component_SubInteger('numLength','NumOne','numLength');
 
-  self.TPtrCComponent^.Component_V1LTV2('PaceBaseOne','NumZero','bool2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('PaceBaseOne','NumZero','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpFalse1');
 
   self.TPtrCComponent^.Component_MulInteger('PaceBaseOne','NegOne','PaceBaseOne');
@@ -5222,14 +5208,14 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','iForEnd');
 
   //============================================================================
 
   self.TPtrCComponent^.Component_SubInteger('i','PaceBaseOne','nCount');
 
-  self.TPtrCComponent^.Component_V1GTV2('nCount','NegOne','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('nCount','NegOne','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpFalse2');
 
   self.TPtrCComponent^.Component_DivReal('i','Num7','nCountr');
@@ -5252,8 +5238,9 @@ begin
   self.TPtrCComponent^.Component_MoveGV1ToV1('nCountr');
   self.TPtrCComponent^.Component_MoveGV2ToV1('nCountrInt');
 
-  self.TPtrCComponent^.Component_V1EqV2('nCountrInt','nCountr','Andbool1');
-  self.TPtrCComponent^.Component_V1NotEqV2('NumZero','nCountr','Andbool2');
+  self.TPtrCComponent^.Component_IntToReal('nCountrInt','nCountrReal');
+  self.TPtrCComponent^.Component_V1EqV2('nCountrReal','nCountr','Andbool1');
+  self.TPtrCComponent^.Component_V1NotEqV2('NumZeroReal','nCountr','Andbool2');
   self.TPtrCComponent^.Component_V1AndV2('Andbool1','Andbool2','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpFalse4');
 
@@ -5324,7 +5311,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','jForEnd');
 
   //============================================================================
@@ -5356,8 +5343,9 @@ begin
   self.TPtrCComponent^.Component_MoveGV1ToV1('nCountr');
   self.TPtrCComponent^.Component_MoveGV2ToV1('nCountrInt');
 
-  self.TPtrCComponent^.Component_V1EqV2('nCountrInt','nCountr','Andbool1');
-  self.TPtrCComponent^.Component_V1NotEqV2('NumZero','nCountr','Andbool2');
+  self.TPtrCComponent^.Component_IntToReal('nCountrInt','nCountrReal');
+  self.TPtrCComponent^.Component_V1EqV2('nCountrReal','nCountr','Andbool1');
+  self.TPtrCComponent^.Component_V1NotEqV2('NumZeroReal','nCountr','Andbool2');
   self.TPtrCComponent^.Component_V1AndV2('Andbool1','Andbool2','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpFalse7');
 
@@ -5430,7 +5418,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','bool2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','kForEnd');
 
   //============================================================================
@@ -5465,7 +5453,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('lForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','TArrLength','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','TArrLength','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','lForEnd');
 
   //============================================================================
@@ -5480,8 +5468,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('lForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('isLeftBoolVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('PaceBaseOneIntVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -5717,14 +5703,14 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','num1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   //============================================================================
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('j','NumZero','num1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('j','NumZero','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','jForEnd');
 
   //============================================================================
@@ -5853,8 +5839,6 @@ begin
   self.TPtrCComponent^.Component_MoveGV2ToV1('num2VarName');
   self.TPtrCComponent^.Component_MoveGV3ToV1('ResultByteVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1VarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2VarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultByteVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -5911,7 +5895,7 @@ begin
   self.TPtrCComponent^.Component_StrLength('DigitStrVarName','StrLength');
 
   self.TPtrCComponent^.Component_V1EqV2('StrLength','False','num1');
-  self.TPtrCComponent^.Component_V1GTV2('StrLength','True','num2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('StrLength','True','num2');
 
   self.TPtrCComponent^.Component_IfV1False('num1','JumpFalse1');
 
@@ -6014,7 +5998,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse12');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('DigitStrVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -6175,7 +6158,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse10');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('DigitByteVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultStrVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -6472,8 +6454,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse11');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('isNegBoolVarName');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('DigitByteVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -6510,7 +6490,7 @@ begin
   self.TPtrCComponent^.Component_Length('num1VarName','num1');
   self.TPtrCComponent^.Component_Length('num2VarName','num2');
 
-  self.TPtrCComponent^.Component_V1GTV2('num1','num2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('num1','num2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_SetLength('num2VarName','num1');
@@ -6518,7 +6498,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
-  self.TPtrCComponent^.Component_V1GTV2('num2','num1','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('num2','num1','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_SetLength('num1VarName','num2');
@@ -6561,7 +6541,6 @@ begin
   self.TPtrCComponent^.Component_MoveGV1ToV1('numVarName');
   self.TPtrCComponent^.Component_MoveGV2ToV1('numResultVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -6640,7 +6619,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','num1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','iForEnd');
 
   //============================================================================
@@ -6697,7 +6676,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','Length1','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','Length1','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','jForEnd');
 
   //============================================================================
@@ -6721,7 +6700,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','Length1','num1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','Length1','num1');
   self.TPtrCComponent^.Component_IfV1True('num1','kForEnd');
 
   //============================================================================
@@ -6736,7 +6715,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -6771,7 +6749,6 @@ begin
   self.TPtrCComponent^.Component_Length('numVarName','NumLength');
   self.TPtrCComponent^.Component_V1EqV2('NumLength','Num8','ResultBoolVarName');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarName');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -6865,7 +6842,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','Num3','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','Num3','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -6882,7 +6859,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','Num7','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','Num7','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','jForEnd');
 
   //============================================================================
@@ -6898,7 +6875,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numBitPos');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultIntByteAtBaseZero');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultIntBitAtBaseZero');
 
@@ -6995,7 +6971,6 @@ begin
   self.TPtrCComponent^.Component_MoveGV2ToV1('NumByte');
   self.TPtrCComponent^.Component_MoveGV3ToV1('NumBit');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('CopyNumBitPos');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ToNumResultBitPos');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -7049,7 +7024,7 @@ begin
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_V1LTV2('IntByteAtBaseZero','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('IntByteAtBaseZero','NumZero','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('NumByte','NumZero');
@@ -7063,7 +7038,7 @@ begin
 
   //============================================================================
 
-  self.TPtrCComponent^.Component_V1LTV2('IntBitAtBaseZero','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('IntBitAtBaseZero','NumZero','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('NumBit','Num7B');
@@ -7071,7 +7046,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
-  self.TPtrCComponent^.Component_V1GTV2('IntBitAtBaseZero','Num7B','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('IntBitAtBaseZero','Num7B','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse3');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('NumBit','NumZero');
@@ -7095,7 +7070,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','Num3','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','Num3','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -7112,7 +7087,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','Num7','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','Num7','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','jForEnd');
 
   //============================================================================
@@ -7129,8 +7104,6 @@ begin
   self.TPtrCComponent^.Component_Port('jForEnd');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numResultBitPos');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('IntByteAtBaseZero');
-  self.TPtrCComponent^.Component_MoveV2ToGV3('IntBitAtBaseZero');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -7179,7 +7152,7 @@ begin
   self.TPtrCComponent^.Component_MoveGV3ToV1('NumBit');
 
   self.TPtrCComponent^.Component_SumInteger('NumBit','NumOne','NumBit');
-  self.TPtrCComponent^.Component_V1GTV2('NumBit','Num7','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('NumBit','Num7','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('NumBit','NumZero');
@@ -7245,7 +7218,7 @@ begin
   self.TPtrCComponent^.Component_MoveGV3ToV1('NumBit');
 
   self.TPtrCComponent^.Component_SubInteger('NumBit','NumOne','NumBit');
-  self.TPtrCComponent^.Component_V1LTV2('NumBit','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('NumBit','NumZero','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('NumBit','Num7');
@@ -7341,7 +7314,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','iForEnd');
 
   //============================================================================
@@ -7426,7 +7399,6 @@ begin
   self.TPtrCComponent^.Component_Port('jForEnd');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numResultBitPos');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('numIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -7521,8 +7493,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1BitPos');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2BitPos');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -7601,8 +7571,8 @@ begin
 
   self.TPtrCComponent^.Component_SubInteger('numLength','NumOne','numLength');
 
-  self.TPtrCComponent^.Component_V1LTV2('numByte','NumZero','boolOr1');
-  self.TPtrCComponent^.Component_V1GTV2('numByte','numLength','boolOr2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('numByte','NumZero','boolOr1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numByte','numLength','boolOr2');
   self.TPtrCComponent^.Component_V1OrV2('boolOr1','boolOr2','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','JumpExit1');
 
@@ -7619,8 +7589,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numBitPos');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('numIntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -7688,8 +7656,8 @@ begin
 
   self.TPtrCComponent^.Component_SubInteger('numLength','NumOne','numLength');
 
-  self.TPtrCComponent^.Component_V1LTV2('numByte','NumZero','boolOr1');
-  self.TPtrCComponent^.Component_V1GTV2('numByte','numLength','boolOr2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('numByte','NumZero','boolOr1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numByte','numLength','boolOr2');
   self.TPtrCComponent^.Component_V1OrV2('boolOr1','boolOr2','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','JumpExit1');
 
@@ -7708,7 +7676,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numBitPos');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -7769,7 +7736,7 @@ begin
   self.TPtrCComponent^.Component_MoveGV2ToV1('numByte');
   self.TPtrCComponent^.Component_MoveGV3ToV1('numBit');
 
-  self.TPtrCComponent^.Component_V1GTV2('numByte','numLength','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numByte','numLength','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_SumInteger('numByte','NumOne','num1');
@@ -7790,7 +7757,6 @@ begin
 
   self.TPtrCComponent^.Component_ArrayIndexSet('numResultIntArr','numByte','ByteA');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numBitPos');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -7906,7 +7872,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool4');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool4');
   self.TPtrCComponent^.Component_IfV1True('bool4','iForEnd');
 
   //============================================================================
@@ -8081,8 +8047,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse9');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8275,7 +8239,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool4');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool4');
   self.TPtrCComponent^.Component_IfV1True('bool4','iForEnd');
 
   //============================================================================
@@ -8425,8 +8389,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV4('num1BiggerByteResult');
 
@@ -8729,7 +8691,7 @@ begin
   //============================================================================
 
   self.TPtrCComponent^.Component_Length('numResultIntArr','numLength');
-  self.TPtrCComponent^.Component_V1GTV2('numLength','NumOne','bool4');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength','NumOne','bool4');
   self.TPtrCComponent^.Component_IfV1False('bool4','JumpExit1');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numResultIntArr');
@@ -8746,8 +8708,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -8995,7 +8955,7 @@ begin
   self.TPtrCComponent^.Component_V1AndV2('boolAnd1','boolAnd2','boolAnd3');
   self.TPtrCComponent^.Component_IfV1False('boolAnd3','JumpFalse2');
 
-  self.TPtrCComponent^.Component_V1GTV2('CData0','NumZero','bool4');
+  self.TPtrCComponent^.Component_V1GTV2_Int('CData0','NumZero','bool4');
   self.TPtrCComponent^.Component_IfV1False('bool4','JumpFalse4');
 
   self.TPtrCComponent^.Component_SubInteger('CData0','NumOne','CData0');
@@ -9029,7 +8989,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
-  self.TPtrCComponent^.Component_V1GTV2('CData0','NumZero','bool4');
+  self.TPtrCComponent^.Component_V1GTV2_Int('CData0','NumZero','bool4');
   self.TPtrCComponent^.Component_IfV1False('bool4','JumpFalse3');
 
   self.TPtrCComponent^.Component_SubInteger('CData0','NumOne','CData0');
@@ -9119,7 +9079,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','CData0','bool4');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','CData0','bool4');
   self.TPtrCComponent^.Component_IfV1True('bool4','iForEnd');
 
   //============================================================================
@@ -9243,8 +9203,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse17');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -9351,7 +9309,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -9485,8 +9443,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -9730,7 +9686,7 @@ begin
   self.TPtrCComponent^.Component_Port('JumpFalse6');
 
   self.TPtrCComponent^.Component_Length('num1Arr','numLength');
-  self.TPtrCComponent^.Component_V1GTV2('numLength','NumOne','numLength');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength','NumOne','numLength');
   self.TPtrCComponent^.Component_IfV1False('numLength','JumpExit1');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numResultIntArr');
@@ -9747,10 +9703,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('num1IntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('num2IntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV3('numResultIntArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV4('doMulBool');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -9894,7 +9847,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','iForEnd');
 
   //============================================================================
@@ -9934,7 +9887,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
-  self.TPtrCComponent^.Component_V1GTV2('numLength','NumOne','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength','NumOne','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpExit1');
 
   //============================================================================
@@ -9995,7 +9948,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','jForEnd');
 
   //============================================================================
@@ -10041,7 +9994,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumOne','bool2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumOne','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','kForEnd');
 
   //============================================================================
@@ -10167,7 +10120,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('AStr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('numResultIntArr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -10389,7 +10341,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numIntArr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('AStrResult');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -10451,7 +10402,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarNameArr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultBoolVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -10477,6 +10427,7 @@ begin
   self.TPtrCComponent^.Component_AllocateMem('True',1);
   self.TPtrCComponent^.Component_AllocateMem('False',0);
   self.TPtrCComponent^.Component_AllocateMem('NumZero',0);
+  self.TPtrCComponent^.Component_AllocateMem('NumZeroReal',0.0);
   self.TPtrCComponent^.Component_AllocateMem('NegNumOne',-1);
   self.TPtrCComponent^.Component_AllocateMem('NumFour',SizeOf(Integer));
   self.TPtrCComponent^.Component_AllocateMem('bool1',0);
@@ -10486,8 +10437,11 @@ begin
   self.TPtrCComponent^.Component_ArrayIndexGet('False','NumZero','False');
 
   self.TPtrCComponent^.Component_AllocateMem('num1',0);
+  self.TPtrCComponent^.Component_AllocateMem('num1Real',0);
 
   self.TPtrCComponent^.Component_Length('numVarNameArr','numLength');
+  self.TPtrCComponent^.Component_IntToReal('numLength','numLength');
+  self.TPtrCComponent^.Component_IntToReal('NumFour','NumFour');
   self.TPtrCComponent^.Component_DivReal('numLength','NumFour','numLength');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numLength');
@@ -10498,7 +10452,7 @@ begin
 
   self.TPtrCComponent^.Component_MoveV2ToV1('ResultIntVarName','NegNumOne');
 
-  self.TPtrCComponent^.Component_V1EqV2('numLength','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1EqV2('numLength','NumZeroReal','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('ResultIntVarName','NumZero');
@@ -10506,21 +10460,21 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
-  self.TPtrCComponent^.Component_V1LTV2('numLength','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Real('numLength','NumZeroReal','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_JumpTo('JumpFalse3');
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
-  self.TPtrCComponent^.Component_V1EqV2('numLength','num1','bool1');
+  self.TPtrCComponent^.Component_IntToReal('num1','num1Real');
+  self.TPtrCComponent^.Component_V1EqV2('numLength','num1Real','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse3');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('ResultIntVarName','num1');
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarNameArr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('ResultIntVarName');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -10549,7 +10503,6 @@ begin
   self.TPtrCComponent^.Component_SetLength('numResultVarNameArr','num1');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numResultVarNameArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('ArrayLengthVarName');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -10597,7 +10550,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','num2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','num2','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -10614,8 +10567,6 @@ begin
   self.TPtrCComponent^.Component_Port('iForEnd');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('numVarNameArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('IndexVarNameInt');
-  self.TPtrCComponent^.Component_MoveV2ToGV3('SetIntValue');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -10662,7 +10613,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','num2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','num2','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -10678,8 +10629,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('numVarNameArr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('IndexVarNameInt');
   self.TPtrCComponent^.Component_MoveV2ToGV3('GetIntValue');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -10770,7 +10719,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
-  self.TPtrCComponent^.Component_V1GTV2('numLength1','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength1','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_CombineV2ToV1('AWhole2','ADeci2','VarNameResultNum2Str');
@@ -10787,7 +10736,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse2');
 
-  self.TPtrCComponent^.Component_V1LTV2('numLength1','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('numLength1','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse3');
 
   self.TPtrCComponent^.Component_CombineV2ToV1('AWhole2','ADeci2','VarNameResultNum2Str');
@@ -10797,7 +10746,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -10892,7 +10841,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength1','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength1','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','iForEnd');
 
   //============================================================================
@@ -10928,7 +10877,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNumVStr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('OutStrAWhole');
   self.TPtrCComponent^.Component_MoveV2ToGV3('OutStrADeci');
 
@@ -11001,7 +10949,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNumVStr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameResultByte');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -11055,7 +11002,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNumVStr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameResultBool');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -11218,7 +11164,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumOne','bool2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumOne','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','iForEnd');
 
   //============================================================================
@@ -11254,7 +11200,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength1','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength1','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','jForEnd');
 
   //============================================================================
@@ -11294,7 +11240,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength1','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength1','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','kForEnd');
 
   //============================================================================
@@ -11302,8 +11248,8 @@ begin
   self.TPtrCComponent^.Component_StrIndexGet('AWhole','i','StrA');
   self.TPtrCComponent^.Component_SubInteger('StrA','NumFourtyEight','Calcu1');
 
-  self.TPtrCComponent^.Component_V1LTV2('Calcu1','NumZero','boolOr1');
-  self.TPtrCComponent^.Component_V1GTV2('Calcu1','NumNine','boolOr2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('Calcu1','NumZero','boolOr1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('Calcu1','NumNine','boolOr2');
   self.TPtrCComponent^.Component_V1OrV2('boolOr1','boolOr2','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpFalse8');
 
@@ -11324,7 +11270,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('lForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength1','bool2');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength1','bool2');
   self.TPtrCComponent^.Component_IfV1True('bool2','lForEnd');
 
   //============================================================================
@@ -11332,8 +11278,8 @@ begin
   self.TPtrCComponent^.Component_StrIndexGet('ADeci','i','StrA');
   self.TPtrCComponent^.Component_SubInteger('StrA','NumFourtyEight','Calcu1');
 
-  self.TPtrCComponent^.Component_V1LTV2('Calcu1','NumZero','boolOr1');
-  self.TPtrCComponent^.Component_V1GTV2('Calcu1','NumNine','boolOr2');
+  self.TPtrCComponent^.Component_V1LTV2_Int('Calcu1','NumZero','boolOr1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('Calcu1','NumNine','boolOr2');
   self.TPtrCComponent^.Component_V1OrV2('boolOr1','boolOr2','bool2');
   self.TPtrCComponent^.Component_IfV1False('bool2','JumpFalse9');
 
@@ -11368,7 +11314,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNumVStr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -11449,14 +11394,14 @@ begin
   self.TPtrCComponent^.Component_V1EqV2('isRight','True','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
-  self.TPtrCComponent^.Component_V1GTV2('numLength1','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength1','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_SubInteger('numLength1','numLength2','numLength3');
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength3','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength3','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -11478,7 +11423,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength3','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength3','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','jForEnd');
 
   //============================================================================
@@ -11499,14 +11444,14 @@ begin
   self.TPtrCComponent^.Component_V1EqV2('isRight','False','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpExit1');
 
-  self.TPtrCComponent^.Component_V1GTV2('numLength1','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength1','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse3');
 
   self.TPtrCComponent^.Component_SubInteger('numLength1','numLength2','numLength3');
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength3','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength3','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','kForEnd');
 
   //============================================================================
@@ -11528,7 +11473,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('lForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength3','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength3','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','lForEnd');
 
   //============================================================================
@@ -11546,8 +11491,6 @@ begin
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameResultNum1Str');
   self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameResultNum2Str');
-  self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameStrPlace');
-  self.TPtrCComponent^.Component_MoveV2ToGV4('VarNameBoolisRight');
 
   self.TPtrCComponent^.Component_EndMem;
   self.TPtrCComponent^.Component_Exit;
@@ -11660,7 +11603,7 @@ begin
   self.TPtrCComponent^.Component_StrLength('n1','numLength1');
   self.TPtrCComponent^.Component_StrLength('n2','numLength2');
 
-  self.TPtrCComponent^.Component_V1GTV2('numLength1','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('numLength1','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('VarNameResultByte','True');
@@ -11668,7 +11611,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
-  self.TPtrCComponent^.Component_V1LTV2('numLength1','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('numLength1','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('VarNameResultByte','False');
@@ -11681,7 +11624,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength1','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength1','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -11691,7 +11634,7 @@ begin
   self.TPtrCComponent^.Component_StrToInt('StrA1','Int1');
   self.TPtrCComponent^.Component_StrToInt('StrA2','Int2');
 
-  self.TPtrCComponent^.Component_V1GTV2('Int1','Int2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('Int1','Int2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse3');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('VarNameResultByte','True');
@@ -11699,7 +11642,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse3');
 
-  self.TPtrCComponent^.Component_V1LTV2('Int1','Int2','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('Int1','Int2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse4');
 
   self.TPtrCComponent^.Component_MoveV2ToV1('VarNameResultByte','False');
@@ -11718,8 +11661,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNum1Str');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameNum2Str');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultByte');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -11826,7 +11767,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength1','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength1','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -11854,7 +11795,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('jForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength2','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','jForEnd');
 
   //============================================================================
@@ -11890,7 +11831,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','kForEnd');
 
   //============================================================================
@@ -11911,7 +11852,7 @@ begin
   self.TPtrCComponent^.Component_MoveGV2ToV1('i');
   self.TPtrCComponent^.Component_MoveGV3ToV1('Int2');
 
-  self.TPtrCComponent^.Component_V1GTV2('Int1','Int2','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('Int1','Int2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse1');
 
   self.TPtrCComponent^.Component_SubInteger('Int1','Cr','Cr');
@@ -11930,7 +11871,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse1');
 
-  self.TPtrCComponent^.Component_V1LTV2('Int1','Int2','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('Int1','Int2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse2');
 
   self.TPtrCComponent^.Component_SumInteger('NumTen','Int1','numInt3');
@@ -11955,7 +11896,7 @@ begin
 
   self.TPtrCComponent^.Component_SubInteger('Int1','Cr','Int1');
 
-  self.TPtrCComponent^.Component_V1LTV2('Int1','Int2','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('Int1','Int2','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse4');
 
   self.TPtrCComponent^.Component_SumInteger('Int1','NumTen','Int1');
@@ -11985,8 +11926,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('kForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNum1Str');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameNum2Str');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultArrInt1');
   self.TPtrCComponent^.Component_MoveV2ToGV4('VarNameResultArrInt2');
 
@@ -12033,7 +11972,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1GTV2('i','numLength','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('i','numLength','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -12048,7 +11987,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForEnd');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNum1Str');
   self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -12179,8 +12117,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameXStr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameBoolWithDeci');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -12311,8 +12247,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameXStr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameBoolWithDeci');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -12438,7 +12372,7 @@ begin
   self.TPtrCComponent^.Component_StrIndexGet('ADeci','NumOne','StrA');
   self.TPtrCComponent^.Component_StrToInt('StrA','StrA');
 
-  self.TPtrCComponent^.Component_V1LTEqV2('StrA','NumFive','bool1');
+  self.TPtrCComponent^.Component_V1LTEqV2_Int('StrA','NumFive','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse4');
 
   self.TPtrCComponent^.Component_Port('GotoFalse1');
@@ -12460,7 +12394,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpFalse4');
 
-  self.TPtrCComponent^.Component_V1GTV2('StrA','NumFive','bool1');
+  self.TPtrCComponent^.Component_V1GTV2_Int('StrA','NumFive','bool1');
   self.TPtrCComponent^.Component_IfV1False('bool1','JumpFalse7');
 
   self.TPtrCComponent^.Component_MoveV2ToGV1('AWhole');
@@ -12490,8 +12424,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameXStr');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameBoolWithDeci');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -12539,7 +12471,6 @@ begin
 
   self.TPtrCComponent^.Component_StrLength('Str2','VarNameResultInt');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNumStr');
   self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameResultInt');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -12670,7 +12601,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumOne','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumOne','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -12724,8 +12655,6 @@ begin
   self.TPtrCComponent^.Component_MoveGV1ToV1('VarNameResultStr');
   self.TPtrCComponent^.Component_MoveGV2ToV1('VarNameResultStr');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNum1Str');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameNum2Str');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -12916,7 +12845,7 @@ begin
 
   self.TPtrCComponent^.Component_Port('iForBegin');
 
-  self.TPtrCComponent^.Component_V1LTV2('i','NumZero','bool1');
+  self.TPtrCComponent^.Component_V1LTV2_Int('i','NumZero','bool1');
   self.TPtrCComponent^.Component_IfV1True('bool1','iForEnd');
 
   //============================================================================
@@ -12968,8 +12897,6 @@ begin
   self.TPtrCComponent^.Component_MoveGV1ToV1('VarNameResultStr');
   self.TPtrCComponent^.Component_MoveGV2ToV1('VarNameResultStr');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNum1Str');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameNum2Str');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -13252,8 +13179,6 @@ begin
 
   self.TPtrCComponent^.Component_Port('JumpExit1');
 
-  self.TPtrCComponent^.Component_MoveV2ToGV1('VarNameNum1Str');
-  self.TPtrCComponent^.Component_MoveV2ToGV2('VarNameNum2Str');
   self.TPtrCComponent^.Component_MoveV2ToGV3('VarNameResultStr');
 
   self.TPtrCComponent^.Component_EndMem;
@@ -15815,6 +15740,42 @@ begin
   SetLength(CodeBytes,0);
 end;
 
+function CodeComponentBasic.Component_IntToReal(const VarNameInt,
+  VarNameResultReal: String): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(98,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarNameInt);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarNameResultReal);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.IntToReal_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
+function CodeComponentBasic.Component_RealToInt(const VarNameReal,
+  VarNameResultInt: String): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(89,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarNameReal);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarNameResultInt);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.RealToInt_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
 { CodeCores }
 
 procedure CodeCores.SetProperties;
@@ -15832,7 +15793,7 @@ procedure CodeCores.AddProperty(var ACodeProperties: CodeProperties);
 begin
   SetLength(self.TCPropertyArr,Length(self.TCPropertyArr)+1);
   self.TCPropertyArr[Length(self.TCPropertyArr)-1]:=CodeProperties.Create(ACodeProperties);
-  self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCPoint.Point_AddLast(0);
+  self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCPoint.Point_AddLast;
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCPoint.Point_StartMem_AddLast;
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCLogs:=@self.TCLogs;
 
@@ -16274,14 +16235,12 @@ end;
 constructor CodeVariable.Create;
 begin
   self.TVarArr:=nil;
-  self.TVarMode:=nil;
   self.TVarName:=nil;
 end;
 
 constructor CodeVariable.Create(var ACodeVariable: CodeVariable);
 begin
   self.TVarArr:=nil;
-  self.TVarMode:=nil;
   self.TVarName:=nil;
   self.changeTo(ACodeVariable);
 end;
@@ -16293,7 +16252,6 @@ begin
   inherited Destroy;
   for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
   SetLength(self.TVarArr,0);
-  SetLength(self.TVarMode,0);
   SetLength(self.TVarName,0);
 end;
 
@@ -16305,11 +16263,7 @@ begin
   SetLength(self.TVarArr,0);
 
   SetLength(self.TVarArr,Length(ACodeVariable.TVarArr));
-  for i:=0 to (Length(self.TVarArr)-1)do ArrMath.AssignIntNum(ACodeVariable.TVarArr[i],self.TVarArr[i]);
-
-  SetLength(self.TVarMode,0);
-  SetLength(self.TVarMode,Length(ACodeVariable.TVarMode));
-  for i:=0 to (Length(self.TVarMode)-1)do self.TVarMode[i]:=ACodeVariable.TVarMode[i];
+  for i:=0 to (Length(self.TVarArr)-1)do ArrMath.NumberToNumber(ACodeVariable.TVarArr[i],self.TVarArr[i]);
 
   SetLength(self.TVarName,0);
   SetLength(self.TVarName,Length(ACodeVariable.TVarName));
@@ -16322,7 +16276,6 @@ var
 begin
   for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
   SetLength(self.TVarArr,0);
-  SetLength(self.TVarMode,0);
   SetLength(self.TVarName,0);
 end;
 
@@ -16346,13 +16299,11 @@ procedure CodeVariable.Var_DeleteVarNames(const ANumArr: TNumArr);
 var
   i,j:Integer;
   TArr1:Array of Number;
-  TArr3:Array of Byte;
   TArr2:Array of String;
   bool1:Boolean;
 begin
   if(Length(ANumArr)=0)then Exit;
   TArr1:=nil;
-  TArr3:=nil;
   TArr2:=nil;
   bool1:=False;
   for i:=(Length(self.TVarName)-1) downto 0 do begin
@@ -16360,10 +16311,7 @@ begin
     for j:=0 to (Length(ANumArr)-1)do if(i=ANumArr[j])then begin bool1:=True; break; end;
     if(bool1=False)then begin
       SetLength(TArr1,Length(TArr1)+1);
-      ArrMath.AssignIntNum(self.TVarArr[i],TArr1[Length(TArr1)-1]);
-
-      SetLength(TArr3,Length(TArr3)+1);
-      TArr3[Length(TArr3)-1]:=self.TVarMode[i];
+      ArrMath.NumberToNumber(self.TVarArr[i],TArr1[Length(TArr1)-1]);
 
       SetLength(TArr2,Length(TArr2)+1);
       TArr2[Length(TArr2)-1]:=self.TVarName[i];
@@ -16372,37 +16320,14 @@ begin
   for i:=0 to (Length(self.TVarArr)-1)do SetLength(self.TVarArr[i],0);
   SetLength(self.TVarArr,0);
   SetLength(self.TVarArr,Length(TArr1));
-  SetLength(self.TVarMode,Length(TArr3));
   SetLength(self.TVarName,Length(TArr2));
   for i:=0 to (Length(TArr1)-1)do begin
-    ArrMath.AssignIntNum(TArr1[i],self.TVarArr[i]);
-    self.TVarMode[i]:=TArr3[i];
+    ArrMath.NumberToNumber(TArr1[i],self.TVarArr[i]);
     self.TVarName[i]:=TArr2[i];
   end;
   for i:=0 to (Length(TArr1)-1)do SetLength(TArr1[i],0);
   SetLength(TArr1,0);
-  SetLength(TArr3,0);
   SetLength(TArr2,0);
-end;
-
-procedure CodeVariable.Var_SetVarDataType(const AIndex: Integer;
-  const AMode: String);
-begin
-  if(AIndex<0)or(AIndex>(Length(self.TVarName)-1))then Exit;
-  if(AMode.ToLower='number')then self.TVarMode[AIndex]:=1 else
-  if(AMode.ToLower='string')then self.TVarMode[AIndex]:=2 else
-  if(AMode.ToLower='integer')then self.TVarMode[AIndex]:=3 else
-  if(AMode.ToLower='real')then self.TVarMode[AIndex]:=4;
-end;
-
-function CodeVariable.Var_GetVarDataType(const AIndex: Integer): String;
-begin
-  Result:='';
-  if(AIndex<0)or(AIndex>(Length(self.TVarName)-1))then Exit;
-  if(self.TVarMode[AIndex]=1)then Result:='number' else
-  if(self.TVarMode[AIndex]=2)then Result:='string' else
-  if(self.TVarMode[AIndex]=3)then Result:='integer' else
-  if(self.TVarMode[AIndex]=4)then Result:='real';
 end;
 
 function CodeVariable.Var_AddVariable(const AVarName: String): Boolean;
@@ -16414,9 +16339,6 @@ begin
   if(Result=False)and(AIndex=-1)then begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
     self.TVarArr[Length(self.TVarArr)-1]:=nil;
-
-    SetLength(self.TVarMode,Length(self.TVarMode)+1);
-    self.TVarMode[Length(self.TVarMode)-1]:=0;
 
     SetLength(self.TVarName,Length(self.TVarName)+1);
     self.TVarName[Length(self.TVarName)-1]:=AVarName;
@@ -16434,10 +16356,7 @@ begin
   Result:=self.isVarNameExist(AVarName,AIndex);
   if(Result=False)and(AIndex=-1)then begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
-    ArrMath.AssignIntNum(AValue,self.TVarArr[Length(self.TVarArr)-1]);
-
-    SetLength(self.TVarMode,Length(self.TVarMode)+1);
-    self.TVarMode[Length(self.TVarMode)-1]:=1;
+    ArrMath.NumberToNumber(AValue,self.TVarArr[Length(self.TVarArr)-1]);
 
     SetLength(self.TVarName,Length(self.TVarName)+1);
     self.TVarName[Length(self.TVarName)-1]:=AVarName;
@@ -16457,9 +16376,6 @@ begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
     ArrMath.IntToNumber(AValue,self.TVarArr[Length(self.TVarArr)-1]);
 
-    SetLength(self.TVarMode,Length(self.TVarMode)+1);
-    self.TVarMode[Length(self.TVarMode)-1]:=3;
-
     SetLength(self.TVarName,Length(self.TVarName)+1);
     self.TVarName[Length(self.TVarName)-1]:=AVarName;
 
@@ -16477,9 +16393,6 @@ begin
   if(Result=False)and(AIndex=-1)then begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
     ArrMath.RealToNumber(AValue,self.TVarArr[Length(self.TVarArr)-1]);
-
-    SetLength(self.TVarMode,Length(self.TVarMode)+1);
-    self.TVarMode[Length(self.TVarMode)-1]:=4;
 
     SetLength(self.TVarName,Length(self.TVarName)+1);
     self.TVarName[Length(self.TVarName)-1]:=AVarName;
@@ -16499,9 +16412,6 @@ begin
     SetLength(self.TVarArr,Length(self.TVarArr)+1);
     ArrMath.StrToNumber(AValue,self.TVarArr[Length(self.TVarArr)-1]);
 
-    SetLength(self.TVarMode,Length(self.TVarMode)+1);
-    self.TVarMode[Length(self.TVarMode)-1]:=2;
-
     SetLength(self.TVarName,Length(self.TVarName)+1);
     self.TVarName[Length(self.TVarName)-1]:=AVarName;
 
@@ -16520,10 +16430,8 @@ var
   AIndex:Integer;
 begin
   AIndex:=-1;
-  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
-    self.TVarMode[AIndex]:=1;
-    ArrMath.AssignIntNum(AValue,self.TVarArr[AIndex]);
-  end;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
+    ArrMath.NumberToNumber(AValue,self.TVarArr[AIndex]);
 end;
 
 procedure CodeVariable.Var_SetValueInt(const AVarName: String; AValue: Integer);
@@ -16531,10 +16439,8 @@ var
   AIndex:Integer;
 begin
   AIndex:=-1;
-  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
-    self.TVarMode[AIndex]:=3;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
     ArrMath.IntToNumber(AValue,self.TVarArr[AIndex]);
-  end;
 end;
 
 procedure CodeVariable.Var_SetValueReal(const AVarName: String; AValue: Real);
@@ -16542,10 +16448,8 @@ var
   AIndex:Integer;
 begin
   AIndex:=-1;
-  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
-    self.TVarMode[AIndex]:=4;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
     ArrMath.RealToNumber(AValue,self.TVarArr[AIndex]);
-  end;
 end;
 
 procedure CodeVariable.Var_SetValueStr(const AVarName: String; AValue: String);
@@ -16553,38 +16457,32 @@ var
   AIndex:Integer;
 begin
   AIndex:=-1;
-  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then begin
-    self.TVarMode[AIndex]:=2;
+  if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
     ArrMath.StrToNumber(AValue,self.TVarArr[AIndex]);
-  end;
 end;
 
 procedure CodeVariable.Var_SetValue(const AIndex: Integer; const AValue: Number
   );
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  self.TVarMode[AIndex]:=1;
-  ArrMath.AssignIntNum(AValue,self.TVarArr[AIndex]);
+  ArrMath.NumberToNumber(AValue,self.TVarArr[AIndex]);
 end;
 
 procedure CodeVariable.Var_SetValueInt(const AIndex: Integer; AValue: Integer);
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  self.TVarMode[AIndex]:=3;
   ArrMath.IntToNumber(AValue,self.TVarArr[AIndex]);
 end;
 
 procedure CodeVariable.Var_SetValueReal(const AIndex: Integer; AValue: Real);
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  self.TVarMode[AIndex]:=4;
   ArrMath.RealToNumber(AValue,self.TVarArr[AIndex]);
 end;
 
 procedure CodeVariable.Var_SetValueStr(const AIndex: Integer; AValue: String);
 begin
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  self.TVarMode[AIndex]:=2;
   ArrMath.StrToNumber(AValue,self.TVarArr[AIndex]);
 end;
 
@@ -16613,7 +16511,7 @@ begin
   SetLength(ValueResult,0);
   AIndex:=-1;
   if(self.isVarNameExist(AVarName,AIndex)=True)and(AIndex>-1)then
-    ArrMath.AssignIntNum(self.TVarArr[AIndex],ValueResult);
+    ArrMath.NumberToNumber(self.TVarArr[AIndex],ValueResult);
 end;
 
 procedure CodeVariable.Var_GetValueInt(const AVarName: String;
@@ -16654,7 +16552,7 @@ procedure CodeVariable.Var_GetValue(const AIndex: Integer;
 begin
   SetLength(ValueResult,0);
   if(AIndex<0)or(AIndex>(Length(self.TVarArr)-1))then Exit;
-  ArrMath.AssignIntNum(self.TVarArr[AIndex],ValueResult);
+  ArrMath.NumberToNumber(self.TVarArr[AIndex],ValueResult);
 end;
 
 procedure CodeVariable.Var_GetValueInt(const AIndex: Integer;
@@ -16757,12 +16655,27 @@ end;
 
 procedure CodeProperties.ChangeTo(var ACodeProperties: CodeProperties);
 begin
+  self.TCLogs:=nil;
+
+  self.Property_CodePoint:=nil;
+  self.Property_CodePorts:=nil;
+  self.Property_CodeParams:=nil;
+  self.Property_CodeVariable:=nil;
+  self.Property_CodeArray:=nil;
+
   self.TCPoint.ChangeTo(ACodeProperties.TCPoint);
   self.TPortArr.changeTo(ACodeProperties.TPortArr);
   self.TParaArr.changeTo(ACodeProperties.TParaArr);
   self.TVarArr.ChangeTo(ACodeProperties.TVarArr);
   self.TCodeArr.ChangeTo(ACodeProperties.TCodeArr);
+
   self.TCLogs:=ACodeProperties.TCLogs;
+
+  self.Property_CodePoint:=@self.TCPoint;
+  self.Property_CodePorts:=@self.TPortArr;
+  self.Property_CodeParams:=@self.TParaArr;
+  self.Property_CodeVariable:=@self.TVarArr;
+  self.Property_CodeArray:=@self.TCodeArr;
 
   self.TCodeArr.TCCodeProperties:=@self;
   self.TCodeArr.SetPtrCodeProperties;
@@ -16885,12 +16798,18 @@ procedure CodeArray.ChangeTo(var ACodeArray: CodeArray);
 var
   i:Integer;
 begin
+  self.Lines:=nil;
+  self.Lines_AtLast:=nil;
+
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i].Free;
   SetLength(self.TCodeLn,0);
+
   SetLength(self.TCodeLn,Length(ACodeArray.TCodeLn));
   for i:=0 to (Length(self.TCodeLn)-1)do self.TCodeLn[i]:=CodeLine.Create(ACodeArray.TCodeLn[i]);
 
+  self.Lines:=@self.TCodeLn;
   self.Lines_AtLast:=@self.TCodeLn[Length(self.TCodeLn)-1];
+  self.SetPtrCodeProperties;
 end;
 
 procedure CodeArray.Lines_CreateLast;
@@ -17184,7 +17103,7 @@ begin
   num1Str:='';
 
   ArrMath.NumberToStr(AParamArr[0],num1Str);
-  ArrMath.AssignIntNum(AParamArr[1],numValue);
+  ArrMath.NumberToNumber(AParamArr[1],numValue);
 
   num1AIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(num1Str);
 
@@ -18256,7 +18175,7 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
@@ -18273,7 +18192,7 @@ begin
   VarNameStr:='';
 
   ArrMath.NumberToStr(AParamArr[0],VarNameStr);
-  ArrMath.AssignIntNum(AParamArr[1],AValue);
+  ArrMath.NumberToNumber(AParamArr[1],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarNameStr);
 
@@ -18383,8 +18302,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -18431,7 +18350,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV1';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -18537,8 +18456,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -18585,7 +18504,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV2';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -18691,8 +18610,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -18739,7 +18658,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV3';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -18845,8 +18764,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -18893,7 +18812,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV4';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -18999,8 +18918,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -19047,7 +18966,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV5';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -19153,8 +19072,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -19201,7 +19120,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV6';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -19307,8 +19226,8 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeParams^.Var_GetValue(VarName2Index,Anum);
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodeParams^.Var_SetValue(VarName1Index,Anum);
 
   SetLength(Anum,0);
 end;
@@ -19355,7 +19274,7 @@ begin
   AValue:=nil;
 
   VarNameStr:='$GV7';
-  ArrMath.AssignIntNum(AParamArr[0],AValue);
+  ArrMath.NumberToNumber(AParamArr[0],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeParams^.Var_GetValueInt_Index(VarNameStr);
 
@@ -20262,7 +20181,7 @@ begin
     Anum3[Length(Anum3)-1]:=Anum2[i];
   end;
 
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3)
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(ResultVarAIndex,Anum3);
 
   SetLength(Anum1,0);
   SetLength(Anum2,0);
@@ -20568,7 +20487,7 @@ begin
   VarNameStr:='';
 
   ArrMath.NumberToStr(AParamArr[0],VarNameStr);
-  ArrMath.AssignIntNum(AParamArr[1],AValue);
+  ArrMath.NumberToNumber(AParamArr[1],AValue);
 
   if(self.isVarNameValid(VarNameStr)=False)then begin
     ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var Name"'+VarNameStr+'" is invalid');
@@ -20779,7 +20698,7 @@ begin
   VarNameStr:='';
 
   ArrMath.NumberToStr(AParamArr[0],VarNameStr);
-  ArrMath.AssignIntNum(AParamArr[1],AValue);
+  ArrMath.NumberToNumber(AParamArr[1],AValue);
 
   AIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarNameStr);
 
@@ -20885,7 +20804,6 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(AIndex,AValue1);
-  AValue2:=Round(AValue1);
 
   AIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(ResultIntVarNameStr);
 
@@ -20894,7 +20812,7 @@ begin
     Exit;
   end;
 
-  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValueInt(AIndex,AValue2);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValueInt(AIndex,Round(AValue1));
 end;
 
 procedure CodeLine.CopyStr_Proc(AParamArr: TParamArr;
@@ -21009,6 +20927,68 @@ begin
   ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValueStr(VarNameResultStrAIndex,IntToStr(AInt1));
 end;
 
+procedure CodeLine.IntToReal_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameIntStr,VarNameResultRealStr:String;
+  VarNameIntAIndex,VarNameResultRealAIndex:Integer;
+  AInt1:Integer;
+begin
+  VarNameIntStr:='';
+  VarNameResultRealStr:='';
+  AInt1:=0;
+
+  ArrMath.NumberToStr(AParamArr[0],VarNameIntStr);
+  ArrMath.NumberToStr(AParamArr[1],VarNameResultRealStr);
+
+  VarNameIntAIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarNameIntStr);
+  VarNameResultRealAIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarNameResultRealStr);
+
+  if(VarNameIntAIndex=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameIntStr+'" does not Exists');
+    Exit;
+  end else
+  if(VarNameResultRealAIndex=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameResultRealStr+'" does not Exists');
+    Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt(VarNameIntAIndex,AInt1);
+
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValueReal(VarNameResultRealAIndex,AInt1+0.0);
+end;
+
+procedure CodeLine.RealToInt_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameRealStr,VarNameResultIntStr:String;
+  VarNameRealAIndex,VarNameResultIntAIndex:Integer;
+  AReal1:Real;
+begin
+  VarNameRealStr:='';
+  VarNameResultIntStr:='';
+  AReal1:=0.0;
+
+  ArrMath.NumberToStr(AParamArr[0],VarNameRealStr);
+  ArrMath.NumberToStr(AParamArr[1],VarNameResultIntStr);
+
+  VarNameRealAIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarNameRealStr);
+  VarNameResultIntAIndex:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarNameResultIntStr);
+
+  if(VarNameRealAIndex=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameRealStr+'" does not Exists');
+    Exit;
+  end else
+  if(VarNameResultIntAIndex=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarNameResultIntStr+'" does not Exists');
+    Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueReal(VarNameRealAIndex,AReal1);
+
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValueInt(VarNameResultIntAIndex,ArrMath.RR(AReal1));
+end;
+
 constructor CodeLine.Create;
 begin
   self.TCodeArr:=nil;
@@ -21032,7 +21012,7 @@ end;
 
 constructor CodeLine.Create(const CodeData: Number);
 begin
-  ArrMath.AssignIntNum(CodeData,self.TCodeArr);
+  ArrMath.NumberToNumber(CodeData,self.TCodeArr);
   self.TParaArr:=nil;
   self.TFuncDataIsNor:=2;
   self.TFuncDataNor:=nil;
@@ -21058,14 +21038,18 @@ procedure CodeLine.ChangeTo(var ACodeLine: CodeLine);
 var
   i:Integer;
 begin
-  ArrMath.AssignIntNum(ACodeLine.TCodeArr,self.TCodeArr);
+  ArrMath.NumberToNumber(ACodeLine.TCodeArr,self.TCodeArr);
 
   for i:=0 to (Length(self.TParaArr)-1)do SetLength(self.TParaArr[i],0);
   SetLength(self.TParaArr,0);
 
   SetLength(self.TParaArr,Length(ACodeLine.TParaArr));
   for i:=0 to (Length(self.TParaArr)-1)do
-    ArrMath.AssignIntNum(ACodeLine.TParaArr[i],self.TParaArr[i]);
+    ArrMath.NumberToNumber(ACodeLine.TParaArr[i],self.TParaArr[i]);
+
+  self.TFuncDataNor:=nil;
+  self.TFuncDataObj:=nil;
+  self.TCCodeProperties:=nil;
 
   self.TFuncDataIsNor:=ACodeLine.TFuncDataIsNor;
   self.TFuncDataNor:=ACodeLine.TFuncDataNor;
@@ -21075,13 +21059,13 @@ end;
 
 procedure CodeLine.Code_SetCodeData(const CodeData: Number);
 begin
-  ArrMath.AssignIntNum(CodeData,self.TCodeArr);
+  ArrMath.NumberToNumber(CodeData,self.TCodeArr);
 end;
 
 procedure CodeLine.Code_AddParamData(const ParamData: Number);
 begin
   SetLength(self.TParaArr,Length(self.TParaArr)+1);
-  ArrMath.AssignIntNum(ParamData,self.TParaArr[Length(self.TParaArr)-1]);
+  ArrMath.NumberToNumber(ParamData,self.TParaArr[Length(self.TParaArr)-1]);
 end;
 
 procedure CodeLine.Code_AddParamDataInt(const ParamData: Integer);
@@ -21124,7 +21108,7 @@ procedure CodeLine.Code_GetParamData(const AIndexBaseZero: Integer;
 begin
   SetLength(ValueResult,0);
   if(AIndexBaseZero<0)or(AIndexBaseZero>(Length(self.TParaArr)-1))then Exit;
-  ArrMath.AssignIntNum(self.TParaArr[AIndexBaseZero],ValueResult);
+  ArrMath.NumberToNumber(self.TParaArr[AIndexBaseZero],ValueResult);
 end;
 
 procedure CodeLine.Code_GetParamDataInt(const AIndexBaseZero: Integer;
@@ -22236,7 +22220,7 @@ begin
   ADeciDigitCountBaseOne),StrMath.SumSubReal(num,InitReal('1.0'),
   ADeciDigitCountBaseOne),ADeciDigitCountBaseOne,False);
 
-  ArrMath.AssignIntNum(n1,n3);
+  ArrMath.NumberToNumber(n1,n3);
   n4:=StrMath.MulDivReal(n1,n1,ADeciDigitCountBaseOne,True);
   n2:=InitReal('1.0');
   numResult:=InitReal('0.0');
@@ -22261,7 +22245,7 @@ begin
   n2:=nil;
   n3:=nil;
   Str1:='';
-  ArrMath.AssignIntNum(num,n1);
+  ArrMath.NumberToNumber(num,n1);
   n2:=InitReal('0');
   while(ConditionReal(IntReal(RoundRealR(n1)),'<>',InitReal('1'))=True)do begin
     n1:=StrMath.MulDivReal(n1,InitReal('2'),ADeciDigitCountBaseOne,False);
@@ -22301,7 +22285,7 @@ begin
   if(Length(num)=0)then Exit else
   if(ConditionReal(num,'<',InitReal('0.0'))=True)then Exit else
   if(ConditionReal(num,'=',InitReal('0.0'))=True)then begin
-    ArrMath.AssignIntNum(num,numResult);
+    ArrMath.NumberToNumber(num,numResult);
     Exit;
   end;
   numResult:=InitReal('1.0');
@@ -22533,16 +22517,16 @@ begin
   n2:=nil;
   n3:=nil;
   if(StrMath.isInt(RealStr(Apower))=False)then Exit;
-  ArrMath.AssignIntNum(Abase,n1);
-  ArrMath.AssignIntNum(Apower,n2);
+  ArrMath.NumberToNumber(Abase,n1);
+  ArrMath.NumberToNumber(Apower,n2);
   While(ConditionReal(Abase,'<=',Apower)=True)do begin
     n3:=StrMath.MulDivReal(n2,InitReal('2'),ADeciDigitCountBaseOne,False);
     if(ConditionReal(n3,'=',InitReal('0.0'))=True)then Exit else
     if(StrMath.isInt(RealStr(n3))=False)then Exit;
     n1:=self.RealXPowerInt(n1,InitReal('2'),ADeciDigitCountBaseOne);
-    ArrMath.AssignIntNum(n3,n2);
-    ArrMath.AssignIntNum(n1,Abase);
-    ArrMath.AssignIntNum(n2,Apower);
+    ArrMath.NumberToNumber(n3,n2);
+    ArrMath.NumberToNumber(n1,Abase);
+    ArrMath.NumberToNumber(n2,Apower);
   end;
   //End...
 end;
@@ -22570,6 +22554,14 @@ begin
 end;
 
 { ArrMath }
+
+class procedure ArrMath.NumberToNumber(num: Number; var ValueResult: Number);
+begin
+  SetLength(ValueResult,0);
+  if(Length(num)=0)then Exit;
+  SetLength(ValueResult,Length(num));
+  Move(num[0],ValueResult[0],Length(ValueResult));
+end;
 
 class procedure ArrMath.StrToNumber(AStr: String; var ValueResult: Number);
 var
@@ -23188,7 +23180,7 @@ begin
   end;
   bool1:=TCCores.Cores_RunPropertyUntilOutBound;
 
-  While(True)do begin
+  {While(True)do begin
     SetLength(TArr1,0);
     SetLength(TArr2,0);
     for i:=0 to (TCCores.Cores_ArrLength-1)do begin
@@ -23209,12 +23201,12 @@ begin
 
     SetLength(TArr2,Length(TArr2)+1);
     SetLength(TArr2[Length(TArr2)-1],1);
-    for i:=(Length(TArr2)-1) downto 1 do ArrMath.AssignIntNum(TArr2[i-1],TArr2[i]);
+    for i:=(Length(TArr2)-1) downto 1 do ArrMath.NumberToNumber(TArr2[i-1],TArr2[i]);
     TArr2[0][0]:=0;
 
     for i:=0 to (Length(TArr1)-1)do begin
-      ArrMath.AssignIntNum(TArr1[i],n1);
-      ArrMath.AssignIntNum(TArr2[i],n2);
+      ArrMath.NumberToNumber(TArr1[i],n1);
+      ArrMath.NumberToNumber(TArr2[i],n2);
 
       TCBuild.Build_Basic^.UnComponent_AppendVariable('Num1',n1);
       TCBuild.Build_Basic^.UnComponent_AppendVariable('Num2',n2);
@@ -23250,7 +23242,7 @@ begin
   SetLength(TArr1,0);
 
   for i:=0 to (Length(TArr2)-1)do SetLength(TArr2[i],0);
-  SetLength(TArr2,0);
+  SetLength(TArr2,0); }
 
   TCCores.Free;
   TCBuild.Free;
@@ -23313,7 +23305,7 @@ end;
 
 class function ArrMath.SubIntCores(num1, num2: IntArr; var numResult: IntArr;
   out num1Bigger: Byte): Boolean;
-var
+{var
   TCProperty:CodeProperties;
   TCBuild:CodeBuild;
   TCCores:CodeCores;
@@ -23325,11 +23317,14 @@ var
   bool1,bool2:Boolean;
   AdNum1,AdNum2,AdNum3,AdNum4,AdNum5,AdNum6,AdNum7:Integer;
 
-  TArr3,TArr4:IntArr;
+  TArr3,TArr4:IntArr;}
 begin
+  SetLength(numResult,0);
+
+
   Result:=False;
 
-  TCProperty:=CodeProperties.Create;
+  {TCProperty:=CodeProperties.Create;
   TCBuild:=CodeBuild.Create(@TCProperty);
   TCCores:=CodeCores.Create;
 
@@ -23466,7 +23461,7 @@ begin
 
   TCCores.Free;
   TCBuild.Free;
-  TCProperty.Free;
+  TCProperty.Free;}
 end;
 
 class procedure ArrMath.SumSubInt(num1, num2: IntArr; var numResult: IntArr);
@@ -23790,7 +23785,7 @@ begin
     end;
   end else begin
     TArr1:=InitInt('-1');
-    ArrMath.AssignIntNum(Base,TArr2);
+    ArrMath.NumberToNumber(Base,TArr2);
     While(StrMath.ConditionInt(TArr1,'>=',Power)=True)do begin
       TArr2:=StrMath.MulDivInt(TArr2,Base);
       TArr1:=StrMath.SumSubInt(TArr1,InitInt('-1'));
