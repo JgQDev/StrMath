@@ -399,6 +399,38 @@ type
     function Vars_ArrLength:Integer;
   end;
 
+  { CodeVariableCores }
+
+  { CodePortCores }
+
+  CodePortCores = class(TObject)
+  private
+    TCodePortDataArr:Array of Number;
+    TCodePortAddressArr:Array of Integer;
+    function IsAddressExists(const Address:Integer;out AIndex:Integer):Boolean;
+  public
+    constructor Create;
+    constructor Create(var ACodePortCores:CodePortCores);
+    destructor Destroy; override;
+    procedure changeTo(var ACodePortCores:CodePortCores);
+    function PortC_CreatePort(const Address:Integer):Boolean;
+    function PortC_CreatePort(const Address:Integer;const AValue:Number):Boolean;
+    function PortC_CreatePort(const Address:Integer;const AValue:Integer):Boolean;
+    function PortC_CreatePort(const Address:Integer;const AValue:Real):Boolean;
+    function PortC_CreatePort(const Address:Integer;const AValue:String):Boolean;
+    procedure PortC_AppendPort(const Address:Integer;const AValue:Number);
+    procedure PortC_AppendPort(const Address:Integer;const AValue:Integer);
+    procedure PortC_AppendPort(const Address:Integer;const AValue:Real);
+    procedure PortC_AppendPort(const Address:Integer;const AValue:String);
+    function PortC_GetDataAtPort(const Address:Integer;var AValue:Number):Boolean;
+    function PortC_GetDataAtPort(const Address:Integer;var AValue:Integer):Boolean;
+    function PortC_GetDataAtPort(const Address:Integer;var AValue:Real):Boolean;
+    function PortC_GetDataAtPort(const Address:Integer;var AValue:String):Boolean;
+    function PortC_IsPortExists(const Address:Integer):Boolean;
+    procedure PortC_ResetAll;
+    procedure PortC_ChangeAddress(const fromPortC,ToPortC:Integer);
+  end;
+
   { CodeLine }
 
   CodeLine = class(TObject)
@@ -521,6 +553,13 @@ type
     procedure MoveV2ToGV7_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
     procedure MoveV2ToGV7_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
 
+    procedure MoveV2ToPortC_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MovePortCToV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToPortC_Number_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToPortC_Integer_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToPortC_Real_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+    procedure MoveV2ToPortC_String_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
+
     procedure V1AndV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
     procedure V1OrV2_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
     procedure NotV1_Proc(AParamArr:TParamArr;var ATCCodeProperties:PtrCodeProperties);
@@ -622,6 +661,7 @@ type
     Property_CodeParams:^CodeVariable;
     Property_CodeVariable:^CodeVariableArray;
     Property_CodeArray:^CodeArray;
+    Property_CodePortCores:^CodePortCores;
     constructor Create;
     constructor Create(var ACodeProperties:CodeProperties);
     destructor Destroy; override;
@@ -641,6 +681,7 @@ type
     TCPropertyDoneBoolArr:TBoolArr;
     TCPropertyOutBoundBoolArr:TBoolArr;
     TCLogs:CodeLog;
+    TPortC:CodePortCores;
     procedure SetProperties;
     procedure AddProperty(var ACodeProperties:CodeProperties);
   public
@@ -701,6 +742,7 @@ type
     function UnComponent_CreateVariable(const VarName:String;const AValue:Integer):Integer;
     function UnComponent_CreateVariable(const VarName:String;const AValue:Real):Integer;
     function UnComponent_CreateVariable(const VarName:String;const AValue:String):Integer;
+    procedure UnComponent_ChangePortCAddress(const fromPortC,ToPortC:Integer);
 
     function Component_DebugPoint:Integer;
     function Component_DebugPointCoreAt(const CoreIndex:Integer):Integer;
@@ -793,6 +835,13 @@ type
     function Component_MoveC2ToGV7(const C2AValue:Integer):Integer;
     function Component_MoveC2ToGV7(const C2AValue:Real):Integer;
     function Component_MoveC2ToGV7(const C2AValue:String):Integer;
+
+    function Component_MoveV2ToPortC(const PortAddress:Integer;const VarName2:String):Integer;
+    function Component_MovePortCToV1(const VarName1:String;const PortAddress:Integer):Integer;
+    function Component_MoveC2ToPortC(const PortAddress:Integer;const C2AValue:Number):Integer;
+    function Component_MoveC2ToPortC(const PortAddress:Integer;const C2AValue:Integer):Integer;
+    function Component_MoveC2ToPortC(const PortAddress:Integer;const C2AValue:Real):Integer;
+    function Component_MoveC2ToPortC(const PortAddress:Integer;const C2AValue:String):Integer;
 
     function Component_V1AndV2(const VarName1,VarName2,ResultVarName:String):Integer;
     function Component_V1OrV2(const VarName1,VarName2,ResultVarName:String):Integer;
@@ -3518,6 +3567,297 @@ end;
 function xMod(const num1, num2: String): String;
 begin
   Result:=StringMath.xModX(num1,num2);
+end;
+
+{ CodePortCores }
+
+function CodePortCores.IsAddressExists(const Address: Integer; out
+  AIndex: Integer): Boolean;
+var
+  i:Integer;
+begin
+  Result:=False;
+  AIndex:=-1;
+  for i:=0 to (Length(self.TCodePortAddressArr)-1)do
+    if(self.TCodePortAddressArr[i]=Address)then begin
+      AIndex:=i;
+      Result:=True;
+      Exit;
+    end;
+end;
+
+constructor CodePortCores.Create;
+begin
+  self.TCodePortDataArr:=nil;
+  self.TCodePortAddressArr:=nil;
+end;
+
+constructor CodePortCores.Create(var ACodePortCores: CodePortCores);
+begin
+  self.TCodePortDataArr:=nil;
+  self.TCodePortAddressArr:=nil;
+  self.changeTo(ACodePortCores);
+end;
+
+destructor CodePortCores.Destroy;
+var
+  i:Integer;
+begin
+  inherited Destroy;
+  for i:=0 to (Length(self.TCodePortDataArr)-1)do SetLength(self.TCodePortDataArr[i],0);
+  SetLength(self.TCodePortDataArr,0);
+  SetLength(self.TCodePortAddressArr,0);
+end;
+
+procedure CodePortCores.changeTo(var ACodePortCores: CodePortCores);
+var
+  i:Integer;
+begin
+  for i:=0 to (Length(self.TCodePortDataArr)-1)do SetLength(self.TCodePortDataArr[i],0);
+  SetLength(self.TCodePortDataArr,Length(ACodePortCores.TCodePortDataArr));
+  for i:=0 to (Length(self.TCodePortDataArr)-1)do
+    ArrMath.NumberToNumber(ACodePortCores.TCodePortDataArr[i],self.TCodePortDataArr[i]);
+
+  SetLength(self.TCodePortAddressArr,Length(ACodePortCores.TCodePortAddressArr));
+  for i:=0 to (Length(self.TCodePortAddressArr)-1)do
+    self.TCodePortAddressArr[i]:=ACodePortCores.TCodePortAddressArr[i];
+end;
+
+function CodePortCores.PortC_CreatePort(const Address: Integer): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]:=nil;
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_CreatePort(const Address: Integer;
+  const AValue: Number): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.NumberToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_CreatePort(const Address: Integer;
+  const AValue: Integer): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.IntToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_CreatePort(const Address: Integer;
+  const AValue: Real): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.RealToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_CreatePort(const Address: Integer;
+  const AValue: String): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.StrToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+
+    Result:=True;
+  end;
+end;
+
+procedure CodePortCores.PortC_AppendPort(const Address: Integer;
+  const AValue: Number);
+var
+  AIndex:Integer;
+begin
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.NumberToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+  end else begin
+    ArrMath.NumberToNumber(AValue,self.TCodePortDataArr[AIndex]);
+  end;
+end;
+
+procedure CodePortCores.PortC_AppendPort(const Address: Integer;
+  const AValue: Integer);
+var
+  AIndex:Integer;
+begin
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.IntToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+  end else begin
+    ArrMath.IntToNumber(AValue,self.TCodePortDataArr[AIndex]);
+  end;
+end;
+
+procedure CodePortCores.PortC_AppendPort(const Address: Integer;
+  const AValue: Real);
+var
+  AIndex:Integer;
+begin
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.RealToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+  end else begin
+    ArrMath.RealToNumber(AValue,self.TCodePortDataArr[AIndex]);
+  end;
+end;
+
+procedure CodePortCores.PortC_AppendPort(const Address: Integer;
+  const AValue: String);
+var
+  AIndex:Integer;
+begin
+  if(self.IsAddressExists(Address,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.StrToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=Address;
+  end else begin
+    ArrMath.StrToNumber(AValue,self.TCodePortDataArr[AIndex]);
+  end;
+end;
+
+function CodePortCores.PortC_GetDataAtPort(const Address: Integer;
+  var AValue: Number): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=True)then begin
+    ArrMath.NumberToNumber(self.TCodePortDataArr[AIndex],AValue);
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_GetDataAtPort(const Address: Integer;
+  var AValue: Integer): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=True)then begin
+    ArrMath.NumberToInt(self.TCodePortDataArr[AIndex],AValue);
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_GetDataAtPort(const Address: Integer;
+  var AValue: Real): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=True)then begin
+    ArrMath.NumberToReal(self.TCodePortDataArr[AIndex],AValue);
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_GetDataAtPort(const Address: Integer;
+  var AValue: String): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=False;
+  if(self.IsAddressExists(Address,AIndex)=True)then begin
+    ArrMath.NumberToStr(self.TCodePortDataArr[AIndex],AValue);
+    Result:=True;
+  end;
+end;
+
+function CodePortCores.PortC_IsPortExists(const Address: Integer): Boolean;
+var
+  AIndex:Integer;
+begin
+  Result:=self.IsAddressExists(Address,AIndex);
+end;
+
+procedure CodePortCores.PortC_ResetAll;
+var
+  i:Integer;
+begin
+  for i:=0 to (Length(self.TCodePortDataArr)-1)do SetLength(self.TCodePortDataArr[i],0);
+  SetLength(self.TCodePortDataArr,0);
+  SetLength(self.TCodePortAddressArr,0);
+end;
+
+procedure CodePortCores.PortC_ChangeAddress(const fromPortC, ToPortC: Integer);
+var
+  AIndex:Integer;
+  AValue:Number;
+begin
+  AValue:=nil;
+  if(fromPortC=ToPortC)then Exit;
+  if(self.IsAddressExists(fromPortC,AIndex)=False)then begin
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.NumberToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=ToPortC;
+  end else begin
+    ArrMath.NumberToNumber(self.TCodePortDataArr[AIndex],AValue);
+
+    SetLength(self.TCodePortDataArr,Length(self.TCodePortDataArr)+1);
+    ArrMath.NumberToNumber(AValue,self.TCodePortDataArr[Length(self.TCodePortDataArr)-1]);
+
+    SetLength(self.TCodePortAddressArr,Length(self.TCodePortAddressArr)+1);
+    self.TCodePortAddressArr[Length(self.TCodePortAddressArr)-1]:=ToPortC;
+  end;
+  SetLength(AValue,0);
 end;
 
 { CodeVariableArray }
@@ -13750,6 +14090,12 @@ begin
   Result:=self.TCProperty^.Property_CodeVariable^.Vars_AtLast^.Var_ArrLength-1;
 end;
 
+procedure CodeComponentBasic.UnComponent_ChangePortCAddress(const fromPortC,
+  ToPortC: Integer);
+begin
+  self.TCProperty^.Property_CodePortCores^.PortC_ChangeAddress(fromPortC,ToPortC);
+end;
+
 function CodeComponentBasic.Component_DebugPoint: Integer;
 var
   CodeBytes:Number;
@@ -15180,6 +15526,114 @@ begin
   SetLength(CodeBytes,0);
 end;
 
+function CodeComponentBasic.Component_MoveV2ToPortC(const PortAddress: Integer;
+  const VarName2: String): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(255,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(PortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName2);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToPortC_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
+function CodeComponentBasic.Component_MovePortCToV1(const VarName1: String;
+  const PortAddress: Integer): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(255,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(VarName1);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(PortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MovePortCToV1_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
+function CodeComponentBasic.Component_MoveC2ToPortC(const PortAddress: Integer;
+  const C2AValue: Number): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(255,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(PortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamData(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToPortC_Number_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
+function CodeComponentBasic.Component_MoveC2ToPortC(const PortAddress: Integer;
+  const C2AValue: Integer): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(255,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(PortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToPortC_Integer_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
+function CodeComponentBasic.Component_MoveC2ToPortC(const PortAddress: Integer;
+  const C2AValue: Real): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(255,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(PortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataReal(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToPortC_Real_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
+function CodeComponentBasic.Component_MoveC2ToPortC(const PortAddress: Integer;
+  const C2AValue: String): Integer;
+var
+  CodeBytes:Number;
+begin
+  CodeBytes:=nil;
+  ArrMath.IntToNumber(255,CodeBytes);
+
+  self.TCProperty^.Property_CodeArray^.Lines_CreateLast;
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetCodeData(CodeBytes);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataInt(PortAddress);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_AddParamDataStr(C2AValue);
+  self.TCProperty^.Property_CodeArray^.Lines_AtLast^.Code_SetFuncData(@self.TCProperty^.Property_CodeArray^.Lines_AtLast^.MoveV2ToPortC_String_Proc);
+  Result:=self.TCProperty^.Property_CodeArray^.Lines_ArrLength-1;
+
+  SetLength(CodeBytes,0);
+end;
+
 function CodeComponentBasic.Component_V1AndV2(const VarName1, VarName2,
   ResultVarName: String): Integer;
 var
@@ -15968,6 +16422,7 @@ begin
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCPoint.Point_AddLast;
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCPoint.Point_StartMem_AddLast;
   self.TCPropertyArr[Length(self.TCPropertyArr)-1].TCLogs:=@self.TCLogs;
+  self.TCPropertyArr[Length(self.TCPropertyArr)-1].Property_CodePortCores:=@self.TPortC;
 
   SetLength(self.TCPropertyIndexDoneArr,Length(self.TCPropertyIndexDoneArr)+1);
   self.TCPropertyIndexDoneArr[Length(self.TCPropertyIndexDoneArr)-1]:=0;
@@ -15987,6 +16442,7 @@ begin
   self.TCPropertyDoneBoolArr:=nil;
   self.TCPropertyOutBoundBoolArr:=nil;
   self.TCLogs:=CodeLog.Create;
+  self.TPortC:=CodePortCores.Create;
 end;
 
 constructor CodeCores.Create(var ACodeCores: CodeCores);
@@ -15997,6 +16453,7 @@ begin
   self.TCPropertyDoneBoolArr:=nil;
   self.TCPropertyOutBoundBoolArr:=nil;
   self.TCLogs:=CodeLog.Create;
+  self.TPortC:=CodePortCores.Create;
   self.ChangeTo(ACodeCores);
 end;
 
@@ -16012,6 +16469,7 @@ begin
   SetLength(self.TCPropertyDoneBoolArr,0);
   SetLength(self.TCPropertyOutBoundBoolArr,0);
   self.TCLogs.Free;
+  self.TPortC.Free;
 end;
 
 procedure CodeCores.ChangeTo(var ACodeCores: CodeCores);
@@ -16024,6 +16482,7 @@ begin
   SetLength(self.TCPropertyArr,Length(ACodeCores.TCPropertyArr));
   for i:=0 to (Length(self.TCPropertyArr)-1)do self.TCPropertyArr[i]:=CodeProperties.Create(ACodeCores.TCPropertyArr[i]);
   self.TCLogs.ChangeTo(ACodeCores.TCLogs);
+  self.TPortC.changeTo(ACodeCores.TPortC);
 
   SetLength(self.TCPropertyIndexDoneArr,0);
   SetLength(self.TCPropertyIndexDoneArr,Length(ACodeCores.TCPropertyIndexDoneArr));
@@ -16065,6 +16524,7 @@ begin
   SetLength(self.TCPropertyOutBoundBoolArr,0);
   self.TCLogs.Error_EraseLog;
   self.TCLogs.Warning_EraseLog;
+  self.TPortC.PortC_ResetAll;
 end;
 
 procedure CodeCores.Cores_ResetIndex;
@@ -16081,6 +16541,7 @@ begin
   for i:=0 to (Length(self.TCPropertyIndexDoneArr)-1)do self.TCPropertyIndexDoneArr[i]:=0;
   for i:=0 to (Length(self.TCPropertyOutBoundBoolArr)-1)do self.TCPropertyOutBoundBoolArr[i]:=False;
   for i:=0 to (Length(self.TCPropertyDoneBoolArr)-1)do self.TCPropertyDoneBoolArr[i]:=False;
+  self.TPortC.PortC_ResetAll;
 end;
 
 procedure CodeCores.Cores_Continue;
@@ -16159,6 +16620,7 @@ begin
   self.SetProperties;
   if(self.TCoreIndex<0)or(self.TCoreIndex>(self.Cores_ArrLength-1))then Exit;
   if(self.TCLogs.Error_ArrLength>0)then Exit;
+  if(self.TCPropertyOutBoundBoolArr[self.TCoreIndex]=True)and(self.TCPropertyDoneBoolArr[self.TCoreIndex]=True)then Exit;
 
   AIndex:=self.TCPropertyArr[self.TCoreIndex].Property_CodePoint^.Point_GetPoint;
 
@@ -16780,6 +17242,7 @@ begin
 
   self.TCodeArr.TCCodeProperties:=@self;
   self.TCLogs:=nil;
+  self.Property_CodePortCores:=nil;
 end;
 
 constructor CodeProperties.Create(var ACodeProperties: CodeProperties);
@@ -16800,6 +17263,7 @@ begin
 
   self.TCodeArr.TCCodeProperties:=@self;
   self.TCLogs:=nil;
+  self.Property_CodePortCores:=nil;
 
   self.ChangeTo(ACodeProperties);
 end;
@@ -16809,6 +17273,7 @@ begin
   inherited Destroy;
 
   self.TCLogs:=nil;
+  self.Property_CodePortCores:=nil;
 
   self.Property_CodePoint:=nil;
   self.Property_CodePorts:=nil;
@@ -16828,6 +17293,7 @@ end;
 procedure CodeProperties.ChangeTo(var ACodeProperties: CodeProperties);
 begin
   self.TCLogs:=nil;
+  self.Property_CodePortCores:=nil;
 
   self.Property_CodePoint:=nil;
   self.Property_CodePorts:=nil;
@@ -19748,6 +20214,133 @@ begin
   end;
 
   ATCCodeProperties^.Property_CodeParams^.Var_SetValueStr(AIndex,AValue);
+end;
+
+procedure CodeLine.MoveV2ToPortC_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Int:Integer;
+  VarName2Str:String;
+  VarName2Index:Integer;
+  Anum:Number;
+begin
+  Anum:=nil;
+  VarName1Int:=0;
+  VarName2Str:='';
+
+  ArrMath.NumberToInt(AParamArr[0],VarName1Int);
+  ArrMath.NumberToStr(AParamArr[1],VarName2Str);
+
+  VarName2Index:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarName2Str);
+
+  if(VarName2Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName2Str+'" does not Exists');
+    SetLength(Anum,0);
+    Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValue(VarName2Index,Anum);
+  ATCCodeProperties^.Property_CodePortCores^.PortC_AppendPort(VarName1Int,Anum);
+
+  SetLength(Anum,0);
+end;
+
+procedure CodeLine.MovePortCToV1_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarName1Str:String;
+  VarName2Int:Integer;
+  VarName1Index:Integer;
+  VarName2Bool:Boolean;
+  Anum:Number;
+begin
+  Anum:=nil;
+  VarName1Str:='';
+  VarName2Int:=0;
+
+  ArrMath.NumberToStr(AParamArr[0],VarName1Str);
+  ArrMath.NumberToInt(AParamArr[1],VarName2Int);
+
+  VarName1Index:=ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_GetValueInt_Index(VarName1Str);
+  VarName2Bool:=ATCCodeProperties^.Property_CodePortCores^.PortC_IsPortExists(VarName2Int);
+
+  if(VarName1Index=-1)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: Var "'+VarName1Str+'" does not Exists');
+    SetLength(Anum,0);
+    Exit;
+  end;
+  if(VarName2Bool=False)then begin
+    ATCCodeProperties^.TCLogs^.Error_CreateLastLog('Error: PortC Address "'+IntToStr(VarName2Int)+'" does not Exists');
+    SetLength(Anum,0);
+    Exit;
+  end;
+
+  ATCCodeProperties^.Property_CodePortCores^.PortC_GetDataAtPort(VarName2Int,Anum);
+  ATCCodeProperties^.Property_CodeVariable^.Vars_AtLast^.Var_SetValue(VarName1Index,Anum);
+
+  SetLength(Anum,0);
+end;
+
+procedure CodeLine.MoveV2ToPortC_Number_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameInt:Integer;
+  AValue:Number;
+begin
+  VarNameInt:=0;
+  AValue:=nil;
+
+  ArrMath.NumberToInt(AParamArr[0],VarNameInt);
+  ArrMath.NumberToNumber(AParamArr[1],AValue);
+
+  ATCCodeProperties^.Property_CodePortCores^.PortC_AppendPort(VarNameInt,AValue);
+
+  SetLength(AValue,0);
+end;
+
+procedure CodeLine.MoveV2ToPortC_Integer_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameInt:Integer;
+  AValue:Integer;
+begin
+  VarNameInt:=0;
+  AValue:=0;
+
+  ArrMath.NumberToInt(AParamArr[0],VarNameInt);
+  ArrMath.NumberToInt(AParamArr[1],AValue);
+
+  ATCCodeProperties^.Property_CodePortCores^.PortC_AppendPort(VarNameInt,AValue);
+end;
+
+procedure CodeLine.MoveV2ToPortC_Real_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameInt:Integer;
+  AValue:Real;
+begin
+  VarNameInt:=0;
+  AValue:=0.0;
+
+  ArrMath.NumberToInt(AParamArr[0],VarNameInt);
+  ArrMath.NumberToReal(AParamArr[1],AValue);
+
+  ATCCodeProperties^.Property_CodePortCores^.PortC_AppendPort(VarNameInt,AValue);
+end;
+
+procedure CodeLine.MoveV2ToPortC_String_Proc(AParamArr: TParamArr;
+  var ATCCodeProperties: PtrCodeProperties);
+var
+  VarNameInt:Integer;
+  AValue:String;
+begin
+  VarNameInt:=0;
+  AValue:='';
+
+  ArrMath.NumberToInt(AParamArr[0],VarNameInt);
+  ArrMath.NumberToStr(AParamArr[1],AValue);
+
+  ATCCodeProperties^.Property_CodePortCores^.PortC_AppendPort(VarNameInt,AValue);
 end;
 
 procedure CodeLine.V1AndV2_Proc(AParamArr: TParamArr;
@@ -23544,6 +24137,7 @@ begin
 
   //Cores_Code_Start
 
+  TCBuild.Build_Basic^.Component_AllocateMem('THindex',0);
   TCBuild.Build_Basic^.Component_JumpTo('JumpHere1');
 
   AdNum1:=TCBuild.Build_Advance^.Component_SetBit;
@@ -23560,6 +24154,8 @@ begin
   TCBuild.Build_Basic^.Component_Goto(AdNum6);
   TCBuild.Build_Basic^.Component_MoveGV3ToV1('NumResult');
 
+  TCBuild.Build_Basic^.Component_MoveV2ToPortC(-1,'THindex');
+
   //Cores_Code_End
 
   SetLength(n1,1);
@@ -23569,6 +24165,7 @@ begin
     n1[0]:=num1[i];
     n2[0]:=num2[i];
 
+    TCBuild.Build_Basic^.UnComponent_AppendVariable('THindex',i);
     TCBuild.Build_Basic^.UnComponent_AppendVariable('Num1',n1);
     TCBuild.Build_Basic^.UnComponent_AppendVariable('Num2',n2);
 
