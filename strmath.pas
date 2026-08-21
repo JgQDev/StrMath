@@ -24461,7 +24461,7 @@ begin
 
   SetLength(numResult,0);
   self.AlignNums(num1,num2);
-  NumLength:=Length(num1)*2;
+  NumLength:=(Length(num1)*2)+1;
   SetLength(num1,NumLength);
   SetLength(num2,NumLength);
 
@@ -24496,6 +24496,7 @@ begin
 
   TCBuild.Build_Basic^.Component_MovePortCToV1('Num1','THindex_Num1');
   TCBuild.Build_Basic^.Component_MovePortCToV1('Num2','THindex_Num2');
+  TCBuild.Build_Basic^.Component_MovePortCToV1('NumResult','THindex_NumResult');
 
   TCBuild.Build_Basic^.Component_Port('JumpFalse1');
 
@@ -24553,8 +24554,10 @@ begin
   TCBuild.Build_Basic^.Component_AllocateMem('bool1',0);
   TCBuild.Build_Basic^.Component_AllocateMem('NumZero',0);
   TCBuild.Build_Basic^.Component_AllocateMem('NumOne',1);
+  TCBuild.Build_Basic^.Component_AllocateMem('NumTwo',2);
   TCBuild.Build_Basic^.Component_AllocateMem('NumThree',3);
-  TCBuild.Build_Basic^.Component_AllocateMem('PortCData',nil);
+  TCBuild.Build_Basic^.Component_AllocateMem('NumFour',4);
+  TCBuild.Build_Basic^.Component_AllocateMem('PortCData1',nil);
   TCBuild.Build_Basic^.Component_AllocateMem('numLength',0);
   TCBuild.Build_Basic^.Component_AllocateMem('numLength1',0);
   TCBuild.Build_Basic^.Component_AllocateMem('CalcuA',0);
@@ -24574,8 +24577,8 @@ begin
 
   //============================================================================
 
-  TCBuild.Build_Basic^.Component_MovePortCToV1('PortCData','i');
-  TCBuild.Build_Basic^.Component_IfV1False('PortCData','JumpExit1');
+  TCBuild.Build_Basic^.Component_MovePortCToV1('PortCData1','i');
+  TCBuild.Build_Basic^.Component_IfV1False('PortCData1','JumpExit1');
 
   //============================================================================
 
@@ -24595,20 +24598,20 @@ begin
 
   TCBuild.Build_Basic^.Component_MulInteger('THindexMax','NumThree','CalcuA');
   TCBuild.Build_Basic^.Component_SumInteger('CalcuA','i','CalcuA');
-  TCBuild.Build_Basic^.Component_MovePortCToV1('PortCData','CalcuA');
+  TCBuild.Build_Basic^.Component_MovePortCToV1('PortCData1','CalcuA');
 
-  TCBuild.Build_Basic^.Component_Length('PortCData','numLength1');
+  TCBuild.Build_Basic^.Component_Length('PortCData1','numLength1');
   TCBuild.Build_Basic^.Component_V1GTV2_Int('numLength1','NumOne','bool1');
   TCBuild.Build_Basic^.Component_IfV1False('bool1','JumpFalse1');
 
-  TCBuild.Build_Basic^.Component_ArrayIndexGet('PortCData','NumZero','ByteA');
-  TCBuild.Build_Basic^.Component_ArrayIndexGet('PortCData','NumOne','ByteB');
+  TCBuild.Build_Basic^.Component_ArrayIndexGet('PortCData1','NumZero','ByteA');
+  TCBuild.Build_Basic^.Component_ArrayIndexGet('PortCData1','NumOne','ByteB');
 
   TCBuild.Build_Basic^.Component_JumpTo('JumpFalse2');
 
   TCBuild.Build_Basic^.Component_Port('JumpFalse1');
 
-  TCBuild.Build_Basic^.Component_ArrayIndexGet('PortCData','NumZero','ByteA');
+  TCBuild.Build_Basic^.Component_ArrayIndexGet('PortCData1','NumZero','ByteA');
   TCBuild.Build_Basic^.Component_MoveV2ToV1('ByteB','ByteZero');
 
   TCBuild.Build_Basic^.Component_Port('JumpFalse2');
@@ -24663,6 +24666,40 @@ begin
   TCBuild.Build_Basic^.Component_Port('kForEnd');
 
   TCBuild.Build_Basic^.Component_ArrayIndexSet('TArr2','NumZero','ByteZero');
+  TCBuild.Build_Basic^.Component_SetLength('TArr1','THindexMax');
+  TCBuild.Build_Basic^.Component_SetLength('TArr2','THindexMax');
+  TCBuild.Build_Basic^.Component_AllocateMem('i',0);
+
+  TCBuild.Build_Basic^.Component_Port('lForBegin');
+
+  TCBuild.Build_Basic^.Component_V1GTV2_Int('i','numLength','bool1');
+  TCBuild.Build_Basic^.Component_IfV1True('bool1','lForEnd');
+
+  //============================================================================
+
+  TCBuild.Build_Basic^.Component_SumInteger('THindexMax','i','CalcuA');
+  TCBuild.Build_Basic^.Component_ArrayIndexGet('TArr1','i','ByteA');
+  TCBuild.Build_Basic^.Component_MoveV2ToPortC('CalcuA','ByteA');
+
+  TCBuild.Build_Basic^.Component_MulInteger('THindexMax','NumTwo','CalcuA');
+  TCBuild.Build_Basic^.Component_SumInteger('CalcuA','i','CalcuA');
+  TCBuild.Build_Basic^.Component_ArrayIndexGet('TArr2','i','ByteB');
+  TCBuild.Build_Basic^.Component_MoveV2ToPortC('CalcuA','ByteB');
+
+  TCBuild.Build_Basic^.Component_MulInteger('THindexMax','NumThree','CalcuA');
+  TCBuild.Build_Basic^.Component_SumInteger('CalcuA','i','CalcuA');
+  TCBuild.Build_Basic^.Component_MoveC2ToPortC('CalcuA',nil);
+
+  TCBuild.Build_Basic^.Component_MulInteger('THindexMax','NumFour','CalcuA');
+  TCBuild.Build_Basic^.Component_SumInteger('CalcuA','i','CalcuA');
+  TCBuild.Build_Basic^.Component_MoveV2ToPortC('CalcuA','NumOne');
+
+  //============================================================================
+
+  TCBuild.Build_Basic^.Component_SumInteger('i','NumOne','i');
+  TCBuild.Build_Basic^.Component_JumpTo('lForBegin');
+
+  TCBuild.Build_Basic^.Component_Port('lForEnd');
 
   TCBuild.Build_Basic^.Component_Port('JumpExit1');
 
