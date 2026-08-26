@@ -47,6 +47,9 @@ procedure SumSubInt(const num1,num2:IntArr;var AAnswer:IntArr);
 function MulDivInt(const num1,num2:IntArr;const doMul:Boolean = True):IntArr;
 procedure MulDivInt(const num1,num2:IntArr;var AAnswer:IntArr;const doMul:Boolean = True);
 
+function BinaryToByteArr(const Num:String):IntArr;
+procedure BinaryToByteArr(const Num:String;var AAnswer:IntArr);
+
 function unNumInt(const num:IntArr):IntArr;
 procedure unNumInt(const num:IntArr;var AAnswer:IntArr);
 
@@ -1433,6 +1436,62 @@ procedure MulDivInt(const num1, num2: IntArr; var AAnswer: IntArr;
   const doMul: Boolean);
 begin
   ArrMath.MulDivInt(num1,num2,AAnswer,doMul);
+end;
+
+function BinaryToByteArr(const Num: String): IntArr;
+var
+  i:Integer;
+  nCount1:Integer;
+  TArr1:IntArr;
+begin
+  Result:=nil;
+  TArr1:=nil;
+  SetLength(TArr1,Length(TArr1)+1);
+  TArr1[Length(TArr1)-1]:=0;
+  nCount1:=0;
+  for i:=Length(Num) downto 1 do begin
+    nCount1:=nCount1+1;
+    if(Num[i]='1')then ArrMath.SetBit(TArr1[Length(TArr1)-1],nCount1-1) else
+    if(Num[i]<>'0')then begin
+      SetLength(TArr1,0);
+      Exit;
+    end;
+    if(nCount1=8)then begin
+      nCount1:=0;
+      SetLength(TArr1,Length(TArr1)+1);
+      TArr1[Length(TArr1)-1]:=0;
+    end;
+  end;
+  if(TArr1[Length(TArr1)-1]=0)then SetLength(TArr1,Length(TArr1)-1);
+  ArrMath.NumberToNumber(TArr1,Result);
+end;
+
+procedure BinaryToByteArr(const Num: String; var AAnswer: IntArr);
+var
+  i:Integer;
+  nCount1:Integer;
+  TArr1:IntArr;
+begin
+  SetLength(AAnswer,0);
+  TArr1:=nil;
+  SetLength(TArr1,Length(TArr1)+1);
+  TArr1[Length(TArr1)-1]:=0;
+  nCount1:=0;
+  for i:=Length(Num) downto 1 do begin
+    nCount1:=nCount1+1;
+    if(Num[i]='1')then ArrMath.SetBit(TArr1[Length(TArr1)-1],nCount1-1) else
+    if(Num[i]<>'0')then begin
+      SetLength(TArr1,0);
+      Exit;
+    end;
+    if(nCount1=8)then begin
+      nCount1:=0;
+      SetLength(TArr1,Length(TArr1)+1);
+      TArr1[Length(TArr1)-1]:=0;
+    end;
+  end;
+  if(TArr1[Length(TArr1)-1]=0)then SetLength(TArr1,Length(TArr1)-1);
+  ArrMath.NumberToNumber(TArr1,AAnswer);
 end;
 
 function unNumInt(const num: IntArr): IntArr;
@@ -2909,7 +2968,7 @@ begin
   Result:='0';
   if(isBinary(Num)=False)then Exit;
   if(Num[Length(Num)]='0')then Result:='0' else Result:='1';
-  for i:=1 to (Length(Num)-1)do
+  for i:=(Length(Num)-1) downto 1 do
     Result:=SumSub(Result,xPower(MulDiv(Num[i],'2'),IntToStr(Length(Num)-i)));
 end;
 
@@ -2921,7 +2980,7 @@ begin
   AAnswer:='0';
   if(isBinary(Num)=False)then Exit;
   if(Num[Length(Num)]='0')then AAnswer:='0' else AAnswer:='1';
-  for i:=1 to (Length(Num)-1)do
+  for i:=(Length(Num)-1) downto 1 do
     AAnswer:=SumSub(AAnswer,xPower(MulDiv(Num[i],'2'),IntToStr(Length(Num)-i)));
   Result:=True;
 end;
