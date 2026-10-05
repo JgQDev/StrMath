@@ -35,7 +35,6 @@ function SetAnd(const num1,num2:Number):Number;
 function SetOr(const num1,num2:Number):Number;
 function SetNot(const num1:Number):Number;
 function SetXOR(const num1,num2:Number):Number;
-function SetIf(const num1:Number):Number;
 
 { IntArr-Math }
 function ConditionInt(Num1:IntArr;Symbol:String;Num2:IntArr):Boolean;
@@ -24670,22 +24669,6 @@ begin
   SetLength(N2,0);
   SetLength(N3,0);
   SetLength(N4,0);
-end;
-
-class procedure ArrMath.GetIf(const num1: IntArr; var numResult: IntArr);
-var
-  i:Integer;
-begin
-  SetLength(numResult,0);
-  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
-  if(Length(num1)=0)then Exit;
-
-  for i:=0 to (Length(num1)-1)do
-    if(num1[i]>0)then begin
-      numResult[Length(numResult)-1]:=1;
-      Exit;
-    end;
-
 end;
 
 class procedure ArrMath.SumInt(num1, num2: IntArr; var numResult: IntArr);
