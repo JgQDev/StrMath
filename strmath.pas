@@ -31,6 +31,11 @@ procedure ShiftRight(var num:Number);
 procedure ShiftPaceLeft(const PaceBaseOne:Integer;var num:Number);
 procedure ShiftPaceRight(const PaceBaseOne:Integer;var num:Number);
 function AssignNum(const num:Number):Number;
+function SetAnd(const num1,num2:Number):Number;
+function SetOr(const num1,num2:Number):Number;
+function SetNot(const num1:Number):Number;
+function SetXOR(const num1,num2:Number):Number;
+function SetIf(const num1:Number):Number;
 
 { IntArr-Math }
 function ConditionInt(Num1:IntArr;Symbol:String;Num2:IntArr):Boolean;
@@ -1082,6 +1087,11 @@ type
     class function IsBitPosSet(const num:TBitPos;const numArr:IntArr):Boolean;
     class procedure BitPosSetArr(const num:TBitPos;var numArr:IntArr);
     class procedure BitPosAddSetArr(const num:TBitPos;var numArr:IntArr);
+    class procedure GetAnd(num1,num2:IntArr;var numResult:IntArr);
+    class procedure GetOr(num1,num2:IntArr;var numResult:IntArr);
+    class procedure GetNot(const num1:IntArr;var numResult:IntArr);
+    class procedure GetXOR(const num1,num2:IntArr;var numResult:IntArr);
+    class procedure GetIf(const num1:IntArr;var numResult:IntArr);
     class procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
     class function SumIntCores(num1,num2:IntArr;var numResult:IntArr):Boolean;
     class procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
@@ -1287,6 +1297,36 @@ function AssignNum(const num: Number): Number;
 begin
   Result:=nil;
   ArrMath.NumberToNumber(num,Result);
+end;
+
+function SetAnd(const num1, num2: Number): Number;
+begin
+  Result:=nil;
+  ArrMath.GetAnd(num1,num2,Result);
+end;
+
+function SetOr(const num1, num2: Number): Number;
+begin
+  Result:=nil;
+  ArrMath.GetOr(num1,num2,Result);
+end;
+
+function SetNot(const num1: Number): Number;
+begin
+  Result:=nil;
+  ArrMath.GetNot(num1,Result);
+end;
+
+function SetXOR(const num1, num2: Number): Number;
+begin
+  Result:=nil;
+  ArrMath.GetXOR(num1,num2,Result);
+end;
+
+function SetIf(const num1: Number): Number;
+begin
+  Result:=nil;
+  ArrMath.GetIf(num1,Result);
 end;
 
 { Arr-Math }
@@ -24528,6 +24568,124 @@ class procedure ArrMath.BitPosAddSetArr(const num: TBitPos; var numArr: IntArr);
 begin
   if(num.ByteAtBaseZero>(Length(numArr)-1))then SetLength(numArr,num.ByteAtBaseZero+1);
   self.SetBit(numArr[num.ByteAtBaseZero],Byte(num.BitAtBaseZero));
+end;
+
+class procedure ArrMath.GetAnd(num1, num2: IntArr; var numResult: IntArr);
+var
+  TBPosMin,TBPosMax:TBitPos;
+  bool1,bool2:Boolean;
+begin
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then Exit;
+  if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
+  if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
+  SetLength(numResult,Length(num1));
+
+  bool1:=False;
+  bool2:=False;
+  self.SetBitPosZero(TBPosMin);
+  self.SetBitPosZero(TBPosMax);
+  self.GetLastBit(TBPosMax,numResult);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then self.SetBitPos(TBPosMax,Length(numResult)-1,7);
+  while(self.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
+    bool1:=self.IsBitPosSet(TBPosMin,num1);
+    bool2:=self.IsBitPosSet(TBPosMin,num2);
+    if(bool1=True)and(bool2=True)then self.BitPosAddSetArr(TBPosMin,numResult);
+    self.IncBitPos(TBPosMin);
+  end;
+  bool1:=self.IsBitPosSet(TBPosMin,num1);
+  bool2:=self.IsBitPosSet(TBPosMin,num2);
+  if(bool1=True)and(bool2=True)then self.BitPosAddSetArr(TBPosMin,numResult);
+end;
+
+class procedure ArrMath.GetOr(num1, num2: IntArr; var numResult: IntArr);
+var
+  TBPosMin,TBPosMax:TBitPos;
+  bool1,bool2:Boolean;
+begin
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)and(Length(num2)=0)then Exit;
+  if(Length(num1)>Length(num2))then SetLength(num2,Length(num1)) else
+  if(Length(num1)<Length(num2))then SetLength(num1,Length(num2));
+  SetLength(numResult,Length(num1));
+
+  bool1:=False;
+  bool2:=False;
+  self.SetBitPosZero(TBPosMin);
+  self.SetBitPosZero(TBPosMax);
+  self.GetLastBit(TBPosMax,numResult);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then self.SetBitPos(TBPosMax,Length(numResult)-1,7);
+  while(self.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
+    bool1:=self.IsBitPosSet(TBPosMin,num1);
+    bool2:=self.IsBitPosSet(TBPosMin,num2);
+    if(bool1=True)or(bool2=True)then self.BitPosAddSetArr(TBPosMin,numResult);
+    self.IncBitPos(TBPosMin);
+  end;
+  bool1:=self.IsBitPosSet(TBPosMin,num1);
+  bool2:=self.IsBitPosSet(TBPosMin,num2);
+  if(bool1=True)or(bool2=True)then self.BitPosAddSetArr(TBPosMin,numResult);
+end;
+
+class procedure ArrMath.GetNot(const num1: IntArr; var numResult: IntArr);
+var
+  TBPosMin,TBPosMax:TBitPos;
+  bool1:Boolean;
+begin
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)then Exit;
+  SetLength(numResult,Length(num1));
+
+  bool1:=False;
+  self.SetBitPosZero(TBPosMin);
+  self.SetBitPosZero(TBPosMax);
+  self.GetLastBit(TBPosMax,numResult);
+  if(TBPosMax.ByteAtBaseZero=0)and(TBPosMax.BitAtBaseZero=0)then self.SetBitPos(TBPosMax,Length(numResult)-1,7);
+  while(self.IsBitPosEqual(TBPosMin,TBPosMax)=False)do begin
+    bool1:=self.IsBitPosSet(TBPosMin,num1);
+    if(bool1=False)then self.BitPosAddSetArr(TBPosMin,numResult);
+    self.IncBitPos(TBPosMin);
+  end;
+  bool1:=self.IsBitPosSet(TBPosMin,num1);
+  if(bool1=False)then self.BitPosAddSetArr(TBPosMin,numResult);
+end;
+
+class procedure ArrMath.GetXOR(const num1, num2: IntArr; var numResult: IntArr);
+var
+  N1,N2,N3,N4:IntArr;
+begin
+  N1:=nil;
+  N2:=nil;
+  N3:=nil;
+  N4:=nil;
+  SetLength(numResult,0);
+  self.GetNot(num1,N1);
+  self.GetAnd(N1,num2,N2);
+  self.GetNot(num2,N3);
+  self.GetAnd(num1,N3,N4);
+  self.GetOr(N4,N2,numResult);
+  SetLength(N1,0);
+  SetLength(N2,0);
+  SetLength(N3,0);
+  SetLength(N4,0);
+end;
+
+class procedure ArrMath.GetIf(const num1: IntArr; var numResult: IntArr);
+var
+  i:Integer;
+begin
+  SetLength(numResult,0);
+  SetLength(numResult,Length(numResult)+1);numResult[Length(numResult)-1]:=0;
+  if(Length(num1)=0)then Exit;
+
+  for i:=0 to (Length(num1)-1)do
+    if(num1[i]>0)then begin
+      numResult[Length(numResult)-1]:=1;
+      Exit;
+    end;
+
 end;
 
 class procedure ArrMath.SumInt(num1, num2: IntArr; var numResult: IntArr);
