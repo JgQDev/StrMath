@@ -46,6 +46,11 @@ function isPositiveIntAdvance(const num:IntArr):Byte; // 0 = False, 1 = True, 2 
 function isPositiveInt(const num:IntArr):Boolean;
 procedure SetZeroInt(var num:IntArr);
 
+function SumInt(const num1,num2:IntArr):IntArr;
+function SubInt(const num1,num2:IntArr):IntArr;
+function MulInt(const num1,num2:IntArr):IntArr;
+function DivInt(const num1,num2:IntArr):IntArr;
+
 function SumSubInt(const num1,num2:IntArr):IntArr;
 procedure SumSubInt(const num1,num2:IntArr;var AAnswer:IntArr);
 function MulDivInt(const num1,num2:IntArr;const doMul:Boolean = True):IntArr;
@@ -78,6 +83,16 @@ function CutRealDeciCountBaseOneR(const num:RealArr;const CutAt:Integer):RealArr
 function isPositiveRealAdvance(const num:RealArr):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
 function isPositiveReal(const num:RealArr):Boolean;
 
+function SumRealO(const num1,num2:RealArr):RealArr;
+function SubRealO(const num1,num2:RealArr):RealArr;
+function MulRealO(const num1,num2:RealArr):RealArr;
+function DivRealO(const num1,num2:RealArr):RealArr;
+
+function SumRealO(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+function SubRealO(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+function MulRealO(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+function DivRealO(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+
 function SumSubRealO(const num1,num2:RealArr):RealArr;
 procedure SumSubRealO(const num1,num2:RealArr;var AAnswer:RealArr);
 function SumSubRealO(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
@@ -86,6 +101,16 @@ function MulDivRealO(const num1,num2:RealArr;const doMul:Boolean = True):RealArr
 procedure MulDivRealO(const num1,num2:RealArr;var AAnswer:RealArr;const doMul:Boolean = True);
 function MulDivRealO(const num1,num2:RealArr;DeciCountBaseOne:Integer;const doMul:Boolean = True):RealArr;
 procedure MulDivRealO(const num1,num2:RealArr;var AAnswer:RealArr;DeciCountBaseOne:Integer;const doMul:Boolean = True);
+
+function SumReal(const num1,num2:RealArr):RealArr;
+function SubReal(const num1,num2:RealArr):RealArr;
+function MulReal(const num1,num2:RealArr):RealArr;
+function DivReal(const num1,num2:RealArr):RealArr;
+
+function SumReal(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+function SubReal(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+function MulReal(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
+function DivReal(const num1,num2:RealArr;DeciCountBaseOne:Integer):RealArr;
 
 function SumSubReal(const num1,num2:RealArr):RealArr;
 procedure SumSubReal(const num1,num2:RealArr;var AAnswer:RealArr);
@@ -188,6 +213,11 @@ function ToDeci(const NumV:String;out AAnswer:String;
 function isPositiveAdvance(const NumV:String):Byte; // 0 = False, 1 = True, 2 = Zero, 3 = Error
 function isPositive(const NumV:String):Boolean;
 function Num1Bigger(const Num1,Num2:String):Byte; // 0 = False, 1 = True, 2 = Same-Numbers, 3 = Error
+
+function SumStr(const Num1,Num2:String):String;
+function SubStr(const Num1,Num2:String):String;
+function MulStr(const Num1,Num2:String):String;
+function DivStr(const Num1,Num2:String):String;
 
 function SumSub(const Num1,Num2:String):String;
 function MulDiv(const Num1,Num2:String;const doMul:Boolean = True):String;
@@ -1452,6 +1482,34 @@ begin
   num:=InitInt('0');
 end;
 
+function SumInt(const num1, num2: IntArr): IntArr;
+begin
+  Result:=nil;
+  ArrMath.SumSubInt(num1,num2,Result);
+end;
+
+function SubInt(const num1, num2: IntArr): IntArr;
+var
+  num3:IntArr;
+begin
+  Result:=nil;
+  num3:=nil;
+  ArrMath.MulDivInt(InitInt('-1'),num2,num3,True);
+  ArrMath.SumSubInt(num1,num3,Result);
+end;
+
+function MulInt(const num1, num2: IntArr): IntArr;
+begin
+  Result:=nil;
+  ArrMath.MulDivInt(num1,num2,Result,True);
+end;
+
+function DivInt(const num1, num2: IntArr): IntArr;
+begin
+  Result:=nil;
+  ArrMath.MulDivInt(num1,num2,Result,False);
+end;
+
 function SumSubInt(const num1, num2: IntArr): IntArr;
 begin
   Result:=nil;
@@ -1809,6 +1867,91 @@ begin
   SetLength(TArr1,0);
 end;
 
+function SumRealO(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  RealMath.SumSubReal(num1,num2,Result,Int3);
+end;
+
+function SubRealO(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+  num3:RealArr;
+begin
+  Result:=nil;
+  num3:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  RealMath.MulDivReal(InitReal('-1.0'),num2,num3,True,Int2);
+  RealMath.SumSubReal(num1,num3,Result,Int3);
+end;
+
+function MulRealO(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  RealMath.MulDivReal(num1,num2,Result,True,Int3);
+end;
+
+function DivRealO(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  RealMath.MulDivReal(num1,num2,Result,False,Int3);
+end;
+
+function SumRealO(const num1, num2: RealArr; DeciCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  RealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne);
+end;
+
+function SubRealO(const num1, num2: RealArr; DeciCountBaseOne: Integer
+  ): RealArr;
+var
+  Int2:Integer;
+  num3:RealArr;
+begin
+  Result:=nil;
+  num3:=nil;
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  RealMath.MulDivReal(InitReal('-1.0'),num2,num3,True,Int2);
+  RealMath.SumSubReal(num1,num3,Result,DeciCountBaseOne);
+end;
+
+function MulRealO(const num1, num2: RealArr; DeciCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  RealMath.MulDivReal(num1,num2,Result,True,DeciCountBaseOne);
+end;
+
+function DivRealO(const num1, num2: RealArr; DeciCountBaseOne: Integer
+  ): RealArr;
+begin
+  Result:=nil;
+  RealMath.MulDivReal(num1,num2,Result,False,DeciCountBaseOne);
+end;
+
 function SumSubRealO(const num1, num2: RealArr): RealArr;
 var
   Int1,Int2,Int3:Integer;
@@ -1880,6 +2023,103 @@ procedure MulDivRealO(const num1, num2: RealArr; var AAnswer: RealArr;
   DeciCountBaseOne: Integer; const doMul: Boolean);
 begin
   RealMath.MulDivReal(num1,num2,AAnswer,doMul,DeciCountBaseOne);
+end;
+
+function SumReal(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  RealMath.SumSubReal(num1,num2,Result,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function SubReal(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+  num3:RealArr;
+begin
+  Result:=nil;
+  num3:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  RealMath.MulDivReal(InitReal('-1.0'),num2,num3,True,Int2);
+  RealMath.SumSubReal(num1,num3,Result,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function MulReal(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  RealMath.MulDivReal(num1,num2,Result,True,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function DivReal(const num1, num2: RealArr): RealArr;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:=nil;
+  Int1:=RealMath.GetDeciCountBaseOne(num1);
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  RealMath.MulDivReal(num1,num2,Result,False,Int3+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function SumReal(const num1, num2: RealArr; DeciCountBaseOne: Integer): RealArr;
+begin
+  Result:=nil;
+  DeciCountBaseOne:=DeciCountBaseOne+1;
+  RealMath.SumSubReal(num1,num2,Result,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+end;
+
+function SubReal(const num1, num2: RealArr; DeciCountBaseOne: Integer): RealArr;
+var
+  Int2:Integer;
+  num3:RealArr;
+begin
+  Result:=nil;
+  num3:=nil;
+  Int2:=RealMath.GetDeciCountBaseOne(num2);
+  DeciCountBaseOne:=DeciCountBaseOne+1;
+  RealMath.MulDivReal(InitReal('-1.0'),num2,num3,True,Int2);
+  RealMath.SumSubReal(num1,num3,Result,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+end;
+
+function MulReal(const num1, num2: RealArr; DeciCountBaseOne: Integer): RealArr;
+begin
+  Result:=nil;
+  DeciCountBaseOne:=DeciCountBaseOne+1;
+  RealMath.MulDivReal(num1,num2,Result,True,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
+end;
+
+function DivReal(const num1, num2: RealArr; DeciCountBaseOne: Integer): RealArr;
+begin
+  Result:=nil;
+  DeciCountBaseOne:=DeciCountBaseOne+1;
+  RealMath.MulDivReal(num1,num2,Result,False,DeciCountBaseOne+1);
+  RealMath.RealCutDeciCountBaseOneR(Result,DeciCountBaseOne);
 end;
 
 function SumSubReal(const num1, num2: RealArr): RealArr;
@@ -2855,6 +3095,65 @@ begin
   if(StringMath.isPositiveAd(Cal)=1)then Result:=1 else
   if(StringMath.isPositiveAd(Cal)=0)then Result:=0 else
   if(StringMath.isPositiveAd(Cal)=2)then Result:=2;
+end;
+
+function SumStr(const Num1, Num2: String): String;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:='';
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  Result:=StringMath.SumSub(Num1,Num2);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function SubStr(const Num1, Num2: String): String;
+var
+  Int1,Int2,Int3:Integer;
+  Num3:String;
+begin
+  Result:='';
+  Num3:='';
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  Num3:=StringMath.MulDiv('-1.0',Num2,Int2,True);
+  Result:=StringMath.SumSub(Num1,Num3);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function MulStr(const Num1, Num2: String): String;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:='';
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  Result:=StringMath.MulDiv(Num1,Num2,Int3+1,True);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
+end;
+
+function DivStr(const Num1, Num2: String): String;
+var
+  Int1,Int2,Int3:Integer;
+begin
+  Result:='';
+  Int1:=StringMath.GetDeciCountBaseOne(num1);
+  Int2:=StringMath.GetDeciCountBaseOne(num2);
+  if(Int1>=Int2)then Int3:=Int1 else Int3:=Int2;
+  if(Int3<RealDeciLength)then Int3:=RealDeciLength;
+  Int3:=Int3+1;
+  Result:=StringMath.MulDiv(Num1,Num2,Int3+1,False);
+  StringMath.RealCutDeciCountBaseOneR(Result,Int3);
 end;
 
 function SumSub(const Num1, Num2: String): String;
