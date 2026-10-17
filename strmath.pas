@@ -18,8 +18,8 @@ uses
 type
 
   Number = Array of Byte;
-  IntArr = type Number;
-  RealArr = type Number;
+  IntArr = Number;
+  RealArr = Number;
 
 { Extra-Math }
 function isNaNNumber(const num:Number):Boolean;
@@ -1120,7 +1120,6 @@ type
     class procedure GetOr(num1,num2:IntArr;var numResult:IntArr);
     class procedure GetNot(const num1:IntArr;var numResult:IntArr);
     class procedure GetXOR(const num1,num2:IntArr;var numResult:IntArr);
-    class procedure GetIf(const num1:IntArr;var numResult:IntArr);
     class procedure SumInt(num1,num2:IntArr;var numResult:IntArr);
     class function SumIntCores(num1,num2:IntArr;var numResult:IntArr):Boolean;
     class procedure SubInt(num1,num2:IntArr;var numResult:IntArr;out num1Bigger:Byte);
@@ -1350,12 +1349,6 @@ function SetXOR(const num1, num2: Number): Number;
 begin
   Result:=nil;
   ArrMath.GetXOR(num1,num2,Result);
-end;
-
-function SetIf(const num1: Number): Number;
-begin
-  Result:=nil;
-  ArrMath.GetIf(num1,Result);
 end;
 
 { Arr-Math }
